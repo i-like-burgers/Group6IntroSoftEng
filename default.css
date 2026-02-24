@@ -1,0 +1,18 @@
+
+/* Default values */
+* {
+    color:white;
+    background-color:black;
+}
+
+/*Page content*/
+body {
+    background-color:black;
+}
+
+/* Paragraph style*/
+p {
+    color: red;
+    font-size: 16px;
+}
+
