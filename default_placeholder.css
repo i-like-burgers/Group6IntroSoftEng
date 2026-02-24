@@ -1,4 +1,3 @@
-
 /* Universal values */
 * {
     color:white;
@@ -7,7 +6,16 @@
 
 /*Page content*/
 body {
-    background-color:black;
+    text-align:center
+}
+
+/* Headings */
+h1 {
+    font-size:32px;
+}
+
+h2 {
+    font-size:24px;
 }
 
 /* Paragraph style*/
