@@ -1,6 +1,6 @@
 /* Universal values */
 * {
-    color:white;
+    color:limegreen;
     background-color:black;
 }
 
@@ -20,6 +20,5 @@ h2 {
 
 /* Paragraph style*/
 p {
-    color: red;
     font-size: 16px;
 }
