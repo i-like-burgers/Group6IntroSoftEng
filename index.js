@@ -33,7 +33,7 @@ app.get('/buyerCart', (req, res) => {
 });
 
 app.get('/sellerInventory', (req, res) => {
-    res.sendFile(__dirname + 'sellerInventory.html');
+    res.sendFile(__dirname + '/sellerInventory.html');
 });
 
 app.listen(PORT, () => {
