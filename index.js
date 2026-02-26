@@ -32,6 +32,10 @@ app.get('/adminSub', (req, res) => {
     res.sendFile(__dirname + '/adminsub.html');
 });
 
+app.get('/sellerInventory', (req, res) => {
+    res.sendFile(__dirname + 'sellerInventory.html');
+});
+
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
 });
