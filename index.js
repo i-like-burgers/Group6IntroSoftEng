@@ -28,8 +28,8 @@ app.get('/adminSub', (req, res) => {
     res.sendFile(__dirname + '/adminsub.html');
 });
 
-app.get('/adminSub', (req, res) => {
-    res.sendFile(__dirname + '/adminsub.html');
+app.get('/buyerCart', (req, res) => {
+    res.sendFile(__dirname + '/buyerCart.html');
 });
 
 app.get('/sellerInventory', (req, res) => {
