@@ -1,7 +1,9 @@
 const express = require('express');
-
+const path = require('path');
 
 const app = express();
+const adminRouter = require("./routes/admin");
+
 const PORT = 3000;
 
 app.get('/', (req, res) => {
@@ -21,11 +23,11 @@ app.get('/sellerHome', (req, res) => {
 });
 
 app.get('/adminHome', (req, res) => {
-    res.sendFile(__dirname + '/adminmain.html');
+    res.sendFile(__dirname + '/administration/adminmain.html');
 });
 
 app.get('/adminSub', (req, res) => {
-    res.sendFile(__dirname + '/adminsub.html');
+    res.sendFile(__dirname + '/administration/adminsub.html');
 });
 
 app.get('/buyerCart', (req, res) => {
@@ -35,6 +37,11 @@ app.get('/buyerCart', (req, res) => {
 app.get('/sellerInventory', (req, res) => {
     res.sendFile(__dirname + '/sellerInventory.html');
 });
+
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/admin", adminRouter);
+
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
