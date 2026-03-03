@@ -6,6 +6,10 @@ function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
+function setToken(token, user) {
+    tokens.set(token, user);
+}
+
 function authenticateToken(req,res,next)
 {
     const token = req.cookies.authToken;
@@ -14,7 +18,7 @@ function authenticateToken(req,res,next)
     const username = tokens.get(token);
     if(!username) return res.redirect('/login');
 
-    req.user = {username};
+    req.user = user
     next();
 }
 
@@ -22,5 +26,6 @@ function authenticateToken(req,res,next)
 
 module.exports = {
     generateToken,
+    setToken,
     authenticateToken
 }
