@@ -9,6 +9,8 @@ const { requireRole } = require('./authorize');
 
 const app = express();
 const adminRouter = require("./routes/admin");
+const buyerRouter = require("./routes/buyer");
+const sellerRouter = require("./routes/seller");
 
 const PORT = 3000;
 
@@ -45,9 +47,11 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/landingPage.html');
 });
 
+/*
 app.get('/buyerHome', (req, res) => {
     res.sendFile(__dirname + '/buyerHome.html');
 });
+*/
 
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/LogIn_page.html');
@@ -64,20 +68,20 @@ app.post('/login',async(req,res) => {
 
     const token = auth.generateToken();
     auth.setToken(token, { username: user.username, role: user.role });
-    res.cookie('authToken', token, {httpOnly: true});
+    res.cookie('authToken', token, {httpOnly: true, sameSite: 'Strict'});
+    // might eventually add a flag that reads something like {httpOnly: true, sameSite: 'Strict', secure: true}
+    // so that cookies can only be sent over HTTPS when we get to that point
 
-    console.log("ISSUED token:", token);
-    console.log("Set-Cookie about to send");
+    if(user.role === 'B') res.redirect('/buyer/home');
 
-    if(user.role === 'B') res.redirect('/buyerHome');
-
-    else if(user.role === 'S') res.redirect('/sellerHome');
+    else if(user.role === 'S') res.redirect('/seller/home');
 
     else if(user.role === 'A') res.redirect('/admin');
 
     else res.send("Internal server error");
 })
 
+/*
 app.get('/sellerHome', (req, res) => {
     res.sendFile(__dirname + '/sellerHome.html');
 });
@@ -89,10 +93,13 @@ app.get('/buyerCart', (req, res) => {
 app.get('/sellerInventory', (req, res) => {
     res.sendFile(__dirname + '/sellerInventory.html');
 });
+*/
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/admin", adminRouter);
+app.use("/seller", sellerRouter);
+app.use("/buyer", buyerRouter);
 
 
 app.listen(PORT, () => {
