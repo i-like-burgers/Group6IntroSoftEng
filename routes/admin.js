@@ -12,7 +12,7 @@ router.get('/',
     auth.authenticateToken,
     requireRole('A'),
     (req, res) => {
-        res.sendFile(__dirname + '../administration/adminmain.html');
+        res.sendFile(path.join(__dirname, '../administration/adminmain.html'));
     }
 );
 
@@ -20,7 +20,7 @@ router.get('/sub',
     auth.authenticateToken,
     requireRole('A'),
     (req, res) => {
-        res.sendFile(__dirname + '../administration/adminsub.html');
+        res.sendFile(path.join(__dirname + '../administration/adminsub.html'));
     }
 );
 

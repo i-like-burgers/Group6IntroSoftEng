@@ -1,6 +1,6 @@
 function requireRole(...allowedRoles) {
     return (req, res, next) => {
-        if (!req.use) {
+        if (!req.user) {
             return res.redirect('/login');
         }
 
