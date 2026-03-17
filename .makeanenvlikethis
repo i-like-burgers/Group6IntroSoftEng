@@ -1,0 +1,12 @@
+// create a .env file that uses this as a template,
+// substituting USER and PASSWORD.
+
+DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/ecommerce_db"
+
+// I'd recommend running mysql and then throwing
+// commands to create a user and its password,
+// and granting it all privileges
+//
+// CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
+// GRANT ALL PRIVILEGES ON ecommerce_db.* TO 'username'@'localhost';
+// FLUSH PRIVILEGES;

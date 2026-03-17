@@ -71,7 +71,7 @@ app.get('/denied', (req, res) => {
 
 // some admin functionality stuff
 
-app.get('/api/admin/pending-users', async (req, res) => {
+app.get('/api/admin/pending-users', auth.authenticateToken, requireRole('admin'), async (req, res) => {
     try {
         const users = await prisma.user.findMany({
             where: { approved: false },
@@ -91,7 +91,7 @@ app.get('/api/admin/pending-users', async (req, res) => {
     }
 });
 
-app.post('/api/admin/approve-user/:id', async (req, res) => {
+app.post('/api/admin/approve-user/:id', auth.authenticateToken, requireRole('admin'), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
@@ -135,7 +135,7 @@ try {
     // if (user.approved) return res.send("Account approved!");
 
     const token = auth.generateToken();
-    auth.setToken(token, { username: user.username, role: user.role });
+    auth.setToken(token, { id: user.id, username: user.username, role: user.role });
     res.cookie('authToken', token, {httpOnly: true, sameSite: 'Strict'});
     // might eventually add a flag that reads something like {httpOnly: true, sameSite: 'Strict', secure: true}
     // so that cookies can only be sent over HTTPS when we get to that point
@@ -152,6 +152,51 @@ try {
     console.error(error);
     res.status(500).send("Internal server error");
 }
+});
+
+
+app.post('/api/login',async(req,res) => {
+    const {username,password} = req.body;
+
+try {
+    const user = await prisma.user.findUnique({
+        where: { username }
+    });
+
+    if (!user) {
+        return res.status(401).json({error: 'Username or password incorrect!'});
+    }
+
+    const match = await(bcrypt.compare(password,user.password));
+    if (!match) {
+        return res.status(401).json({ error: 'Username or password incorrect'});
+    }
+
+    if (!user.approved) {
+        return res.status(403).json({ error: 'Account is awaiting approval :)'});
+    }
+
+    const token = auth.generateToken();
+    auth.setToken(token, { id: user.id, username: user.username, role: user.role });
+
+    res.json({
+        token,
+        user: {
+            id: user.id,
+            username: user.username,
+            role: user.role
+        }
+    });
+
+
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+}
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(__dirname + '/register.html');
 });
 
 app.post('/api/register', async (req, res) =>{
