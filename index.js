@@ -1,4 +1,5 @@
 const express = require('express');
+const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const path = require('path');
 //const tokens = new Map();
@@ -8,6 +9,10 @@ const auth = require('./authenticate') // Authentication module imported
 const { requireRole } = require('./authorize');
 
 const app = express();
+const prisma = new PrismaClient();
+
+app.use(express.json());
+
 const adminRouter = require("./routes/admin");
 const buyerRouter = require("./routes/buyer");
 const sellerRouter = require("./routes/seller");
@@ -25,6 +30,7 @@ app.use(express.urlencoded({extended: true}));
 
 
 // Fake database
+/*
 const users = [
     {
         username: 'buyer',
@@ -42,6 +48,7 @@ const users = [
         role: 'A'
     }
 ]
+*/
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/landingPage.html');
@@ -53,6 +60,61 @@ app.get('/buyerHome', (req, res) => {
 });
 */
 
+app.get('/test', async (req, res) => {
+    const users = await prisma.user.findMany();
+    res.json(users);
+});
+
+app.get('/denied', (req, res) => {
+    res.status(403).send('Access denied');
+});
+
+// some admin functionality stuff
+
+app.get('/api/admin/pending-users', async (req, res) => {
+    try {
+        const users = await prisma.user.findMany({
+            where: { approved: false },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                role: true,
+                approved: true,
+                createdAt: true
+            }
+        });
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch pending users' });
+    }
+});
+
+app.post('/api/admin/approve-user/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        const user = await prisma.user.update({
+            where: { id },
+            data: { approved: true }
+        });
+
+        res.json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            approved: user.approved
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to approve user'});
+    }
+});
+
+// yep
+
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/LogIn_page.html');
 });
@@ -60,11 +122,17 @@ app.get('/login', (req, res) => {
 app.post('/login',async(req,res) => {
     const {username,password} = req.body;
 
-    const user = users.find(u=> u.username === username);
+try {
+    const user = await prisma.user.findUnique({
+        where: { username }
+    });
+
     if(!user) return res.send("Username or password incorrect");
 
     const match = await(bcrypt.compare(password,user.password));
     if(!match) return res.send("Username or password incorrect");
+    if (!user.approved) return res.send("Account is awaiting approval");
+    // if (user.approved) return res.send("Account approved!");
 
     const token = auth.generateToken();
     auth.setToken(token, { username: user.username, role: user.role });
@@ -72,28 +140,56 @@ app.post('/login',async(req,res) => {
     // might eventually add a flag that reads something like {httpOnly: true, sameSite: 'Strict', secure: true}
     // so that cookies can only be sent over HTTPS when we get to that point
 
-    if(user.role === 'B') res.redirect('/buyer/home');
+    if(user.role === 'buyer') res.redirect('/buyer/home');
 
-    else if(user.role === 'S') res.redirect('/seller/home');
+    else if(user.role === 'seller') res.redirect('/seller/home');
 
-    else if(user.role === 'A') res.redirect('/admin');
+    else if(user.role === 'admin') res.redirect('/admin');
 
     else res.send("Internal server error");
-})
 
-/*
-app.get('/sellerHome', (req, res) => {
-    res.sendFile(__dirname + '/sellerHome.html');
+} catch (error) {
+    console.error(error);
+    res.status(500).send("Internal server error");
+}
 });
 
-app.get('/buyerCart', (req, res) => {
-    res.sendFile(__dirname + '/buyerCart.html');
-});
+app.post('/api/register', async (req, res) =>{
+    try {
+        const { username, email, password, role } = req.body;
 
-app.get('/sellerInventory', (req, res) => {
-    res.sendFile(__dirname + '/sellerInventory.html');
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await prisma.user.create({
+            data: {
+                username,
+                email,
+                password: hashedPassword,
+                role,
+                approved: false
+            }
+        });
+
+        res.json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            approved: user.approved,
+            createdAt: user.createdAt
+        });
+    } catch (error) {
+        console.error(error);
+
+        // the P2002 code is what spits out when a duplicate credential
+        // is attempted to be entered.
+        if (error.code === 'P2002') {
+            return res.status(400).json({ error: 'Username or email already exists'});
+        }
+
+        res.status(500).json({error: "Registration failed"});
+    }
 });
-*/
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -103,6 +199,6 @@ app.use("/buyer", buyerRouter);
 
 
 app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 

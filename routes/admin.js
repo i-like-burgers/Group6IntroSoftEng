@@ -10,7 +10,7 @@ router.get("/css", (req, res) => {
 
 router.get('/',
     auth.authenticateToken,
-    requireRole('A'),
+    requireRole('admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminmain.html'));
     }
@@ -18,7 +18,7 @@ router.get('/',
 
 router.get('/sub',
     auth.authenticateToken,
-    requireRole('A'),
+    requireRole('admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminsub.html'));
     }

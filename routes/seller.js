@@ -7,7 +7,7 @@ const { requireRole } = require("../authorize");
 
 router.get("/home",
     auth.authenticateToken,
-    requireRole("S"),
+    requireRole("seller"),
     (req, res) => {
         res.sendFile(path.join(__dirname, "../sellerHome.html"));
     }
@@ -15,7 +15,7 @@ router.get("/home",
 
 router.get("/inventory",
     auth.authenticateToken,
-    requireRole("S"),
+    requireRole("seller"),
     (req, res) => {
         res.sendFile(path.join(__dirname, "../sellerInventory.html"));
     }
