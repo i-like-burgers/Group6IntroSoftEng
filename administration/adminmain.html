@@ -3,20 +3,24 @@
 <head>
     <title>Admin</title>
     <link rel="stylesheet" href="/css/admin.css">
-	<style>
-	body {
-		min-height: 100vh;
-		margin: 0;
-		}
-	</style>
 </head>
-    <body>
-        <h1 style= "text-align: center;">ADMINISTRATION HOME</h1>
-		<p style = "text-align: center;">
-        <a href="/admin/sub">User Management</a>
-		</p>
-		<p style = "text-align: center;">
-		Audit Log
-		</p>
-    </body>
+<body>
+    <div class="header">
+        <h1>ADMINISTRATION HOME</h1>
+    </div>
+
+    <div class="columns">
+        <div class="box">
+            <h2>Moderation</h2>
+            <p class="section-copy">Manage users and seller listings.</p>
+            <p><a href="/admin/sub">User Management</a></p>
+        </div>
+
+        <div class="box">
+            <h2>Audit Log</h2>
+            <p class="section-copy">Review recent listing, delisting, and cart actions.</p>
+            <p><a href="/admin/audit">Open Audit Log</a></p>
+        </div>
+    </div>
+</body>
 </html>

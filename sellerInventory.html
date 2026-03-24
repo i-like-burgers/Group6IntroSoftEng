@@ -1,21 +1,154 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
-    <title>
-      RandomAccessMarket
-    </title>
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seller Inventory</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <a href="/seller/home">Back to Seller home</a>
+    <h1>SELLER INVENTORY</h1>
+  </div>
 
-  <body>
-    <h1>Random Access Market</h1>
-    <h2>"Inventory"</h2>
-    <button style="width: 100px; height: 40px; background-color: darkgreen; color: white; border: none;">Create Listing</button>
-    <p></p>
-    <a>Manage Products</a>
-    <p></p>
-    <a>Financials</a>
-    <p></p>
-    <a>Logout</a>
-  </body>
+  <div class="columns">
+    <div class="box">
+      <h2>Create Listing</h2>
+      <p class="section-copy">Publish a new product under the authenticated seller account.</p>
+
+      <form id="create-product-form" class="stack-form">
+        <label for="name">Product name</label>
+        <input id="name" name="name" type="text" required />
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4"></textarea>
+
+        <label for="price">Price</label>
+        <input id="price" name="price" type="number" min="0" step="0.01" required />
+
+        <label for="stock">Stock</label>
+        <input id="stock" name="stock" type="number" min="0" step="1" required />
+
+        <button type="submit">Create Listing</button>
+      </form>
+
+      <p id="form-message" class="status-message"></p>
+    </div>
+
+    <div class="box">
+      <h2>Your Listings</h2>
+      <p class="section-copy">Shows both active and admin-delisted products for this seller.</p>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody id="inventory-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleString();
+    }
+
+    function buildProductRow(product) {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${escapeHtml(product.name)}</td>
+        <td>${escapeHtml(formatCurrency(product.price))}</td>
+        <td>${escapeHtml(String(product.stock))}</td>
+        <td>${escapeHtml(product.isListed ? 'Listed' : 'Delisted')}</td>
+        <td>${escapeHtml(formatDate(product.createdAt))}</td>
+      `;
+
+      return tr;
+    }
+
+    async function loadInventory() {
+      const products = await fetchJson('/api/seller/products');
+      const tbody = document.getElementById('inventory-body');
+      tbody.innerHTML = '';
+
+      if (products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No listings yet.</td></tr>';
+        return;
+      }
+
+      products.forEach((product) => {
+        tbody.appendChild(buildProductRow(product));
+      });
+    }
+
+    async function createListing(event) {
+      event.preventDefault();
+
+      const message = document.getElementById('form-message');
+      const form = event.currentTarget;
+      const payload = {
+        name: form.name.value,
+        description: form.description.value,
+        price: form.price.value,
+        stock: form.stock.value
+      };
+
+      try {
+        await fetchJson('/api/seller/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        form.reset();
+        message.textContent = 'Listing created.';
+        await loadInventory();
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not create listing.';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.getElementById('create-product-form').addEventListener('submit', createListing);
+
+    loadInventory().catch((error) => {
+      console.error(error);
+      document.getElementById('form-message').textContent = error.message || 'Could not load inventory.';
+    });
+  </script>
+</body>
 </html>

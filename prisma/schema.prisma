@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  role      String
+  approved  Boolean   @default(false)
+  blocked   Boolean   @default(false)
+  banned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  products  Product[]  @relation("SellerProducts")
+  cartItems CartItem[] @relation("BuyerCartItems")
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?   @db.Text
+  price       Float
+  stock       Int
+  createdAt   DateTime  @default(now())
+
+  isListed    Boolean   @default(true)
+
+  sellerId    Int
+  seller      User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
+  cartItems   CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  buyerId   Int
+  productId Int
+
+  buyer     User     @relation("BuyerCartItems", fields: [buyerId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([buyerId, productId])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  actorId     Int?
+  username    String
+  actionType  String
+  details     String   @db.Text
+  createdAt   DateTime @default(now())
+}
