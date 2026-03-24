@@ -10,7 +10,8 @@ const auth = require("./accounts/authenticate")
 
 const PORT = 3000;
 
-app.use(express.static(__dirname)) //Allows use of CSS files
+app.use(express.static(path.join(__dirname, "public"))); // CSS files pulled from public folder.
+
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
