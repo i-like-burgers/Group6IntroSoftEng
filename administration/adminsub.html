@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Admin</title>
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
 </head>
 <body>
 
@@ -153,52 +153,123 @@
           <th>Status</th>
           <th></th>
         </tr>
-
-        <tr>
-          <td>newBuyer01</td>
-          <td>Buyer</td>
-          <td>
-            <select>
-              <option>Approved</option>
-              <option selected>Unapproved</option>
-              <option>Blocked</option>
-            </select>
-          </td>
-          <td class="dotscol">
-            <details class="dots">
-              <summary>...</summary>
-              <div class="menu">
-                <div><b>newBuyer01</b></div>
-                <div>Registration request date: 2026-02-24</div>
-              </div>
-            </details>
-          </td>
-        </tr>
-
-        <tr>
-          <td>sellerApplicant</td>
-          <td>Seller</td>
-          <td>
-            <select>
-              <option>Approved</option>
-              <option selected>Unapproved</option>
-              <option>Blocked</option>
-            </select>
-          </td>
-          <td class="dotscol">
-            <details class="dots">
-              <summary>...</summary>
-              <div class="menu">
-                <div><b>sellerApplicant</b></div>
-                <div>Registration request date: 2026-02-25</div>
-              </div>
-            </details>
-          </td>
-        </tr>
+      </thread>
+      <tbody id="pending-users-body">
+      </tbody>
       </table>
 
     </div>
 
   </div>
+
+<script>
+  async function loadPendingUsers() {
+
+    try{
+      const response = await fetch('/api/admin/pending-users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch pending users');
+      }
+
+      const users = await response.json();
+      const tbody = document.getElementById('pending-users-body');
+      tbody.innerHTML = '';
+
+      users.forEach(user => {
+        const row = buildPendingUserRow(user);
+        tbody.appendChild(row);
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Could not load pending users.');
+    }
+  }
+
+  function buildPendingUserRow(user) {
+    const tr = document.createElement('tr');
+
+    const usernameTd = document.createElement('td');
+    usernameTd.textContent = user.username;
+
+    const roleTd = document.createElement('td');
+    roleTd.textContent = capitalizeRole(user.role);
+
+    const statusTd = document.createElement('td');
+    const approveButton = document.createElement('button');
+    approveButton.textContent = 'Approve';
+    approveButton.addEventListener('click', () => approveUser(user.id));
+    statusTd.appendChild(approveButton);
+
+    const detailsTd = document.createElement('td');
+    detailsTd.className = 'dotscol';
+
+    const details = document.createElement('details');
+    details.className = 'dots';
+
+    const summary = document.createElement('summary');
+    summary.textContent = '...';
+
+    const menu = document.createElement('div');
+    menu.className = 'menu';
+
+    const usernameInfo = document.createElement('div');
+    usernameInfo.innerHTML = `<b>${escapeHtml(user.username)}</b>`;
+
+    const emailInfo = document.createElement('div');
+    emailInfo.textContent = `Email: ${user.email}`;
+
+    const createdInfo = document.createElement('div');
+    createdInfo.textContent = `Registration request date: ${formatDate(user.createdAt)}`;
+
+    menu.appendChild(usernameInfo);
+    menu.appendChild(emailInfo);
+    menu.appendChild(createdInfo);
+
+    details.appendChild(summary);
+    details.appendChild(menu);
+    detailsTd.appendChild(details);
+
+    tr.appendChild(usernameTd);
+    tr.appendChild(roleTd);
+    tr.appendChild(statusTd);
+    tr.appendChild(detailsTd);
+
+    return tr;
+  }
+
+async function approveUser(id) {
+  try {
+    const response = await fetch(`/api/admin/approve-user/${id}`, {
+      method: 'POST'
+    });
+  
+  if (!response.ok) {
+    throw new Error('Failed to approve user');
+  }
+  
+  await loadPendingUsers();
+  } catch (error) {
+    console.error(error);
+    alert('Could not approve user.');
+  }
+}
+
+function capitalizeRole(role) {
+  if (!role) return '';
+  return role.charAt(0).toUpperCase() + role.slice(1);
+}
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleString();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+loadPendingUsers();
+</script>
 </body>
 </html>
