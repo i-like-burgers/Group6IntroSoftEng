@@ -1,10 +1,17 @@
-1. Make sure you create a database.
+# Useful Info
 
-CREATE DATABASE ecommerce_db;
+## Local Setup
 
-2. Run npm install
+  Run the database migration, seed the database, then start the server:
 
-3. Set up a file named ".env". An example template named ".makeanenvlikethis" is provided.
+- `npm run prisma:migrate`
+- `npm run prisma:seed`
+- `npm start`
 
-4. Make sure to run:
-npx prisma migrate dev
+## Seeded Accounts
+
+Default seeded logins:
+
+- admin: `admin` / `admin1234`
+- seller: `seller` / `seller1234`
+- buyer: `buyer` / `buyer1234`

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Product Details</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <a href="/buyer/home">Back to Buyer Home</a>
+    <a href="/buyer/cart">View Cart</a>
+  </div>
+
+  <div class="box">
+    <p class="muted-label" id="product-seller"></p>
+    <h1 id="product-name">Loading...</h1>
+    <p id="product-price"></p>
+    <p id="product-stock"></p>
+    <pre id="product-description" class="product-description"></pre>
+    <button id="add-to-cart-button" type="button">Add To Cart</button>
+    <p id="product-message" class="status-message"></p>
+  </div>
+
+  <script>
+    const productId = window.location.pathname.split('/').pop();
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    async function loadProduct() {
+      const product = await fetchJson(`/api/buyer/products/${productId}`);
+      document.title = product.name;
+      document.getElementById('product-seller').textContent = `Sold by ${product.seller.username}`;
+      document.getElementById('product-name').textContent = product.name;
+      document.getElementById('product-price').textContent = `Price: ${formatCurrency(product.price)}`;
+      document.getElementById('product-stock').textContent = `Stock: ${product.stock}`;
+      document.getElementById('product-description').textContent = product.description || 'No description provided.';
+    }
+
+    async function addToCart() {
+      const message = document.getElementById('product-message');
+
+      try {
+        await fetchJson('/api/buyer/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1
+          })
+        });
+
+        message.textContent = 'Item added to cart.';
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    document.getElementById('add-to-cart-button').addEventListener('click', addToCart);
+
+    loadProduct().catch((error) => {
+      console.error(error);
+      document.getElementById('product-name').textContent = 'Product unavailable';
+      document.getElementById('product-description').textContent = error.message || 'This product could not be loaded.';
+      document.getElementById('add-to-cart-button').disabled = true;
+    });
+  </script>
+</body>
+</html>

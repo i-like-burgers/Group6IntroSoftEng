@@ -24,4 +24,12 @@ router.get('/sub',
     }
 );
 
+router.get('/audit',
+    auth.authenticateToken,
+    requireRole('admin'),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, '../administration/adminaudit.html'));
+    }
+);
+
 module.exports = router;

@@ -21,4 +21,12 @@ router.get("/cart",
     }
 );
 
+router.get("/products/:id",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyerProduct.html"));
+    }
+);
+
 module.exports = router;
