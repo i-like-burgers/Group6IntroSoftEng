@@ -1,0 +1,28 @@
+/* Universal values */
+* {
+    color:limegreen;
+    background-color:black;
+}
+
+/*Page content*/
+body {
+    text-align:center
+}
+
+/* Headings */
+h1 {
+    font-size:32px;
+}
+
+h2 {
+    font-size:24px;
+}
+
+/* Paragraph style*/
+p {
+    font-size: 16px;
+}
+
+a{
+    color:orange;
+}

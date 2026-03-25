@@ -1,0 +1,32 @@
+const express = require("express");
+const router = express.Router();
+const path = require("path");
+
+const auth = require("../authenticate");
+const { requireRole } = require("../authorize");
+
+router.get("/home",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyerHome.html"));
+    }
+);
+
+router.get("/cart",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyerCart.html"));
+    }
+);
+
+router.get("/products/:id",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyerProduct.html"));
+    }
+);
+
+module.exports = router;
