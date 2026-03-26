@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser')
 
 const auth = require('./authenticate') // Authentication module imported
 const { requireRole } = require('./authorize');
+const products = require('./buyer/product_handling')
 
 const app = express();
 const prisma = new PrismaClient();
@@ -722,3 +723,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+module.exports = {
+    prisma
+}
