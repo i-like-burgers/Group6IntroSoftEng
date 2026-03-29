@@ -10,6 +10,7 @@
   <div class="header">
     <a href="/buyer/home">Back to Buyer Home</a>
     <a href="/buyer/cart">View Cart</a>
+    <a href="/buyer/compare">View Comparison</a>
   </div>
 
   <div class="box">
@@ -19,6 +20,7 @@
     <p id="product-stock"></p>
     <pre id="product-description" class="product-description"></pre>
     <button id="add-to-cart-button" type="button">Add To Cart</button>
+    <button id="mark-for-compare" type="button">Mark for comparing</button>
     <p id="product-message" class="status-message"></p>
   </div>
 
@@ -75,14 +77,39 @@
         message.textContent = error.message || 'Could not add item to cart.';
       }
     }
+    
+    // Function for adding product to comparison list
+    async function addToComparison() {
+      const message = document.getElementById('product-message');
+
+      try {
+        await fetchJson('/api/buyer/compare', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId
+          })
+        });
+
+        message.textContent = 'Item added to comparison list.';
+
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to comparison list.';
+      }
+    }
 
     document.getElementById('add-to-cart-button').addEventListener('click', addToCart);
+    document.getElementById('mark-for-compare').addEventListener('click',addToComparison)
 
     loadProduct().catch((error) => {
       console.error(error);
       document.getElementById('product-name').textContent = 'Product unavailable';
       document.getElementById('product-description').textContent = error.message || 'This product could not be loaded.';
       document.getElementById('add-to-cart-button').disabled = true;
+      document.getElementById('mark-for-compare').disabled = true;
     });
   </script>
 </body>

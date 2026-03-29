@@ -647,6 +647,61 @@ app.post('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async 
     }
 });
 
+app.post('/api/buyer/compare', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const productID = Number(req.body.productId);
+
+        if (Number.isNaN(productID)) {
+            return res.status(400).json({ error: 'A valid product is required' });
+        }
+
+        const product = await prisma.product.findUnique({
+            where: { id: productID }
+        });
+
+        if (!product || !product.isListed) {
+            return res.status(404).json({ error: 'Product is not available' });
+        }
+
+        const existingItem = await prisma.compare.findUnique({
+            where: {
+                buyerID_productID: {
+                    buyerID: req.user.id,
+                    productID
+                }
+            }
+        });
+
+        if(!existingItem) 
+        {
+            const compareItem = await prisma.compare.create({
+                data: {
+                    buyerID: req.user.id,
+                    productID,
+                }
+            });
+
+            await logAuditAction({
+                actorId: req.user.id,
+                username: req.user.username,
+                actionType: 'comparison_addition',
+                details: `Added "${product.name}" to comparison list`
+            });
+
+            return res.status(201).json(compareItem);
+        }
+        else {
+            return res.status(200).json({
+                message: 'Product already marked'
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add item to list' });
+    }
+});
+
 app.post('/api/buyer/cart/:id/remove', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
     try {
         const id = Number(req.params.id);
