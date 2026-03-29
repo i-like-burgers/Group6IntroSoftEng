@@ -29,4 +29,8 @@ router.get("/products/:id",
     }
 );
 
+router.get("/compare", auth.authenticateToken, requireRole("buyer"), (req,res) => {
+    res.sendFile(path.join(__dirname, "../buyer/buyerCompare.html"));
+});
+
 module.exports = router;
