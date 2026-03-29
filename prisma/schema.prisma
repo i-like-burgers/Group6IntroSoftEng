@@ -66,3 +66,10 @@ model AuditLog {
   details     String   @db.Text
   createdAt   DateTime @default(now())
 }
+
+model Compare {
+  buyerID     Int
+  productID   Int
+
+  @@id([buyerID, productID])
+}
