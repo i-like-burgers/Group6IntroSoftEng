@@ -584,6 +584,38 @@ app.get('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async (
     }
 });
 
+app.get('/api/buyer/compare', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const itemList = await prisma.compare.findMany({
+            where: {
+                buyerID: req.user.id
+            },
+            include: {
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        price: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const products = itemList.map(item => item.product);
+
+        res.json({
+            items: products,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load comparison list' });
+    }
+});
+
 app.post('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
     try {
         const productId = Number(req.body.productId);
