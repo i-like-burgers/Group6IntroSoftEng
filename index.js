@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser')
 
 const auth = require('./authenticate') // Authentication module imported
 const { requireRole } = require('./authorize');
+const products = require('./buyer/product_handling')
 
 const app = express();
 const prisma = new PrismaClient();
@@ -583,6 +584,38 @@ app.get('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async (
     }
 });
 
+app.get('/api/buyer/compare', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const itemList = await prisma.compare.findMany({
+            where: {
+                buyerID: req.user.id
+            },
+            include: {
+                product: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        price: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const products = itemList.map(item => item.product);
+
+        res.json({
+            items: products,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load comparison list' });
+    }
+});
+
 app.post('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
     try {
         const productId = Number(req.body.productId);
@@ -646,6 +679,61 @@ app.post('/api/buyer/cart', auth.authenticateToken, requireRole('buyer'), async 
     }
 });
 
+app.post('/api/buyer/compare', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const productID = Number(req.body.productId);
+
+        if (Number.isNaN(productID)) {
+            return res.status(400).json({ error: 'A valid product is required' });
+        }
+
+        const product = await prisma.product.findUnique({
+            where: { id: productID }
+        });
+
+        if (!product || !product.isListed) {
+            return res.status(404).json({ error: 'Product is not available' });
+        }
+
+        const existingItem = await prisma.compare.findUnique({
+            where: {
+                buyerID_productID: {
+                    buyerID: req.user.id,
+                    productID
+                }
+            }
+        });
+
+        if(!existingItem) 
+        {
+            const compareItem = await prisma.compare.create({
+                data: {
+                    buyerID: req.user.id,
+                    productID,
+                }
+            });
+
+            await logAuditAction({
+                actorId: req.user.id,
+                username: req.user.username,
+                actionType: 'comparison_addition',
+                details: `Added "${product.name}" to comparison list`
+            });
+
+            return res.status(201).json(compareItem);
+        }
+        else {
+            return res.status(200).json({
+                message: 'Product already marked'
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add item to list' });
+    }
+});
+
 app.post('/api/buyer/cart/:id/remove', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -669,6 +757,32 @@ app.post('/api/buyer/cart/:id/remove', auth.authenticateToken, requireRole('buye
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to remove item from cart' });
+    }
+});
+
+app.post('/api/buyer/compare/:id/remove', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid cart item id' });
+        }
+
+        const result = await prisma.compare.deleteMany({
+            where: {
+                productID: id,
+                buyerID: req.user.id
+            }
+        });
+
+        if (result.count === 0) {
+            return res.status(404).json({ error: 'Comparison item not found' });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to remove item from list' });
     }
 });
 
@@ -722,3 +836,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+module.exports = {
+    prisma
+}

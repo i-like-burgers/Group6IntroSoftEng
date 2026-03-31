@@ -27,6 +27,7 @@ model User {
 
   products  Product[]  @relation("SellerProducts")
   cartItems CartItem[] @relation("BuyerCartItems")
+  comparison Compare[]
 }
 
 model Product {
@@ -42,6 +43,7 @@ model Product {
   sellerId    Int
   seller      User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
   cartItems   CartItem[]
+  compareItems Compare[]
 }
 
 model CartItem {
@@ -65,4 +67,16 @@ model AuditLog {
   actionType  String
   details     String   @db.Text
   createdAt   DateTime @default(now())
+}
+
+model Compare {
+  id          Int       @id @default(autoincrement())
+  buyerID     Int
+  productID   Int
+  createdAt   DateTime  @default(now())
+
+  buyer       User      @relation(fields: [buyerID], references: [id], onDelete: Cascade)
+  product     Product   @relation(fields: [productID], references: [id], onDelete: Cascade)
+
+  @@unique([buyerID, productID])
 }

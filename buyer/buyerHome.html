@@ -10,6 +10,7 @@
   <div class="header">
     <h1>RANDOM ACCESS MARKET</h1>
     <a href="/buyer/cart">View Cart</a>
+    <a href="/buyer/compare">Compare Products</a>
   </div>
 
   <div class="box">
@@ -64,11 +65,18 @@
         <td>${escapeHtml(product.seller.username)}</td>
         <td>${escapeHtml(formatCurrency(product.price))}</td>
         <td>${escapeHtml(String(product.stock))}</td>
-        <td><button data-product-id="${product.id}">Add To Cart</button></td>
+        <td>
+          <button class="add-to-cart" data-product-id="${product.id}">Add To Cart</button>
+          <button class="compare"  data-product-id="${product.id}">Compare</button>
+        </td>
       `;
 
-      tr.querySelector('button').addEventListener('click', async () => {
+      tr.querySelector('.add-to-cart').addEventListener('click', async () => {
         await addToCart(product.id);
+      });
+
+      tr.querySelector('.compare').addEventListener('click', async () => {
+        await compare(product.id);
       });
 
       return tr;
@@ -108,6 +116,28 @@
       } catch (error) {
         console.error(error);
         message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    async function compare(productId) {
+            const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/compare', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+          })
+        });
+
+        message.textContent = 'Item added to list for comparison.';
+      }
+      catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to list.';
       }
     }
 

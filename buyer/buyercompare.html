@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Products</title>
+    <link rel="stylesheet" href="../public/css/admin.css">
+</head>
+<body>
+    <div class="header">
+        <a href="/buyer/home">Continue Shopping</a>
+        <a href="/buyer/cart">View Cart</a>
+    </div>
+    <h1>Products to Compare</h1>
+    <div class="box">
+        <p class="section-copy"></p>
+        <table class="grid">
+        <thead>
+            <tr>
+            <th>Product</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="compare-list"></tbody>
+        </table>
+        <p id="buyer-message" class="status-message"></p>
+  </div>
+
+  <script>
+    // Fetch JSON from API
+    async function fetchJson(url, options={})
+    {
+        const response = await fetch(url, options);
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await response.json() : null;
+        if (!response.ok)
+        {
+            throw new Error(data?.error || 'Request failed');
+        }
+
+        return data;
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    }
+
+    // Build table rows
+    function buildProductRow(item)
+    {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${escapeHtml(item.name)}</td>
+        <td>${escapeHtml(truncate(item.description || '', 120))}</td>
+        <td>${escapeHtml(formatCurrency(item.price))}</td>
+        <td>
+            <button class="add-to-cart" data-product-id="${item.id}">Add to Cart</button>
+            <button class="remove" data-product-id="${item.id}">Remove</button>
+        </td>
+        `;
+
+        // Event listeners for buttons
+        tr.querySelector('.add-to-cart').addEventListener('click', async () => {
+            // call API to add to cart
+            await addToCart(item.id);
+        });
+
+        tr.querySelector('.remove').addEventListener('click', async () => {
+            await removeItem(item.id);
+        });
+
+        return tr;
+    }
+
+    // Load products
+    async function loadProducts()
+    {
+        try {
+            const list = await fetchJson('/api/buyer/compare');
+            const tbody = document.getElementById('compare-list');
+            tbody.innerHTML = '';
+
+            if(!list || list.items.length === 0)
+            {
+                tbody.innerHTML = '<tr><td colspan="4">No products marked for comparison.</td></tr>';
+                return;
+            }
+
+            list.items.forEach(product => {
+                tbody.appendChild(buildProductRow(product));
+            });
+        }
+        catch (error) {
+            console.error(error);
+            document.getElementById('buyer-message').textContent = error.message || 'Could not load comparison products.';
+        }
+    }
+
+    async function removeItem(itemId)
+    {
+        try {
+            await fetchJson(`/api/buyer/compare/${itemId}/remove`, {
+                method: 'POST'
+            });
+
+            await loadProducts();
+        }
+        catch(error)
+        {
+            console.error(error);
+            alert(error.message || 'Could not remove item.');
+        }
+    }
+
+    async function addToCart(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1
+          })
+        });
+
+        message.textContent = 'Item added to cart.';
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    function escapeHtml(text)
+    {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    loadProducts().catch((error) => {
+        console.error(error);
+        alert(error.message || 'Could not load list.');
+    });
+
+    function truncate(text, maxLength)
+    {
+        if(!text) return '';
+        return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+    }
+  </script>
+</body>
