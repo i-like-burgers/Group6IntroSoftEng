@@ -67,11 +67,7 @@
         // Event listeners for buttons
         tr.querySelector('.add-to-cart').addEventListener('click', async () => {
             // call API to add to cart
-            await fetchJson('/api/buyer/cart', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({productId: item.id})
-            });
+            await addToCart(item.id);
         });
 
         tr.querySelector('.remove').addEventListener('click', async () => {
@@ -119,6 +115,28 @@
             console.error(error);
             alert(error.message || 'Could not remove item.');
         }
+    }
+
+    async function addToCart(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1
+          })
+        });
+
+        message.textContent = 'Item added to cart.';
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to cart.';
+      }
     }
 
     function escapeHtml(text)

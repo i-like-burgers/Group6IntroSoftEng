@@ -760,6 +760,32 @@ app.post('/api/buyer/cart/:id/remove', auth.authenticateToken, requireRole('buye
     }
 });
 
+app.post('/api/buyer/compare/:id/remove', auth.authenticateToken, requireRole('buyer'), async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid cart item id' });
+        }
+
+        const result = await prisma.compare.deleteMany({
+            where: {
+                productID: id,
+                buyerID: req.user.id
+            }
+        });
+
+        if (result.count === 0) {
+            return res.status(404).json({ error: 'Comparison item not found' });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to remove item from list' });
+    }
+});
+
 app.post('/api/seller/products', auth.authenticateToken, requireRole('seller'), async (req, res) => {
     try {
         const { name, description, price, stock } = req.body;
