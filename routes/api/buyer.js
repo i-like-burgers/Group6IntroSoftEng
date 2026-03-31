@@ -4,6 +4,7 @@ const prisma = require('../../lib/prisma');
 const auth = require('../../authenticate');
 const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
+const { addCompareItem, getCompareItems } = require('../../buyer/product_handling');
 
 const router = express.Router();
 
@@ -116,6 +117,17 @@ router.get('/cart', async (req, res) => {
     }
 });
 
+router.get('/compare', async (req, res) => {
+    try {
+        const items = await getCompareItems(req.user.id);
+
+        res.json({ items });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load comparison list' });
+    }
+});
+
 router.post('/cart', async (req, res) => {
     try {
         const productId = Number(req.body.productId);
@@ -176,6 +188,62 @@ router.post('/cart', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to add item to cart' });
+    }
+});
+
+router.post('/compare', async (req, res) => {
+    try {
+        const productId = Number(req.body.productId);
+
+        if (Number.isNaN(productId)) {
+            return res.status(400).json({ error: 'A valid product is required' });
+        }
+
+        const product = await prisma.product.findFirst({
+            where: {
+                id: productId,
+                isListed: true,
+                seller: {
+                    banned: false
+                }
+            }
+        });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product is not available' });
+        }
+
+        const existingItem = await prisma.compare.findUnique({
+            where: {
+                buyerID_productID: {
+                    buyerID: req.user.id,
+                    productID: productId
+                }
+            }
+        });
+
+        const compareItem = await addCompareItem({
+            buyerID: req.user.id,
+            productID: productId
+        });
+
+        if (!existingItem) {
+            await logAuditAction({
+                actorId: req.user.id,
+                username: req.user.username,
+                actionType: 'comparison_addition',
+                details: `Added "${product.name}" to comparison list`
+            });
+
+            return res.status(201).json(compareItem);
+        }
+
+        return res.status(200).json({
+            message: 'Product already marked'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add item to list' });
     }
 });
 
