@@ -4,24 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compare Products</title>
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="../public/css/admin.css">
 </head>
 <body>
+    <div class="header">
+        <a href="/buyer/home">Continue Shopping</a>
+        <a href="/buyer/cart">View Cart</a>
+    </div>
     <h1>Products to Compare</h1>
-  <div class="box">
-    <p class="section-copy"></p>
-    <table class="grid">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="compare-list"></tbody>
-    </table>
-    <p id="buyer-message" class="status-message"></p>
+    <div class="box">
+        <p class="section-copy"></p>
+        <table class="grid">
+        <thead>
+            <tr>
+            <th>Product</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="compare-list"></tbody>
+        </table>
+        <p id="buyer-message" class="status-message"></p>
   </div>
 
   <script>
