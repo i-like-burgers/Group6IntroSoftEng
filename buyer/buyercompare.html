@@ -30,6 +30,7 @@
   </div>
 
   <script>
+    // Fetch JSON from API
     async function fetchJson(url, options = {}) {
       const response = await fetch(url, options);
       const contentType = response.headers.get('content-type') || '';
@@ -60,22 +61,33 @@
       return div.innerHTML;
     }
 
+    // Build table rows
     function buildProductRow(item) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><a href="/buyer/products/${item.id}">${escapeHtml(item.name)}</a></td>
         <td>${escapeHtml(truncate(item.description || '', 120))}</td>
         <td>${escapeHtml(formatCurrency(item.price))}</td>
-        <td><button class="add-to-cart" data-product-id="${item.id}">Add To Cart</button></td>
+        <td>
+          <button class="add-to-cart" data-product-id="${item.id}">Add To Cart</button>
+          <button class="remove-from-compare" data-product-id="${item.id}">Remove</button>
+        </td>
       `;
-
+      
+      // Event listeners for buttons
       tr.querySelector('.add-to-cart').addEventListener('click', async () => {
+        // call API to add to cart
         await addToCart(item.id);
+      });
+
+      tr.querySelector('.remove-from-compare').addEventListener('click', async () => {
+        await removeFromCompare(item.id);
       });
 
       return tr;
     }
 
+    // Load products
     async function loadProducts() {
       try {
         const list = await fetchJson('/api/buyer/compare');
@@ -115,6 +127,22 @@
       } catch (error) {
         console.error(error);
         message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    async function removeFromCompare(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson(`/api/buyer/compare/${productId}/remove`, {
+          method: 'POST'
+        });
+
+        message.textContent = 'Item removed from comparison list.';
+        await loadProducts();
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not remove item.';
       }
     }
 

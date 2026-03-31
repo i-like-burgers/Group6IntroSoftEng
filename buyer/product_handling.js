@@ -60,8 +60,18 @@ async function addCompareItem({ buyerID, productID }) {
     });
 }
 
+async function removeCompareItem({ buyerID, productID }) {
+    return prisma.compare.deleteMany({
+        where: {
+            buyerID,
+            productID
+        }
+    });
+}
+
 module.exports = {
     addCompareItem,
     getCompareItems,
-    getSimilar
+    getSimilar,
+    removeCompareItem
 };

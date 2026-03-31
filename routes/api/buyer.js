@@ -4,7 +4,7 @@ const prisma = require('../../lib/prisma');
 const auth = require('../../authenticate');
 const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
-const { addCompareItem, getCompareItems } = require('../../buyer/product_handling');
+const { addCompareItem, getCompareItems, removeCompareItem } = require('../../buyer/product_handling');
 
 const router = express.Router();
 
@@ -270,6 +270,30 @@ router.post('/cart/:id/remove', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to remove item from cart' });
+    }
+});
+
+router.post('/compare/:id/remove', async (req, res) => {
+    try {
+        const productId = Number(req.params.id);
+
+        if (Number.isNaN(productId)) {
+            return res.status(400).json({ error: 'Invalid product id' });
+        }
+
+        const result = await removeCompareItem({
+            buyerID: req.user.id,
+            productID: productId
+        });
+
+        if (result.count === 0) {
+            return res.status(404).json({ error: 'Comparison item not found' });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to remove item from list' });
     }
 });
 
