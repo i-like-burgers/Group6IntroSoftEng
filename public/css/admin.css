@@ -1,22 +1,26 @@
 body {
   font-family: sans-serif;
   margin: 10px;
+  background: #f6f1e8;
+  color: #1c1611;
 }
 
 .columns {
   display: flex;
   gap: 10px;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .box {
-  border: 1px solid black;
-  padding: 8px;
-  width: 50%;
+  border: 1px solid #1c1611;
+  background: #fffaf2;
+  padding: 12px;
+  flex: 1 1 420px;
 }
 
 .filters {
-  border: 1px solid black;
+  border: 1px solid #1c1611;
   padding: 6px;
   margin-bottom: 8px;
 }
@@ -25,9 +29,17 @@ body {
   margin: 4px 0;
 }
 
-input, select {
-  border: 1px solid black;
+input, select, textarea, button {
+  border: 1px solid #1c1611;
   font-size: 12px;
+  font: inherit;
+  padding: 6px 8px;
+}
+
+button {
+  cursor: pointer;
+  background: #1c1611;
+  color: #fffaf2;
 }
 
 table.grid {
@@ -36,10 +48,68 @@ table.grid {
 }
 
 table.grid th, table.grid td {
-  border: 1px solid black;
+  border: 1px solid #1c1611;
   padding: 4px;
   font-size: 12px;
   text-align: left;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.header a {
+  color: #1c1611;
+}
+
+.section-copy {
+  margin-top: 0;
+}
+
+.stack-form {
+  display: grid;
+  gap: 8px;
+}
+
+.status-message {
+  min-height: 1.2em;
+}
+
+.muted-label {
+  color: #6a5e50;
+}
+
+.action-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.danger-button {
+  background: #7d1f1f;
+}
+
+.summary-card {
+  border: 1px solid #1c1611;
+  padding: 12px;
+  background: #f4ead7;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 
@@ -52,7 +122,7 @@ table.grid th, table.grid td {
 .dots summary {
   cursor: pointer;
   list-style: none;
-  border: 1px solid black;
+  border: 1px solid #1c1611;
   padding: 0 5px;
   display: inline-block;
 }
@@ -61,9 +131,22 @@ table.grid th, table.grid td {
   position: absolute;
   right: 0;
   top: 20px;
-  border: 1px solid black;
-  background: white;
+  border: 1px solid #1c1611;
+  background: #fffaf2;
   padding: 6px;
   width: 200px;
   z-index: 1000;
+}
+
+.action-menu {
+  display: grid;
+  gap: 6px;
+}
+
+.product-description {
+  white-space: pre-wrap;
+  font: inherit;
+  border: 1px solid #1c1611;
+  background: #f4ead7;
+  padding: 12px;
 }

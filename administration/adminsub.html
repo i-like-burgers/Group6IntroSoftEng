@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
+<<<<<<< HEAD
   <title>Admin</title>
   <link rel="stylesheet" href="/css/admin.css" />
 </head>
@@ -273,3 +274,330 @@ loadPendingUsers();
 </script>
 </body>
 </html>
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Moderation</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <a href="/admin">Back to Admin home</a>
+    <h1>ADMIN MODERATION</h1>
+  </div>
+
+  <div class="columns">
+    <div class="box">
+      <h2>Pending Registration Requests</h2>
+      <p class="section-copy">Approve buyers and sellers before they can log in, or block the registration request.</p>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Requested</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pending-users-body"></tbody>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Seller Listings</h2>
+      <p class="section-copy">Delist a seller product without deleting it from the database.</p>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seller</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="products-body"></tbody>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Recent Users</h2>
+      <p class="section-copy">Browse the 10 most recently registered users and search by username.</p>
+
+      <form id="user-search-form" class="toolbar">
+        <input id="user-search-input" type="search" placeholder="Search username" />
+        <button type="submit">Search</button>
+        <button type="button" id="clear-search-button">Clear</button>
+      </form>
+
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Registered</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="recent-users-body"></tbody>
+      </table>
+
+      <div class="toolbar">
+        <button type="button" id="previous-users-button">Previous</button>
+        <span id="users-page-info" class="muted-label">Page 1</span>
+        <button type="button" id="next-users-button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const recentUsersState = {
+      page: 1,
+      search: ''
+    };
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleString();
+    }
+
+    function capitalizeRole(role) {
+      if (!role) return '';
+      return role.charAt(0).toUpperCase() + role.slice(1);
+    }
+
+    function getUserStatus(user) {
+      if (user.banned) return 'Banned';
+      if (user.blocked) return 'Blocked';
+      if (user.approved) return 'Approved';
+      return 'Pending';
+    }
+
+    function buildPendingUserRow(user) {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${escapeHtml(user.username)}</td>
+        <td>${escapeHtml(capitalizeRole(user.role))}</td>
+        <td>${escapeHtml(user.email)}</td>
+        <td>${escapeHtml(formatDate(user.createdAt))}</td>
+        <td class="action-group">
+          <button data-action="approve">Approve</button>
+          <button data-action="block" class="danger-button">Block</button>
+        </td>
+      `;
+
+      tr.querySelector('[data-action="approve"]').addEventListener('click', async () => {
+        await approveUser(user.id);
+      });
+
+      tr.querySelector('[data-action="block"]').addEventListener('click', async () => {
+        await blockUser(user.id);
+      });
+
+      return tr;
+    }
+
+    function buildProductRow(product) {
+      const tr = document.createElement('tr');
+      const status = product.isListed ? 'Listed' : 'Delisted';
+      const actionCell = product.isListed
+        ? `<button data-product-id="${product.id}" class="danger-button">Delist</button>`
+        : '<span class="muted-label">Already delisted</span>';
+
+      tr.innerHTML = `
+        <td>${escapeHtml(product.name)}</td>
+        <td>${escapeHtml(product.seller.username)}</td>
+        <td>${escapeHtml(formatCurrency(product.price))}</td>
+        <td>${escapeHtml(String(product.stock))}</td>
+        <td>${escapeHtml(status)}</td>
+        <td>${actionCell}</td>
+      `;
+
+      const button = tr.querySelector('button');
+      if (button) {
+        button.addEventListener('click', async () => {
+          await delistProduct(product.id);
+        });
+      }
+
+      return tr;
+    }
+
+    function buildRecentUserRow(user) {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${escapeHtml(user.username)}</td>
+        <td>${escapeHtml(capitalizeRole(user.role))}</td>
+        <td>${escapeHtml(getUserStatus(user))}</td>
+        <td>${escapeHtml(formatDate(user.createdAt))}</td>
+        <td class="dotscol">
+          <details class="dots">
+            <summary>...</summary>
+            <div class="menu action-menu">
+              <button data-action="approve">Approve</button>
+              <button data-action="block">Block</button>
+              <button data-action="ban" class="danger-button">Ban</button>
+            </div>
+          </details>
+        </td>
+      `;
+
+      tr.querySelector('[data-action="approve"]').addEventListener('click', async () => {
+        await approveUser(user.id);
+      });
+
+      tr.querySelector('[data-action="block"]').addEventListener('click', async () => {
+        await blockUser(user.id);
+      });
+
+      tr.querySelector('[data-action="ban"]').addEventListener('click', async () => {
+        await banUser(user.id);
+      });
+
+      return tr;
+    }
+
+    async function loadPendingUsers() {
+      const users = await fetchJson('/api/admin/pending-users');
+      const tbody = document.getElementById('pending-users-body');
+      tbody.innerHTML = '';
+
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No pending registration requests.</td></tr>';
+        return;
+      }
+
+      users.forEach((user) => {
+        tbody.appendChild(buildPendingUserRow(user));
+      });
+    }
+
+    async function loadProducts() {
+      const products = await fetchJson('/api/admin/products');
+      const tbody = document.getElementById('products-body');
+      tbody.innerHTML = '';
+
+      if (products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">No seller products found.</td></tr>';
+        return;
+      }
+
+      products.forEach((product) => {
+        tbody.appendChild(buildProductRow(product));
+      });
+    }
+
+    async function loadRecentUsers() {
+      const params = new URLSearchParams({
+        page: String(recentUsersState.page)
+      });
+
+      if (recentUsersState.search) {
+        params.set('search', recentUsersState.search);
+      }
+
+      const result = await fetchJson(`/api/admin/users?${params.toString()}`);
+      const tbody = document.getElementById('recent-users-body');
+      tbody.innerHTML = '';
+
+      if (result.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No matching users found.</td></tr>';
+      } else {
+        result.users.forEach((user) => {
+          tbody.appendChild(buildRecentUserRow(user));
+        });
+      }
+
+      document.getElementById('users-page-info').textContent = `Page ${result.page} of ${result.totalPages}`;
+      document.getElementById('previous-users-button').disabled = !result.hasPreviousPage;
+      document.getElementById('next-users-button').disabled = !result.hasNextPage;
+    }
+
+    async function approveUser(id) {
+      await fetchJson(`/api/admin/approve-user/${id}`, { method: 'POST' });
+      await Promise.all([loadPendingUsers(), loadRecentUsers()]);
+    }
+
+    async function blockUser(id) {
+      await fetchJson(`/api/admin/block-user/${id}`, { method: 'POST' });
+      await Promise.all([loadPendingUsers(), loadRecentUsers()]);
+    }
+
+    async function banUser(id) {
+      await fetchJson(`/api/admin/ban-user/${id}`, { method: 'POST' });
+      await Promise.all([loadPendingUsers(), loadRecentUsers(), loadProducts()]);
+    }
+
+    async function delistProduct(id) {
+      await fetchJson(`/api/admin/products/${id}/delist`, { method: 'POST' });
+      await loadProducts();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.getElementById('user-search-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      recentUsersState.page = 1;
+      recentUsersState.search = document.getElementById('user-search-input').value.trim();
+      await loadRecentUsers();
+    });
+
+    document.getElementById('clear-search-button').addEventListener('click', async () => {
+      document.getElementById('user-search-input').value = '';
+      recentUsersState.page = 1;
+      recentUsersState.search = '';
+      await loadRecentUsers();
+    });
+
+    document.getElementById('previous-users-button').addEventListener('click', async () => {
+      if (recentUsersState.page > 1) {
+        recentUsersState.page -= 1;
+        await loadRecentUsers();
+      }
+    });
+
+    document.getElementById('next-users-button').addEventListener('click', async () => {
+      recentUsersState.page += 1;
+      await loadRecentUsers();
+    });
+
+    async function init() {
+      try {
+        await Promise.all([loadPendingUsers(), loadProducts(), loadRecentUsers()]);
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'Could not load admin data.');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+>>>>>>> 4f07380b10aa4d8787694fa4f9efaaa3a3b1cce5

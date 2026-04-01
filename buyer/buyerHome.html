@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buyer Home</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>RANDOM ACCESS MARKET</h1>
+    <a href="/buyer/cart">View Cart</a>
+    <a href="/buyer/compare">Compare Products</a>
+  </div>
+
+  <div class="box">
+    <h2>Available Products</h2>
+    <p class="section-copy">Bare minimum buyer browse view. Only listed products from non-banned sellers appear here.</p>
+    <table class="grid">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Description</th>
+          <th>Seller</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="buyer-products-body"></tbody>
+    </table>
+    <p id="buyer-message" class="status-message"></p>
+  </div>
+
+  <script>
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function truncate(text, maxLength) {
+      if (!text) return '';
+      return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+    }
+
+    function buildProductRow(product) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><a href="/buyer/products/${product.id}">${escapeHtml(product.name)}</a></td>
+        <td>${escapeHtml(truncate(product.description || '', 120))}</td>
+        <td>${escapeHtml(product.seller.username)}</td>
+        <td>${escapeHtml(formatCurrency(product.price))}</td>
+        <td>${escapeHtml(String(product.stock))}</td>
+        <td>
+          <button class="add-to-cart" data-product-id="${product.id}">Add To Cart</button>
+          <button class="compare"  data-product-id="${product.id}">Compare</button>
+        </td>
+      `;
+
+      tr.querySelector('.add-to-cart').addEventListener('click', async () => {
+        await addToCart(product.id);
+      });
+
+      tr.querySelector('.compare').addEventListener('click', async () => {
+        await compare(product.id);
+      });
+
+      return tr;
+    }
+
+    async function loadProducts() {
+      const products = await fetchJson('/api/buyer/products');
+      const tbody = document.getElementById('buyer-products-body');
+      tbody.innerHTML = '';
+
+      if (products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">No listed products are available right now.</td></tr>';
+        return;
+      }
+
+      products.forEach((product) => {
+        tbody.appendChild(buildProductRow(product));
+      });
+    }
+
+    async function addToCart(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1
+          })
+        });
+
+        message.textContent = 'Item added to cart.';
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    async function compare(productId) {
+            const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/compare', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+          })
+        });
+
+        message.textContent = 'Item added to list for comparison.';
+      }
+      catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to list.';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadProducts().catch((error) => {
+      console.error(error);
+      alert(error.message || 'Could not load products.');
+    });
+  </script>
+</body>
+</html>
