@@ -24,7 +24,7 @@ function getTokenFromRequest(req) {
 }
 
 function isApiRequest(req) {
-    return req.path.startsWith('/api/')
+    return req.path.startsWith('/api/') || req.originalUrl?.startsWith('/api/');
 }
 
 function authenticateToken(req,res,next)

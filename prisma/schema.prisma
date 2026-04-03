@@ -25,8 +25,8 @@ model User {
   banned    Boolean   @default(false)
   createdAt DateTime  @default(now())
 
-  products  Product[]  @relation("SellerProducts")
-  cartItems CartItem[] @relation("BuyerCartItems")
+  products   Product[]  @relation("SellerProducts")
+  cartItems  CartItem[] @relation("BuyerCartItems")
   comparison Compare[]
 }
 
@@ -41,8 +41,8 @@ model Product {
   isListed    Boolean   @default(true)
 
   sellerId    Int
-  seller      User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
-  cartItems   CartItem[]
+  seller       User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
+  cartItems    CartItem[]
   compareItems Compare[]
 }
 
@@ -70,13 +70,14 @@ model AuditLog {
 }
 
 model Compare {
-  id          Int       @id @default(autoincrement())
-  buyerID     Int
-  productID   Int
-  createdAt   DateTime  @default(now())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
-  buyer       User      @relation(fields: [buyerID], references: [id], onDelete: Cascade)
-  product     Product   @relation(fields: [productID], references: [id], onDelete: Cascade)
+  buyerID   Int
+  productID Int
+
+  buyer     User     @relation(fields: [buyerID], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productID], references: [id], onDelete: Cascade)
 
   @@unique([buyerID, productID])
 }

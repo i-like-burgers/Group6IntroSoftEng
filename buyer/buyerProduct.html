@@ -94,7 +94,6 @@
         });
 
         message.textContent = 'Item added to comparison list.';
-
       } catch (error) {
         console.error(error);
         message.textContent = error.message || 'Could not add item to comparison list.';
@@ -102,7 +101,7 @@
     }
 
     document.getElementById('add-to-cart-button').addEventListener('click', addToCart);
-    document.getElementById('mark-for-compare').addEventListener('click',addToComparison)
+    document.getElementById('mark-for-compare').addEventListener('click', addToComparison);
 
     loadProduct().catch((error) => {
       console.error(error);
