@@ -43,6 +43,7 @@
           <tr>
             <th>Product</th>
             <th>Seller</th>
+            <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
             <th>Status</th>
@@ -174,6 +175,7 @@
       tr.innerHTML = `
         <td>${escapeHtml(product.name)}</td>
         <td>${escapeHtml(product.seller.username)}</td>
+        <td>${escapeHtml(product.description || 'No description provided.')}</td>
         <td>${escapeHtml(formatCurrency(product.price))}</td>
         <td>${escapeHtml(String(product.stock))}</td>
         <td>${escapeHtml(status)}</td>
@@ -256,7 +258,7 @@
       tbody.innerHTML = '';
 
       if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6">No seller products found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7">No seller products found.</td></tr>';
         return;
       }
 
