@@ -27,6 +27,7 @@ model User {
 
   products   Product[]  @relation("SellerProducts")
   cartItems  CartItem[] @relation("BuyerCartItems")
+  orders     Order[]    @relation("BuyerOrders")
   comparison Compare[]
   authTokens AuthToken[]
 }
@@ -59,6 +60,36 @@ model CartItem {
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([buyerId, productId])
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  status    String      @default("placed")
+  paymentMethod String
+  subtotal  Float
+  taxRate   Float
+  taxAmount Float
+  total     Float
+  createdAt DateTime    @default(now())
+
+  buyerId   Int
+
+  buyer     User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  sellerId    Int
+  productName String
+  unitPrice   Float
+  quantity    Int
+  lineTotal   Float
+
+  orderId     Int
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {

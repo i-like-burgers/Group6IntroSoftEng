@@ -42,6 +42,7 @@
         <p>Estimated Tax: <strong id="tax">$0.00</strong></p>
         <p>Total: <strong id="total">$0.00</strong></p>
         <p class="muted-label">Tax uses a simple placeholder rate of 7% for now.</p>
+        <a id="checkout-link" href="/buyer/checkout">Review Checkout</a>
       </div>
     </div>
   </div>
@@ -89,14 +90,19 @@
     async function loadCart() {
       const cart = await fetchJson('/api/buyer/cart');
       const tbody = document.getElementById('cart-items-body');
+      const checkoutLink = document.getElementById('checkout-link');
       tbody.innerHTML = '';
 
       if (cart.items.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
+        checkoutLink.style.pointerEvents = 'none';
+        checkoutLink.style.opacity = '0.45';
       } else {
         cart.items.forEach((item) => {
           tbody.appendChild(buildCartRow(item));
         });
+        checkoutLink.style.pointerEvents = 'auto';
+        checkoutLink.style.opacity = '1';
       }
 
       document.getElementById('subtotal').textContent = formatCurrency(cart.subtotal);
