@@ -37,12 +37,13 @@
 
     <div class="box">
       <h2>Seller Listings</h2>
-      <p class="section-copy">Delist a seller product without deleting it from the database.</p>
+      <p class="section-copy">Approve or reject pending seller listings, or delist already approved products without deleting them from the database.</p>
       <table class="grid">
         <thead>
           <tr>
             <th>Product</th>
             <th>Seller</th>
+            <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
             <th>Status</th>
@@ -152,26 +153,51 @@
 
     function buildProductRow(product) {
       const tr = document.createElement('tr');
-      const status = product.isListed ? 'Listed' : 'Delisted';
-      const actionCell = product.isListed
-        ? `<button data-product-id="${product.id}" class="danger-button">Delist</button>`
-        : '<span class="muted-label">Already delisted</span>';
+      let status = 'Delisted';
+      let actionCell = '<span class="muted-label">Already delisted</span>';
+
+      if (product.listingStatus === 'pending') {
+        status = 'Pending Approval';
+        actionCell = `
+          <div class="action-group">
+            <button data-product-id="${product.id}" data-action="approve">Approve</button>
+            <button data-product-id="${product.id}" data-action="reject" class="danger-button">Reject</button>
+          </div>
+        `;
+      } else if (product.listingStatus === 'rejected') {
+        status = 'Rejected';
+        actionCell = '<span class="muted-label">Rejected</span>';
+      } else if (product.isListed) {
+        status = 'Listed';
+        actionCell = `<button data-product-id="${product.id}" data-action="delist" class="danger-button">Delist</button>`;
+      }
 
       tr.innerHTML = `
         <td>${escapeHtml(product.name)}</td>
         <td>${escapeHtml(product.seller.username)}</td>
+        <td>${escapeHtml(product.description || 'No description provided.')}</td>
         <td>${escapeHtml(formatCurrency(product.price))}</td>
         <td>${escapeHtml(String(product.stock))}</td>
         <td>${escapeHtml(status)}</td>
         <td>${actionCell}</td>
       `;
 
-      const button = tr.querySelector('button');
-      if (button) {
+      const buttons = tr.querySelectorAll('button');
+      buttons.forEach((button) => {
         button.addEventListener('click', async () => {
+          if (button.dataset.action === 'approve') {
+            await approveProduct(product.id);
+            return;
+          }
+
+          if (button.dataset.action === 'reject') {
+            await rejectProduct(product.id);
+            return;
+          }
+
           await delistProduct(product.id);
         });
-      }
+      });
 
       return tr;
     }
@@ -232,7 +258,7 @@
       tbody.innerHTML = '';
 
       if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6">No seller products found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7">No seller products found.</td></tr>';
         return;
       }
 
@@ -284,6 +310,16 @@
 
     async function delistProduct(id) {
       await fetchJson(`/api/admin/products/${id}/delist`, { method: 'POST' });
+      await loadProducts();
+    }
+
+    async function approveProduct(id) {
+      await fetchJson(`/api/admin/products/${id}/approve`, { method: 'POST' });
+      await loadProducts();
+    }
+
+    async function rejectProduct(id) {
+      await fetchJson(`/api/admin/products/${id}/reject`, { method: 'POST' });
       await loadProducts();
     }
 

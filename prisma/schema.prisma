@@ -41,6 +41,7 @@ model Product {
   createdAt   DateTime  @default(now())
 
   isListed    Boolean   @default(true)
+  listingStatus String  @default("pending")
 
   sellerId    Int
   seller       User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)

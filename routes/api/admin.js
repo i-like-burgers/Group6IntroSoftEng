@@ -218,6 +218,82 @@ router.get('/products', async (req, res) => {
     }
 });
 
+router.post('/products/:id/approve', async (req, res) => {
+    try {
+        const id = Number.parseInt(req.params.id, 10);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid product id' });
+        }
+
+        const product = await prisma.product.update({
+            where: { id },
+            data: {
+                listingStatus: 'approved',
+                isListed: true
+            },
+            include: {
+                seller: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                }
+            }
+        });
+
+        await logAuditAction({
+            actorId: req.user.id,
+            username: req.user.username,
+            actionType: 'listing_approval',
+            details: `Approved product "${product.name}" from seller ${product.seller.username}`
+        });
+
+        res.json(product);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to approve product' });
+    }
+});
+
+router.post('/products/:id/reject', async (req, res) => {
+    try {
+        const id = Number.parseInt(req.params.id, 10);
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid product id' });
+        }
+
+        const product = await prisma.product.update({
+            where: { id },
+            data: {
+                listingStatus: 'rejected',
+                isListed: false
+            },
+            include: {
+                seller: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                }
+            }
+        });
+
+        await logAuditAction({
+            actorId: req.user.id,
+            username: req.user.username,
+            actionType: 'listing_rejection',
+            details: `Rejected product "${product.name}" from seller ${product.seller.username}`
+        });
+
+        res.json(product);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to reject product' });
+    }
+});
+
 router.post('/products/:id/delist', async (req, res) => {
     try {
         const id = Number.parseInt(req.params.id, 10);

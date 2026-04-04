@@ -46,7 +46,8 @@ router.post('/products', async (req, res) => {
                 price: parsedPrice,
                 stock: Math.floor(parsedStock),
                 sellerId: req.user.id,
-                isListed: true
+                isListed: false,
+                listingStatus: 'pending'
             }
         });
 
@@ -54,7 +55,7 @@ router.post('/products', async (req, res) => {
             actorId: req.user.id,
             username: req.user.username,
             actionType: 'listing_creation',
-            details: `Created listing "${product.name}"`
+            details: `Created listing "${product.name}" pending admin approval`
         });
 
         res.status(201).json(product);
