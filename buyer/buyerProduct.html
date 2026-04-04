@@ -8,9 +8,14 @@
 </head>
 <body>
   <div class="header">
-    <a href="/buyer/home">Back to Buyer Home</a>
-    <a href="/buyer/cart">View Cart</a>
-    <a href="/buyer/compare">View Comparison</a>
+    <div class="header-nav">
+      <a href="/buyer/home">Back to Buyer Home</a>
+      <a href="/buyer/cart">View Cart</a>
+      <a href="/buyer/compare">View Comparison</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
   </div>
 
   <div class="box">
@@ -94,7 +99,6 @@
         });
 
         message.textContent = 'Item added to comparison list.';
-
       } catch (error) {
         console.error(error);
         message.textContent = error.message || 'Could not add item to comparison list.';
@@ -102,7 +106,7 @@
     }
 
     document.getElementById('add-to-cart-button').addEventListener('click', addToCart);
-    document.getElementById('mark-for-compare').addEventListener('click',addToComparison)
+    document.getElementById('mark-for-compare').addEventListener('click', addToComparison);
 
     loadProduct().catch((error) => {
       console.error(error);

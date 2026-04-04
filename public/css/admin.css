@@ -66,6 +66,17 @@ table.grid th, table.grid td {
   color: #1c1611;
 }
 
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.logout-form {
+  margin: 0;
+}
+
 .section-copy {
   margin-top: 0;
 }

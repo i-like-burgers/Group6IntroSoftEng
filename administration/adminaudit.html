@@ -8,8 +8,13 @@
 </head>
 <body>
   <div class="header">
-    <a href="/admin">Back to Admin home</a>
     <h1>AUDIT LOG</h1>
+    <div class="header-nav">
+      <a href="/admin">Back to Admin home</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
   </div>
 
   <div class="box">
