@@ -21,6 +21,22 @@ router.get("/cart",
     }
 );
 
+router.get("/checkout",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyer/checkoutReview.html"));
+    }
+);
+
+router.get("/orders/:id/confirmation",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyer/orderConfirmation.html"));
+    }
+);
+
 router.get("/products/:id",
     auth.authenticateToken,
     requireRole("buyer"),

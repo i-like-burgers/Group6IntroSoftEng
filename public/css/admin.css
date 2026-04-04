@@ -110,6 +110,47 @@ table.grid th, table.grid td {
   background: #f4ead7;
 }
 
+.payment-option-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.payment-option {
+  border: 1px solid #1c1611;
+  background: #fffaf2;
+  color: #1c1611;
+  padding: 12px;
+  min-height: 110px;
+  text-align: left;
+}
+
+.payment-option.is-selectable {
+  cursor: pointer;
+}
+
+.payment-option.is-selected {
+  background: #1c1611;
+  color: #fffaf2;
+}
+
+.payment-option-title {
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.payment-option-copy {
+  margin: 0;
+  font-size: 12px;
+}
+
+.payment-option-plus {
+  font-size: 28px;
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
 .toolbar {
   display: flex;
   gap: 8px;
