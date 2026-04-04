@@ -28,6 +28,7 @@ model User {
   products   Product[]  @relation("SellerProducts")
   cartItems  CartItem[] @relation("BuyerCartItems")
   comparison Compare[]
+  authTokens AuthToken[]
 }
 
 model Product {
@@ -80,4 +81,14 @@ model Compare {
   product   Product  @relation(fields: [productID], references: [id], onDelete: Cascade)
 
   @@unique([buyerID, productID])
+}
+
+model AuthToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  deleteAt  DateTime?
+
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

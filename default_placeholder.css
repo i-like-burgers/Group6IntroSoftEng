@@ -28,6 +28,24 @@ a{
     color:orange;
 }
 
+button {
+    border: 1px solid limegreen;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.page-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.logout-form {
+    margin: 0;
+}
+
 .table_container {
     display: flex;
     justify-content: center;

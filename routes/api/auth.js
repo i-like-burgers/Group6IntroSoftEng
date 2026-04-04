@@ -42,6 +42,13 @@ function getRedirectForRole(role) {
     return null;
 }
 
+function clearAuthCookie(res) {
+    res.clearCookie('authToken', {
+        httpOnly: true,
+        sameSite: 'Strict'
+    });
+}
+
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -60,11 +67,7 @@ router.post('/login', async (req, res) => {
         }
 
         const token = auth.generateToken();
-        auth.setToken(token, {
-            id: user.id,
-            username: user.username,
-            role: user.role
-        });
+        await auth.storeToken(token, user.id);
 
         res.cookie('authToken', token, {
             httpOnly: true,
@@ -113,11 +116,7 @@ router.post('/api/login', async (req, res) => {
         }
 
         const token = auth.generateToken();
-        auth.setToken(token, {
-            id: user.id,
-            username: user.username,
-            role: user.role
-        });
+        await auth.storeToken(token, user.id);
 
         res.json({
             token,
@@ -167,6 +166,28 @@ router.post('/api/register', async (req, res) => {
         }
 
         res.status(500).json({ error: 'Registration failed' });
+    }
+});
+
+router.post('/logout', auth.authenticateToken, async (req, res) => {
+    try {
+        await auth.deleteToken(req.token);
+        clearAuthCookie(res);
+        res.redirect('/login');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.post('/api/logout', auth.authenticateToken, async (req, res) => {
+    try {
+        await auth.deleteToken(req.token);
+        clearAuthCookie(res);
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
