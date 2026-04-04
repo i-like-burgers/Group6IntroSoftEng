@@ -85,12 +85,21 @@
 
     function buildProductRow(product) {
       const tr = document.createElement('tr');
+      let status = 'Delisted';
+
+      if (product.listingStatus === 'pending') {
+        status = 'Pending Approval';
+      } else if (product.listingStatus === 'rejected') {
+        status = 'Rejected';
+      } else if (product.isListed) {
+        status = 'Listed';
+      }
 
       tr.innerHTML = `
         <td>${escapeHtml(product.name)}</td>
         <td>${escapeHtml(formatCurrency(product.price))}</td>
         <td>${escapeHtml(String(product.stock))}</td>
-        <td>${escapeHtml(product.isListed ? 'Listed' : 'Delisted')}</td>
+        <td>${escapeHtml(status)}</td>
         <td>${escapeHtml(formatDate(product.createdAt))}</td>
       `;
 
@@ -134,7 +143,7 @@
         });
 
         form.reset();
-        message.textContent = 'Listing created.';
+        message.textContent = 'Listing submitted for admin approval.';
         await loadInventory();
       } catch (error) {
         console.error(error);

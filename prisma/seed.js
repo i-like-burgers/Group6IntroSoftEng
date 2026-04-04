@@ -69,6 +69,7 @@ async function main() {
       price: 19.99,
       stock: 8,
       isListed: true,
+      listingStatus: 'approved',
       sellerId: seller.id,
     },
     create: {
@@ -78,6 +79,7 @@ async function main() {
       price: 19.99,
       stock: 8,
       isListed: true,
+      listingStatus: 'approved',
       sellerId: seller.id,
     },
   });

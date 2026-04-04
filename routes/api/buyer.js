@@ -20,6 +20,7 @@ router.get('/products', async (req, res) => {
         const products = await prisma.product.findMany({
             where: {
                 isListed: true,
+                listingStatus: 'approved',
                 seller: {
                     banned: false
                 }
@@ -55,6 +56,7 @@ router.get('/products/:id', async (req, res) => {
             where: {
                 id,
                 isListed: true,
+                listingStatus: 'approved',
                 seller: {
                     banned: false
                 }
@@ -176,7 +178,7 @@ router.post('/cart', async (req, res) => {
             where: { id: productId }
         });
 
-        if (!product || !product.isListed) {
+        if (!product || !product.isListed || product.listingStatus !== 'approved') {
             return res.status(404).json({ error: 'Product is not available' });
         }
 
@@ -344,7 +346,12 @@ router.post('/checkout', async (req, res) => {
             }
 
             for (const item of cartItems) {
-                if (!item.product || !item.product.isListed || item.product.seller.banned) {
+                if (
+                    !item.product
+                    || !item.product.isListed
+                    || item.product.listingStatus !== 'approved'
+                    || item.product.seller.banned
+                ) {
                     throw new Error(`"${item.product?.name || 'An item'}" is no longer available`);
                 }
 
