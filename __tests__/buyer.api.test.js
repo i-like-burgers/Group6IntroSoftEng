@@ -111,6 +111,25 @@ describe('buyer api routes', () => {
         expect(prismaMock.product.findMany).toHaveBeenCalled();
     });
 
+    test('GET /api/buyer/products/:id returns a specific listed product', async () => {
+        const product = {
+            id: 102,
+            name: 'GeForce RTX 4090',
+            description: '24GB graphics card',
+            price: 1599.99,
+            stock: 2,
+            seller: { username: 'flagship-gpu-store' }
+        };
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.product.findFirst.mockResolvedValue(product);
+
+        const response = await request(app).get('/api/buyer/products/102');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(product);
+        expect(prismaMock.product.findFirst).toHaveBeenCalled();
+    });
+
     test('GET /api/buyer/products rejects unauthenticated requests', async () => {
         const { app } = loadBuyerApiApp({ role: null });
 
@@ -139,6 +158,74 @@ describe('buyer api routes', () => {
         expect(response.status).toBe(400);
         expect(response.body).toEqual({
             error: 'A valid product and quantity are required'
+        });
+    });
+
+    test('GET /api/buyer/cart returns cart totals for the current buyer', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.cartItem.findMany.mockResolvedValue([
+            {
+                id: 601,
+                quantity: 1,
+                product: {
+                    id: 55,
+                    name: 'Corsair RM850x',
+                    price: 149.99,
+                    seller: { username: 'psu-hub' }
+                }
+            },
+            {
+                id: 602,
+                quantity: 2,
+                product: {
+                    id: 56,
+                    name: 'Noctua NH-D15',
+                    price: 109.99,
+                    seller: { username: 'cooling-lab' }
+                }
+            }
+        ]);
+
+        const response = await request(app).get('/api/buyer/cart');
+
+        expect(response.status).toBe(200);
+        expect(response.body.items).toHaveLength(2);
+        expect(response.body.subtotal).toBe(369.97);
+        expect(response.body.tax).toBe(25.9);
+        expect(response.body.total).toBe(395.87);
+    });
+
+    test('GET /api/buyer/orders/:id returns an order for the current buyer', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.order.findFirst.mockResolvedValue({
+            id: 701,
+            buyerId: 7,
+            status: 'placed',
+            paymentMethod: 'demo_card',
+            items: [
+                {
+                    id: 1,
+                    productName: 'WD Black SN850X 2TB',
+                    quantity: 1
+                }
+            ]
+        });
+
+        const response = await request(app).get('/api/buyer/orders/701');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            id: 701,
+            buyerId: 7,
+            status: 'placed',
+            paymentMethod: 'demo_card',
+            items: [
+                {
+                    id: 1,
+                    productName: 'WD Black SN850X 2TB',
+                    quantity: 1
+                }
+            ]
         });
     });
 
@@ -171,5 +258,16 @@ describe('buyer api routes', () => {
             quantity: 2
         });
         expect(prismaMock.cartItem.upsert).toHaveBeenCalled();
+    });
+
+    test('POST /api/buyer/cart/:id/remove removes an existing cart item', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.cartItem.deleteMany.mockResolvedValue({ count: 1 });
+
+        const response = await request(app).post('/api/buyer/cart/501/remove');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ success: true });
+        expect(prismaMock.cartItem.deleteMany).toHaveBeenCalled();
     });
 });

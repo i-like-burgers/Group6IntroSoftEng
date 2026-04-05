@@ -21,7 +21,8 @@
     "prisma:seed": "node prisma/seed.js",
     "db:reset": "prisma migrate reset --force",
     "test": "jest --runInBand",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:report": "jest --runInBand --json --outputFile=reports/jest-results.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",

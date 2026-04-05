@@ -108,4 +108,80 @@ describe('database integration', () => {
             })
         );
     });
+
+    test('POST /api/login rejects an invalid password for a real database user', async () => {
+        const username = `integration-cpu-buyer-${uniqueSuffix}`;
+        const email = `integration-cpu-buyer-${uniqueSuffix}@ram.local`;
+        const hashedPassword = await bcrypt.hash('correct-password', 10);
+
+        const createdUser = await prisma.user.create({
+            data: {
+                username,
+                email,
+                password: hashedPassword,
+                role: 'buyer',
+                approved: true,
+                blocked: false,
+                banned: false
+            }
+        });
+
+        createdUserId = createdUser.id;
+
+        const response = await request(app)
+            .post('/api/login')
+            .send({
+                username,
+                password: 'wrong-password'
+            });
+
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({
+            error: 'Username or password incorrect'
+        });
+
+        const storedTokens = await prisma.authToken.findMany({
+            where: { userId: createdUser.id }
+        });
+
+        expect(storedTokens).toHaveLength(0);
+    });
+
+    test('POST /api/register creates a new user in the real database', async () => {
+        const username = `integration-register-${uniqueSuffix}`;
+        const email = `integration-register-${uniqueSuffix}@ram.local`;
+
+        const response = await request(app)
+            .post('/api/register')
+            .send({
+                username,
+                email,
+                password: 'register-password',
+                role: 'buyer'
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body.username).toBe(username);
+        expect(response.body.email).toBe(email);
+        expect(response.body.role).toBe('buyer');
+        expect(response.body.approved).toBe(false);
+
+        const createdUser = await prisma.user.findUnique({
+            where: { username }
+        });
+
+        expect(createdUser).toEqual(
+            expect.objectContaining({
+                username,
+                email,
+                role: 'buyer',
+                approved: false,
+                blocked: false,
+                banned: false
+            })
+        );
+
+        createdUserId = createdUser.id;
+        expect(createdUser.password).not.toBe('register-password');
+    });
 });
