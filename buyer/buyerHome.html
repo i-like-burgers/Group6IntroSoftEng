@@ -10,8 +10,9 @@
   <div class="header">
     <h1>RANDOM ACCESS MARKET</h1>
     <div class="header-nav">
-      <a href="/buyer/cart">View Cart</a>
-      <a href="/buyer/compare">Compare Products</a>
+      <a href="/buyer/classic/cart">View Cart</a>
+      <a href="/buyer/classic/compare">Compare Products</a>
+      <a href="/buyer/home">Modern UI</a>
       <form class="logout-form" method="POST" action="/logout">
         <button type="submit">Log Out</button>
       </form>
@@ -65,7 +66,7 @@
     function buildProductRow(product) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><a href="/buyer/products/${product.id}">${escapeHtml(product.name)}</a></td>
+        <td><a href="/buyer/classic/products/${product.id}">${escapeHtml(product.name)}</a></td>
         <td>${escapeHtml(truncate(product.description || '', 120))}</td>
         <td>${escapeHtml(product.seller.username)}</td>
         <td>${escapeHtml(formatCurrency(product.price))}</td>

@@ -59,7 +59,7 @@ describe('protected routes', () => {
         const response = await request(app).get('/buyer/home');
 
         expect(response.status).toBe(200);
-        expect(response.text).toContain('Buyer Home');
+        expect(response.text).toContain('Buyer Frontend Preview');
     });
 
     test('authenticated seller is redirected away from /buyer/home', async () => {
@@ -76,5 +76,45 @@ describe('protected routes', () => {
 
         expect(response.status).toBe(200);
         expect(response.text).toContain('AUDIT LOG');
+    });
+
+    test('authenticated buyer can access /buyer/classic/home', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/classic/home');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Home');
+    });
+
+    test('authenticated buyer can access /buyer/cart', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/cart');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Frontend Preview');
+    });
+
+    test('authenticated buyer can access /buyer/checkout', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/checkout');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Frontend Preview');
+    });
+
+    test('authenticated buyer can access /buyer/products/42', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/products/42');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Frontend Preview');
+    });
+
+    test('authenticated buyer can access /buyer/orders/42/confirmation', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/orders/42/confirmation');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Frontend Preview');
     });
 });
