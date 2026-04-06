@@ -9,11 +9,27 @@ router.get("/home",
     auth.authenticateToken,
     requireRole("seller"),
     (req, res) => {
-        res.sendFile(path.join(__dirname, "../sellerHome.html"));
+        res.sendFile(path.join(__dirname, "../seller/sellerApp.html"));
     }
 );
 
 router.get("/inventory",
+    auth.authenticateToken,
+    requireRole("seller"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../seller/sellerApp.html"));
+    }
+);
+
+router.get("/classic/home",
+    auth.authenticateToken,
+    requireRole("seller"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../sellerHome.html"));
+    }
+);
+
+router.get("/classic/inventory",
     auth.authenticateToken,
     requireRole("seller"),
     (req, res) => {

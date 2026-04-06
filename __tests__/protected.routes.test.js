@@ -70,12 +70,60 @@ describe('protected routes', () => {
         expect(response.headers.location).toBe('/denied');
     });
 
+    test('authenticated admin can access /admin', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Admin Workspace');
+    });
+
+    test('authenticated admin can access /admin/sub', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin/sub');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Admin Workspace');
+    });
+
     test('authenticated admin can access /admin/audit', async () => {
         const app = loadAppForRole('admin');
         const response = await request(app).get('/admin/audit');
 
         expect(response.status).toBe(200);
-        expect(response.text).toContain('AUDIT LOG');
+        expect(response.text).toContain('Admin Workspace');
+    });
+
+    test('authenticated admin can access /admin/classic', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin/classic');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('ADMINISTRATION HOME');
+    });
+
+    test('authenticated seller can access /seller/home', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/home');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Frontend Preview');
+    });
+
+    test('authenticated seller can access /seller/inventory', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/inventory');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Frontend Preview');
+    });
+
+    test('authenticated seller can access /seller/classic/home', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/classic/home');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Home Page');
     });
 
     test('authenticated buyer can access /buyer/classic/home', async () => {
