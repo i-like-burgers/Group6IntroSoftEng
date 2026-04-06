@@ -3,6 +3,12 @@ const request = require('supertest');
 function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
     jest.resetModules();
 
+    const compareHandlers = {
+        addCompareItem: jest.fn(),
+        getCompareItems: jest.fn().mockResolvedValue([]),
+        removeCompareItem: jest.fn()
+    };
+
     const prismaMock = {
         user: {
             findMany: jest.fn()
@@ -69,15 +75,12 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
     jest.doMock('../services/audit', () => ({
         logAuditAction: jest.fn().mockResolvedValue(undefined)
     }));
-    jest.doMock('../buyer/product_handling', () => ({
-        addCompareItem: jest.fn(),
-        getCompareItems: jest.fn().mockResolvedValue([]),
-        removeCompareItem: jest.fn()
-    }));
+    jest.doMock('../buyer/product_handling', () => compareHandlers);
 
     return {
         app: require('../index'),
-        prismaMock
+        prismaMock,
+        compareHandlers
     };
 }
 
@@ -229,6 +232,31 @@ describe('buyer api routes', () => {
         });
     });
 
+    test('GET /api/buyer/compare returns the comparison list for the current buyer', async () => {
+        const { app, compareHandlers } = loadBuyerApiApp();
+        compareHandlers.getCompareItems.mockResolvedValue([
+            {
+                id: 801,
+                name: 'MSI GeForce RTX 4080 Super',
+                price: 999.99
+            }
+        ]);
+
+        const response = await request(app).get('/api/buyer/compare');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            items: [
+                {
+                    id: 801,
+                    name: 'MSI GeForce RTX 4080 Super',
+                    price: 999.99
+                }
+            ]
+        });
+        expect(compareHandlers.getCompareItems).toHaveBeenCalledWith(7);
+    });
+
     test('POST /api/buyer/cart adds an available product to cart', async () => {
         const { app, prismaMock } = loadBuyerApiApp();
         prismaMock.product.findUnique.mockResolvedValue({
@@ -260,6 +288,50 @@ describe('buyer api routes', () => {
         expect(prismaMock.cartItem.upsert).toHaveBeenCalled();
     });
 
+    test('POST /api/buyer/compare validates the product id', async () => {
+        const { app } = loadBuyerApiApp();
+
+        const response = await request(app)
+            .post('/api/buyer/compare')
+            .send({ productId: 'abc' });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'A valid product is required'
+        });
+    });
+
+    test('POST /api/buyer/compare adds an available product to the comparison list', async () => {
+        const { app, prismaMock, compareHandlers } = loadBuyerApiApp();
+        prismaMock.product.findFirst.mockResolvedValue({
+            id: 88,
+            name: 'Samsung 990 Pro 2TB',
+            isListed: true,
+            seller: {
+                banned: false
+            }
+        });
+        prismaMock.compare.findUnique.mockResolvedValue(null);
+        compareHandlers.addCompareItem.mockResolvedValue({
+            buyerID: 7,
+            productID: 88
+        });
+
+        const response = await request(app)
+            .post('/api/buyer/compare')
+            .send({ productId: 88 });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toEqual({
+            buyerID: 7,
+            productID: 88
+        });
+        expect(compareHandlers.addCompareItem).toHaveBeenCalledWith({
+            buyerID: 7,
+            productID: 88
+        });
+    });
+
     test('POST /api/buyer/cart/:id/remove removes an existing cart item', async () => {
         const { app, prismaMock } = loadBuyerApiApp();
         prismaMock.cartItem.deleteMany.mockResolvedValue({ count: 1 });
@@ -269,5 +341,19 @@ describe('buyer api routes', () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual({ success: true });
         expect(prismaMock.cartItem.deleteMany).toHaveBeenCalled();
+    });
+
+    test('POST /api/buyer/compare/:id/remove removes an existing comparison item', async () => {
+        const { app, compareHandlers } = loadBuyerApiApp();
+        compareHandlers.removeCompareItem.mockResolvedValue({ count: 1 });
+
+        const response = await request(app).post('/api/buyer/compare/88/remove');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ success: true });
+        expect(compareHandlers.removeCompareItem).toHaveBeenCalledWith({
+            buyerID: 7,
+            productID: 88
+        });
     });
 });
