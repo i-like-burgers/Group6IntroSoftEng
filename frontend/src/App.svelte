@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
 
     let appMode = 'buyer';
     let currentPage = 'storefront';
@@ -20,6 +20,19 @@
         price: '',
         stock: ''
     };
+    let sellerListingForm;
+    let adminPendingUsers = [];
+    let adminProducts = [];
+    let adminUsers = [];
+    let adminAuditLogs = [];
+    let adminUsersPageInfo = {
+        page: 1,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+        search: ''
+    };
+    let adminUserSearch = '';
     let selectedPaymentMethod = 'demo_card';
     let loading = true;
     let errorMessage = '';
@@ -40,11 +53,27 @@
     }
 
     function getAppMode(path = getPath()) {
+        if (path.startsWith('/admin')) {
+            return 'admin';
+        }
+
         return path.startsWith('/seller') ? 'seller' : 'buyer';
     }
 
     function detectPage() {
         const path = getPath();
+
+        if (path === '/admin') {
+            return 'admin-home';
+        }
+
+        if (path === '/admin/sub') {
+            return 'admin-moderation';
+        }
+
+        if (path === '/admin/audit') {
+            return 'admin-audit';
+        }
 
         if (path === '/seller/home') {
             return 'seller-home';
@@ -78,6 +107,18 @@
     }
 
     function getPageTitle() {
+        if (currentPage === 'admin-home') {
+            return 'Admin Home';
+        }
+
+        if (currentPage === 'admin-moderation') {
+            return 'Admin Moderation';
+        }
+
+        if (currentPage === 'admin-audit') {
+            return 'Admin Audit Log';
+        }
+
         if (currentPage === 'seller-home') {
             return 'Seller Home';
         }
@@ -107,6 +148,18 @@
         }
 
         return 'Buyer Storefront';
+    }
+
+    function getAdminClassicPath() {
+        if (currentPage === 'admin-moderation') {
+            return '/admin/classic/sub';
+        }
+
+        if (currentPage === 'admin-audit') {
+            return '/admin/classic/audit';
+        }
+
+        return '/admin/classic';
     }
 
     async function fetchJson(url, options = {}) {
@@ -146,6 +199,42 @@
     function truncate(text, maxLength) {
         if (!text) return '';
         return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+    }
+
+    function capitalizeRole(role) {
+        if (!role) return '';
+        return role.charAt(0).toUpperCase() + role.slice(1);
+    }
+
+    function getUserStatus(user) {
+        if (user.banned) return 'Banned';
+        if (user.blocked) return 'Blocked';
+        if (user.approved) return 'Approved';
+        return 'Pending';
+    }
+
+    function formatActionType(actionType) {
+        if (!actionType) return '';
+        return actionType
+            .split('_')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
+    }
+
+    function mergeAdminUser(existingUser, nextUser) {
+        return {
+            ...existingUser,
+            ...nextUser
+        };
+    }
+
+    function applyAdminUserUpdate(nextUser) {
+        adminPendingUsers = adminPendingUsers.filter((user) => user.id !== nextUser.id);
+        adminUsers = adminUsers.map((user) => user.id === nextUser.id ? mergeAdminUser(user, nextUser) : user);
+    }
+
+    function applyAdminProductUpdate(nextProduct) {
+        adminProducts = adminProducts.map((product) => product.id === nextProduct.id ? { ...product, ...nextProduct } : product);
     }
 
     async function loadProducts(resetStatus = false) {
@@ -219,6 +308,48 @@
         }
     }
 
+    async function loadAdminAuditLogs() {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            adminAuditLogs = await fetchJson('/api/admin/audit-logs');
+        } catch (error) {
+            errorMessage = error.message || 'Could not load audit logs.';
+        } finally {
+            loading = false;
+        }
+    }
+
+    async function loadAdminModeration(page = 1, search = adminUserSearch) {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            const [pendingUsers, products, usersPage] = await Promise.all([
+                fetchJson('/api/admin/pending-users'),
+                fetchJson('/api/admin/products'),
+                fetchJson(`/api/admin/users?page=${page}&search=${encodeURIComponent(search)}`)
+            ]);
+
+            adminPendingUsers = pendingUsers;
+            adminProducts = products;
+            adminUsers = usersPage.users;
+            adminUsersPageInfo = {
+                page: usersPage.page,
+                totalPages: usersPage.totalPages,
+                hasPreviousPage: usersPage.hasPreviousPage,
+                hasNextPage: usersPage.hasNextPage,
+                search: usersPage.search
+            };
+            adminUserSearch = usersPage.search || '';
+        } catch (error) {
+            errorMessage = error.message || 'Could not load moderation data.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadOrderConfirmation() {
         loading = true;
         errorMessage = '';
@@ -238,6 +369,22 @@
     async function loadCurrentPage() {
         appMode = getAppMode();
         currentPage = detectPage();
+
+        if (currentPage === 'admin-home') {
+            loading = false;
+            errorMessage = '';
+            return;
+        }
+
+        if (currentPage === 'admin-moderation') {
+            await loadAdminModeration();
+            return;
+        }
+
+        if (currentPage === 'admin-audit') {
+            await loadAdminAuditLogs();
+            return;
+        }
 
         if (currentPage === 'seller-home') {
             loading = false;
@@ -278,8 +425,36 @@
         await loadProducts();
     }
 
+    async function preserveScrollDuring(task) {
+        const scrollY = typeof window === 'undefined' ? 0 : window.scrollY;
+        await task();
+        await tick();
+
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: scrollY });
+        }
+    }
+
     async function createSellerListing() {
         statusMessage = '';
+        const trimmedPrice = String(sellerForm.price).trim();
+        const trimmedStock = String(sellerForm.stock).trim();
+        const parsedPrice = Number(trimmedPrice);
+        const parsedStock = Number(trimmedStock);
+
+        if (!sellerListingForm?.reportValidity()) {
+            return;
+        }
+
+        if (trimmedPrice === '' || !Number.isFinite(parsedPrice)) {
+            statusMessage = 'Enter a valid number for price.';
+            return;
+        }
+
+        if (trimmedStock === '' || !Number.isInteger(parsedStock)) {
+            statusMessage = 'Enter a whole number for stock.';
+            return;
+        }
 
         try {
             await fetchJson('/api/seller/products', {
@@ -290,8 +465,8 @@
                 body: JSON.stringify({
                     name: sellerForm.name,
                     description: sellerForm.description,
-                    price: sellerForm.price,
-                    stock: sellerForm.stock
+                    price: parsedPrice,
+                    stock: parsedStock
                 })
             });
 
@@ -306,6 +481,89 @@
         } catch (error) {
             statusMessage = error.message || 'Could not create listing.';
         }
+    }
+
+    async function approveUser(id) {
+        statusMessage = '';
+        try {
+            const user = await fetchJson(`/api/admin/approve-user/${id}`, { method: 'POST' });
+            statusMessage = 'User approved.';
+            applyAdminUserUpdate(user);
+        } catch (error) {
+            statusMessage = error.message || 'Could not approve user.';
+        }
+    }
+
+    async function blockUser(id) {
+        statusMessage = '';
+        try {
+            const user = await fetchJson(`/api/admin/block-user/${id}`, { method: 'POST' });
+            statusMessage = 'User blocked.';
+            applyAdminUserUpdate(user);
+        } catch (error) {
+            statusMessage = error.message || 'Could not block user.';
+        }
+    }
+
+    async function banUser(id) {
+        statusMessage = '';
+        try {
+            const user = await fetchJson(`/api/admin/ban-user/${id}`, { method: 'POST' });
+            statusMessage = 'User banned.';
+            applyAdminUserUpdate(user);
+        } catch (error) {
+            statusMessage = error.message || 'Could not ban user.';
+        }
+    }
+
+    async function approveProduct(id) {
+        statusMessage = '';
+        try {
+            const product = await fetchJson(`/api/admin/products/${id}/approve`, { method: 'POST' });
+            statusMessage = 'Product approved.';
+            applyAdminProductUpdate(product);
+        } catch (error) {
+            statusMessage = error.message || 'Could not approve product.';
+        }
+    }
+
+    async function rejectProduct(id) {
+        statusMessage = '';
+        try {
+            const product = await fetchJson(`/api/admin/products/${id}/reject`, { method: 'POST' });
+            statusMessage = 'Product rejected.';
+            applyAdminProductUpdate(product);
+        } catch (error) {
+            statusMessage = error.message || 'Could not reject product.';
+        }
+    }
+
+    async function delistProduct(id) {
+        statusMessage = '';
+        try {
+            const product = await fetchJson(`/api/admin/products/${id}/delist`, { method: 'POST' });
+            statusMessage = 'Product delisted.';
+            applyAdminProductUpdate(product);
+        } catch (error) {
+            statusMessage = error.message || 'Could not delist product.';
+        }
+    }
+
+    async function searchAdminUsers() {
+        await preserveScrollDuring(() => loadAdminModeration(1, adminUserSearch));
+    }
+
+    async function clearAdminUserSearch() {
+        adminUserSearch = '';
+        await preserveScrollDuring(() => loadAdminModeration(1, ''));
+    }
+
+    async function goToAdminUsersPage(nextPage) {
+        if (nextPage < 1 || nextPage > adminUsersPageInfo.totalPages) {
+            return;
+        }
+
+        await preserveScrollDuring(() => loadAdminModeration(nextPage, adminUsersPageInfo.search));
     }
 
     async function addToCart(productId) {
@@ -426,12 +684,25 @@
 <div class="page-shell" data-page={currentPage}>
     <section class="hero">
         <div>
-            <p class="eyebrow">{appMode === 'seller' ? 'Seller Workspace' : 'Buyer Workspace'}</p>
+            <p class="eyebrow">
+                {#if appMode === 'admin'}
+                    Admin Workspace
+                {:else if appMode === 'seller'}
+                    Seller Workspace
+                {:else}
+                    Buyer Workspace
+                {/if}
+            </p>
             <h1>Random Access Market</h1>
         </div>
 
         <div class="hero-actions">
-            {#if appMode === 'seller'}
+            {#if appMode === 'admin'}
+                <a href="/admin" class="action-link">Admin Home</a>
+                <a href="/admin/sub" class="action-link">Moderation</a>
+                <a href="/admin/audit" class="action-link">Audit</a>
+                <a href={getAdminClassicPath()} class="action-link secondary">Classic UI</a>
+            {:else if appMode === 'seller'}
                 <a href="/seller/home" class="action-link">Seller Home</a>
                 <a href="/seller/inventory" class="action-link">Inventory</a>
                 <a href="/seller/classic/home" class="action-link secondary">Classic UI</a>
@@ -449,7 +720,13 @@
         <div class="catalog-header">
             <div>
                 <p class="section-kicker">
-                    {#if currentPage === 'seller-home'}
+                    {#if currentPage === 'admin-home'}
+                        Administration
+                    {:else if currentPage === 'admin-moderation'}
+                        Moderation center
+                    {:else if currentPage === 'admin-audit'}
+                        Activity records
+                    {:else if currentPage === 'seller-home'}
                         Seller workspace
                     {:else if currentPage === 'seller-inventory'}
                         Inventory management
@@ -468,7 +745,13 @@
                     {/if}
                 </p>
                 <h2>
-                    {#if currentPage === 'seller-home'}
+                    {#if currentPage === 'admin-home'}
+                        Administration home
+                    {:else if currentPage === 'admin-moderation'}
+                        Admin moderation
+                    {:else if currentPage === 'admin-audit'}
+                        Audit log
+                    {:else if currentPage === 'seller-home'}
                         Seller control center
                     {:else if currentPage === 'seller-inventory'}
                         Your listings
@@ -491,51 +774,271 @@
         </div>
 
         {#if loading}
-            <div class="state-card">Loading products...</div>
+            <div class="state-card">Loading...</div>
         {:else if errorMessage}
             <div class="state-card error">{errorMessage}</div>
+        {:else if currentPage === 'admin-home'}
+            <div class="admin-columns admin-columns--two">
+                <article class="admin-region admin-region--products">
+                    <p class="section-kicker">Moderation</p>
+                    <h3>User and listing review</h3>
+                    <p class="detail-description">
+                        Review pending registrations, approve or reject seller listings, and handle active account status changes.
+                    </p>
+                    <div class="checkout-actions">
+                        <a class="checkout-link" href="/admin/sub">User management</a>
+                    </div>
+                </article>
+
+                <article class="admin-region">
+                    <p class="section-kicker">Audit</p>
+                    <h3>Recent platform activity</h3>
+                    <p class="detail-description">
+                        Review the most recent approval, rejection, delisting, and other system actions recorded by the backend.
+                    </p>
+                    <div class="checkout-actions">
+                        <a class="checkout-link" href="/admin/audit">Open audit log</a>
+                    </div>
+                </article>
+            </div>
+        {:else if currentPage === 'admin-moderation'}
+            <div class="admin-columns admin-columns--three">
+                <article class="admin-region">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="section-kicker">Pending registration requests</p>
+                            <h3>Users awaiting approval</h3>
+                        </div>
+                        <p class="admin-count">{adminPendingUsers.length}</p>
+                    </div>
+
+                    {#if adminPendingUsers.length === 0}
+                        <div class="state-card">No pending users right now.</div>
+                    {:else}
+                        <div class="admin-table-wrap">
+                            <table class="admin-grid">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Email</th>
+                                        <th>Requested</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each adminPendingUsers as user}
+                                        <tr>
+                                            <td>{user.username}</td>
+                                            <td>{capitalizeRole(user.role)}</td>
+                                            <td>{user.email}</td>
+                                            <td>{formatDate(user.createdAt)}</td>
+                                            <td>
+                                                <div class="admin-action-group">
+                                                    <button class="admin-button" on:click={() => approveUser(user.id)}>Approve</button>
+                                                    <button class="admin-button admin-button-danger" on:click={() => blockUser(user.id)}>Block</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
+                    {/if}
+                </article>
+
+                <article class="admin-region admin-region--products">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="section-kicker">Seller listings</p>
+                            <h3>Listing moderation</h3>
+                        </div>
+                        <p class="admin-count">{adminProducts.length}</p>
+                    </div>
+
+                    {#if adminProducts.length === 0}
+                        <div class="state-card">No seller listings are available for review.</div>
+                    {:else}
+                        <div class="admin-table-wrap">
+                            <table class="admin-grid admin-grid--products">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Seller</th>
+                                        <th>Description</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each adminProducts as item}
+                                        <tr>
+                                            <td>{item.name}</td>
+                                            <td>{item.seller?.username || 'Unknown seller'}</td>
+                                            <td>{item.description || 'No description provided.'}</td>
+                                            <td>{formatCurrency(item.price)}</td>
+                                            <td>{item.stock}</td>
+                                            <td>
+                                                {#if item.listingStatus === 'pending'}
+                                                    Pending approval
+                                                {:else if item.listingStatus === 'rejected'}
+                                                    Rejected
+                                                {:else if item.isListed}
+                                                    Listed
+                                                {:else}
+                                                    Delisted
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {#if item.listingStatus === 'pending'}
+                                                    <div class="admin-action-group">
+                                                        <button class="admin-button" on:click={() => approveProduct(item.id)}>Approve</button>
+                                                        <button class="admin-button admin-button-danger" on:click={() => rejectProduct(item.id)}>Reject</button>
+                                                    </div>
+                                                {:else if item.isListed}
+                                                    <button class="admin-button admin-button-danger" on:click={() => delistProduct(item.id)}>Delist</button>
+                                                {:else}
+                                                    <span class="seller">No further action</span>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
+                    {/if}
+                </article>
+
+                <article class="admin-region">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="section-kicker">Recent users</p>
+                            <h3>Browse and filter accounts</h3>
+                        </div>
+                        <p class="admin-count">{adminUsersPageInfo.totalPages} page{adminUsersPageInfo.totalPages === 1 ? '' : 's'}</p>
+                    </div>
+
+                    <form class="admin-search" on:submit|preventDefault={searchAdminUsers}>
+                        <input bind:value={adminUserSearch} type="search" placeholder="Search username" />
+                        <button class="admin-button" type="submit">Search</button>
+                        <button type="button" class="admin-button" on:click={clearAdminUserSearch}>Clear</button>
+                    </form>
+
+                    {#if adminUsers.length === 0}
+                        <div class="state-card">No users matched that search.</div>
+                    {:else}
+                        <div class="admin-table-wrap">
+                            <table class="admin-grid">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Registered</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each adminUsers as user}
+                                        <tr>
+                                            <td>{user.username}</td>
+                                            <td>{capitalizeRole(user.role)}</td>
+                                            <td>{getUserStatus(user)}</td>
+                                            <td>{formatDate(user.createdAt)}</td>
+                                            <td>
+                                                <div class="admin-action-group">
+                                                    <button class="admin-button" on:click={() => approveUser(user.id)}>Approve</button>
+                                                    <button class="admin-button" on:click={() => blockUser(user.id)}>Block</button>
+                                                    <button class="admin-button admin-button-danger" on:click={() => banUser(user.id)}>Ban</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
+                    {/if}
+
+                    <div class="admin-pagination">
+                        <button
+                            class="admin-button"
+                            on:click={() => goToAdminUsersPage(adminUsersPageInfo.page - 1)}
+                            disabled={!adminUsersPageInfo.hasPreviousPage}
+                        >
+                            Previous
+                        </button>
+                        <p class="seller">
+                            Page {adminUsersPageInfo.page} of {adminUsersPageInfo.totalPages}
+                        </p>
+                        <button
+                            class="admin-button"
+                            on:click={() => goToAdminUsersPage(adminUsersPageInfo.page + 1)}
+                            disabled={!adminUsersPageInfo.hasNextPage}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </article>
+            </div>
+        {:else if currentPage === 'admin-audit'}
+            {#if adminAuditLogs.length === 0}
+                <div class="state-card">No audit log entries yet.</div>
+            {:else}
+                <div class="panel admin-box">
+                    <div class="admin-panel-header">
+                        <div>
+                            <p class="section-kicker">Recent actions</p>
+                            <h3>Recorded system activity</h3>
+                        </div>
+                    </div>
+
+                    <div class="admin-audit-list">
+                    {#each adminAuditLogs as log}
+                        <article class="admin-audit-row">
+                            <p class="seller admin-audit-when">{formatDate(log.createdAt)}</p>
+                            <p class="admin-audit-user">{log.username}</p>
+                            <p class="admin-audit-action">{formatActionType(log.actionType)}</p>
+                            <p class="admin-audit-details">{log.details}</p>
+                        </article>
+                    {/each}
+                    </div>
+                </div>
+            {/if}
         {:else if currentPage === 'seller-home'}
             <div class="seller-home-grid">
                 <article class="detail-card">
                     <p class="section-kicker">Modern seller mode</p>
-                    <h3>Manage your hardware storefront</h3>
+                    <h3>Manage your storefront</h3>
                     <p class="detail-description">
                         Use the inventory workspace to create new listings, review approval status, and keep track of stock.
                     </p>
                     <div class="checkout-actions">
                         <a class="checkout-link" href="/seller/inventory">Open inventory</a>
-                        <a class="checkout-link secondary-link" href="/seller/classic/home">Classic seller home</a>
                     </div>
-                </article>
-
-                <article class="detail-card">
-                    <p class="section-kicker">Workflow</p>
-                    <h3>What this modern seller view currently covers</h3>
-                    <p class="detail-description">
-                        Listing creation and inventory review are already connected to the existing Express seller APIs. This keeps the frontend modern while preserving the current backend and approval flow.
-                    </p>
                 </article>
             </div>
         {:else if currentPage === 'seller-inventory'}
             <div class="cart-layout">
                 <div class="panel">
-                    <div class="stack-form">
+                    <form class="stack-form" bind:this={sellerListingForm} on:submit|preventDefault={createSellerListing}>
                         <label for="seller-name">Product name</label>
-                        <input id="seller-name" bind:value={sellerForm.name} type="text" />
+                        <input id="seller-name" bind:value={sellerForm.name} type="text" required />
 
                         <label for="seller-description">Description</label>
                         <textarea id="seller-description" bind:value={sellerForm.description} rows="4"></textarea>
 
                         <label for="seller-price">Price</label>
-                        <input id="seller-price" bind:value={sellerForm.price} type="number" min="0" step="0.01" />
+                        <input id="seller-price" bind:value={sellerForm.price} type="number" min="0" step="0.01" required />
 
                         <label for="seller-stock">Stock</label>
-                        <input id="seller-stock" bind:value={sellerForm.stock} type="number" min="0" step="1" />
+                        <input id="seller-stock" bind:value={sellerForm.stock} type="number" min="0" step="1" required />
 
-                        <button class="checkout-link place-order-button" on:click={createSellerListing}>
+                        <button class="checkout-link place-order-button" type="submit">
                             Create listing
                         </button>
-                    </div>
+                    </form>
                 </div>
 
                 <aside class="summary-panel inventory-panel">

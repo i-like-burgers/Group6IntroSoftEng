@@ -70,12 +70,36 @@ describe('protected routes', () => {
         expect(response.headers.location).toBe('/denied');
     });
 
+    test('authenticated admin can access /admin', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Admin Workspace');
+    });
+
+    test('authenticated admin can access /admin/sub', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin/sub');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Admin Workspace');
+    });
+
     test('authenticated admin can access /admin/audit', async () => {
         const app = loadAppForRole('admin');
         const response = await request(app).get('/admin/audit');
 
         expect(response.status).toBe(200);
-        expect(response.text).toContain('AUDIT LOG');
+        expect(response.text).toContain('Admin Workspace');
+    });
+
+    test('authenticated admin can access /admin/classic', async () => {
+        const app = loadAppForRole('admin');
+        const response = await request(app).get('/admin/classic');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('ADMINISTRATION HOME');
     });
 
     test('authenticated seller can access /seller/home', async () => {
