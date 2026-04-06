@@ -6,6 +6,8 @@
 
 - `npm run prisma:migrate`
 - `npm run prisma:seed`
+
+- `npm run frontend:build`
 - `npm start`
 
 ## Seeded Accounts
