@@ -16,11 +16,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "frontend:dev": "vite --config vite.config.mjs",
+    "frontend:build": "vite build --config vite.config.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "node prisma/seed.js",
     "db:reset": "prisma migrate reset --force",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:report": "jest --runInBand --json --outputFile=reports/jest-results.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
@@ -31,6 +35,16 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "prisma": "^6.19.2"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "svelte": "^5.55.1",
+    "vite": "^8.0.3"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": []
 }

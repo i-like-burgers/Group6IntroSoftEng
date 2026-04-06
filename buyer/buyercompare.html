@@ -10,8 +10,8 @@
   <div class="header">
     <h1>COMPARE PRODUCTS</h1>
     <div class="header-nav">
-      <a href="/buyer/home">Back to Buyer Home</a>
-      <a href="/buyer/cart">View Cart</a>
+      <a href="/buyer/classic/home">Classic Home</a>
+      <a href="/buyer/compare">Modern UI</a>
       <form class="logout-form" method="POST" action="/logout">
         <button type="submit">Log Out</button>
       </form>
@@ -70,7 +70,7 @@
     function buildProductRow(item) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><a href="/buyer/products/${item.id}">${escapeHtml(item.name)}</a></td>
+        <td><a href="/buyer/classic/products/${item.id}">${escapeHtml(item.name)}</a></td>
         <td>${escapeHtml(truncate(item.description || '', 120))}</td>
         <td>${escapeHtml(formatCurrency(item.price))}</td>
         <td>

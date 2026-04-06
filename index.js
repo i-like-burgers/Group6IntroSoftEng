@@ -35,6 +35,10 @@ app.use('/admin', adminRouter);
 app.use('/seller', sellerRouter);
 app.use('/buyer', buyerRouter);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
