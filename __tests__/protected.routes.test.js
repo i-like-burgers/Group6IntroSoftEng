@@ -78,6 +78,30 @@ describe('protected routes', () => {
         expect(response.text).toContain('AUDIT LOG');
     });
 
+    test('authenticated seller can access /seller/home', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/home');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Frontend Preview');
+    });
+
+    test('authenticated seller can access /seller/inventory', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/inventory');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Frontend Preview');
+    });
+
+    test('authenticated seller can access /seller/classic/home', async () => {
+        const app = loadAppForRole('seller');
+        const response = await request(app).get('/seller/classic/home');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Seller Home Page');
+    });
+
     test('authenticated buyer can access /buyer/classic/home', async () => {
         const app = loadAppForRole('buyer');
         const response = await request(app).get('/buyer/classic/home');

@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
 
+    let appMode = 'buyer';
     let currentPage = 'storefront';
     let products = [];
     let product = null;
@@ -12,6 +13,13 @@
         total: 0
     };
     let order = null;
+    let sellerProducts = [];
+    let sellerForm = {
+        name: '',
+        description: '',
+        price: '',
+        stock: ''
+    };
     let selectedPaymentMethod = 'demo_card';
     let loading = true;
     let errorMessage = '';
@@ -31,8 +39,20 @@
         return match ? Number(match[1]) : null;
     }
 
+    function getAppMode(path = getPath()) {
+        return path.startsWith('/seller') ? 'seller' : 'buyer';
+    }
+
     function detectPage() {
         const path = getPath();
+
+        if (path === '/seller/home') {
+            return 'seller-home';
+        }
+
+        if (path === '/seller/inventory') {
+            return 'seller-inventory';
+        }
 
         if (path === '/buyer/cart') {
             return 'cart';
@@ -58,6 +78,14 @@
     }
 
     function getPageTitle() {
+        if (currentPage === 'seller-home') {
+            return 'Seller Home';
+        }
+
+        if (currentPage === 'seller-inventory') {
+            return 'Seller Inventory';
+        }
+
         if (currentPage === 'cart') {
             return 'Buyer Cart';
         }
@@ -178,6 +206,19 @@
         }
     }
 
+    async function loadSellerProducts() {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            sellerProducts = await fetchJson('/api/seller/products');
+        } catch (error) {
+            errorMessage = error.message || 'Could not load seller inventory.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadOrderConfirmation() {
         loading = true;
         errorMessage = '';
@@ -195,7 +236,19 @@
     }
 
     async function loadCurrentPage() {
+        appMode = getAppMode();
         currentPage = detectPage();
+
+        if (currentPage === 'seller-home') {
+            loading = false;
+            errorMessage = '';
+            return;
+        }
+
+        if (currentPage === 'seller-inventory') {
+            await loadSellerProducts();
+            return;
+        }
 
         if (currentPage === 'cart') {
             await loadCart();
@@ -223,6 +276,36 @@
         }
 
         await loadProducts();
+    }
+
+    async function createSellerListing() {
+        statusMessage = '';
+
+        try {
+            await fetchJson('/api/seller/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: sellerForm.name,
+                    description: sellerForm.description,
+                    price: sellerForm.price,
+                    stock: sellerForm.stock
+                })
+            });
+
+            sellerForm = {
+                name: '',
+                description: '',
+                price: '',
+                stock: ''
+            };
+            statusMessage = 'Listing submitted for admin approval.';
+            await loadSellerProducts();
+        } catch (error) {
+            statusMessage = error.message || 'Could not create listing.';
+        }
     }
 
     async function addToCart(productId) {
@@ -343,19 +426,21 @@
 <div class="page-shell" data-page={currentPage}>
     <section class="hero">
         <div>
-            <p class="eyebrow">Buyer Frontend Preview</p>
+            <p class="eyebrow">{appMode === 'seller' ? 'Seller Workspace' : 'Buyer Workspace'}</p>
             <h1>Random Access Market</h1>
-            <p class="intro">
-                A Svelte-powered buyer interface running on top of the existing Express, Prisma, and MySQL stack.
-            </p>
         </div>
 
         <div class="hero-actions">
-            <a href="/buyer/home" class="action-link">Storefront</a>
-            <a href="/buyer/cart" class="action-link">Cart</a>
-            <a href="/buyer/checkout" class="action-link">Checkout</a>
-            <a href="/buyer/compare" class="action-link">Compare</a>
-            <a href="/buyer/classic/home" class="action-link secondary">Classic UI</a>
+            {#if appMode === 'seller'}
+                <a href="/seller/home" class="action-link">Seller Home</a>
+                <a href="/seller/inventory" class="action-link">Inventory</a>
+                <a href="/seller/classic/home" class="action-link secondary">Classic UI</a>
+            {:else}
+                <a href="/buyer/home" class="action-link">Storefront</a>
+                <a href="/buyer/cart" class="action-link">Cart</a>
+                <a href="/buyer/compare" class="action-link">Compare</a>
+                <a href="/buyer/classic/home" class="action-link secondary">Classic UI</a>
+            {/if}
             <button class="action-link logout-button" on:click={logout}>Log Out</button>
         </div>
     </section>
@@ -364,7 +449,11 @@
         <div class="catalog-header">
             <div>
                 <p class="section-kicker">
-                    {#if currentPage === 'cart'}
+                    {#if currentPage === 'seller-home'}
+                        Seller workspace
+                    {:else if currentPage === 'seller-inventory'}
+                        Inventory management
+                    {:else if currentPage === 'cart'}
                         Cart summary
                     {:else if currentPage === 'compare'}
                         Side-by-side shortlist
@@ -379,7 +468,11 @@
                     {/if}
                 </p>
                 <h2>
-                    {#if currentPage === 'cart'}
+                    {#if currentPage === 'seller-home'}
+                        Seller control center
+                    {:else if currentPage === 'seller-inventory'}
+                        Your listings
+                    {:else if currentPage === 'cart'}
                         Your cart
                     {:else if currentPage === 'compare'}
                         Compare products
@@ -401,6 +494,90 @@
             <div class="state-card">Loading products...</div>
         {:else if errorMessage}
             <div class="state-card error">{errorMessage}</div>
+        {:else if currentPage === 'seller-home'}
+            <div class="seller-home-grid">
+                <article class="detail-card">
+                    <p class="section-kicker">Modern seller mode</p>
+                    <h3>Manage your hardware storefront</h3>
+                    <p class="detail-description">
+                        Use the inventory workspace to create new listings, review approval status, and keep track of stock.
+                    </p>
+                    <div class="checkout-actions">
+                        <a class="checkout-link" href="/seller/inventory">Open inventory</a>
+                        <a class="checkout-link secondary-link" href="/seller/classic/home">Classic seller home</a>
+                    </div>
+                </article>
+
+                <article class="detail-card">
+                    <p class="section-kicker">Workflow</p>
+                    <h3>What this modern seller view currently covers</h3>
+                    <p class="detail-description">
+                        Listing creation and inventory review are already connected to the existing Express seller APIs. This keeps the frontend modern while preserving the current backend and approval flow.
+                    </p>
+                </article>
+            </div>
+        {:else if currentPage === 'seller-inventory'}
+            <div class="cart-layout">
+                <div class="panel">
+                    <div class="stack-form">
+                        <label for="seller-name">Product name</label>
+                        <input id="seller-name" bind:value={sellerForm.name} type="text" />
+
+                        <label for="seller-description">Description</label>
+                        <textarea id="seller-description" bind:value={sellerForm.description} rows="4"></textarea>
+
+                        <label for="seller-price">Price</label>
+                        <input id="seller-price" bind:value={sellerForm.price} type="number" min="0" step="0.01" />
+
+                        <label for="seller-stock">Stock</label>
+                        <input id="seller-stock" bind:value={sellerForm.stock} type="number" min="0" step="1" />
+
+                        <button class="checkout-link place-order-button" on:click={createSellerListing}>
+                            Create listing
+                        </button>
+                    </div>
+                </div>
+
+                <aside class="summary-panel inventory-panel">
+                    <p>Active records</p>
+                    <strong>{sellerProducts.length}</strong>
+                </aside>
+            </div>
+
+            {#if sellerProducts.length === 0}
+                <div class="state-card">No listings yet.</div>
+            {:else}
+                <div class="product-grid inventory-grid">
+                    {#each sellerProducts as item}
+                        <article class="product-card">
+                            <div class="card-topline">
+                                <span class="seller">
+                                    {#if item.listingStatus === 'pending'}
+                                        Pending approval
+                                    {:else if item.listingStatus === 'rejected'}
+                                        Rejected
+                                    {:else if item.isListed}
+                                        Listed
+                                    {:else}
+                                        Delisted
+                                    {/if}
+                                </span>
+                                <span class="stock">{item.stock} in stock</span>
+                            </div>
+
+                            <h3>{item.name}</h3>
+                            <p class="description">{item.description || 'No description provided.'}</p>
+
+                            <div class="card-footer">
+                                <div>
+                                    <p class="price">{formatCurrency(item.price)}</p>
+                                    <p class="seller">Created {new Date(item.createdAt).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </article>
+                    {/each}
+                </div>
+            {/if}
         {:else if currentPage === 'storefront' && products.length === 0}
             <div class="state-card">No listed products are available right now.</div>
         {:else if currentPage === 'product' && product}
@@ -457,7 +634,7 @@
                     <strong>{formatCurrency(cart.tax)}</strong>
                     <p>Total</p>
                     <strong>{formatCurrency(cart.total)}</strong>
-                    <a class="checkout-link" href="/buyer/checkout">Review checkout</a>
+                    <a class="checkout-link" href="/buyer/checkout">Checkout</a>
                 </aside>
             </div>
         {:else if currentPage === 'checkout'}
@@ -494,20 +671,24 @@
                     <strong>{formatCurrency(cart.total)}</strong>
                     <div class="payment-box">
                         <p class="payment-label">Payment method</p>
-                        <button
-                            class:selected={selectedPaymentMethod === 'demo_card'}
-                            class="payment-choice"
-                            on:click={() => { selectedPaymentMethod = 'demo_card'; statusMessage = 'Demo credit card selected.'; }}
-                        >
-                            Demo credit card ending in 4242
-                        </button>
+                        <div class="payment-choice selected">
+                            <div>
+                                <p class="payment-title">Demo credit card ending in 4242</p>
+                            </div>
+                        </div>
+                        <div class="payment-choice payment-placeholder" aria-disabled="true">
+                            <span class="payment-plus">+</span>
+                            <div>
+                                <p class="payment-title">Add another method</p>
+                                <p class="payment-copy">Reserved for future cards and other payment options.</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="checkout-actions">
                         <button class="checkout-link place-order-button" on:click={placeOrder} disabled={cart.items.length === 0}>
                             Place order
                         </button>
                         <a class="checkout-link secondary-link" href="/buyer/cart">Back to cart</a>
-                        <a class="checkout-link secondary-link" href="/buyer/classic/checkout">Classic checkout</a>
                     </div>
                 </aside>
             </div>
@@ -549,7 +730,6 @@
                     <strong>{formatCurrency(order.total)}</strong>
                     <div class="checkout-actions">
                         <a class="checkout-link" href="/buyer/home">Continue shopping</a>
-                        <a class="checkout-link secondary-link" href={`/buyer/classic/orders/${order.id}/confirmation`}>Classic confirmation</a>
                     </div>
                 </aside>
             </div>
