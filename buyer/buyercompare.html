@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compare Products</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>COMPARE PRODUCTS</h1>
+    <div class="header-nav">
+      <a href="/buyer/classic/home">Classic Home</a>
+      <a href="/buyer/compare">Modern UI</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="box">
+    <p class="section-copy">Products marked for comparison are listed here with the same lightweight buyer tooling already used elsewhere.</p>
+    <table class="grid">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="compare-list"></tbody>
+    </table>
+    <p id="buyer-message" class="status-message"></p>
+  </div>
+
+  <script>
+    // Fetch JSON from API
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function truncate(text, maxLength) {
+      if (!text) return '';
+      return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Build table rows
+    function buildProductRow(item) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><a href="/buyer/classic/products/${item.id}">${escapeHtml(item.name)}</a></td>
+        <td>${escapeHtml(truncate(item.description || '', 120))}</td>
+        <td>${escapeHtml(formatCurrency(item.price))}</td>
+        <td>
+          <button class="add-to-cart" data-product-id="${item.id}">Add To Cart</button>
+          <button class="remove-from-compare" data-product-id="${item.id}">Remove</button>
+        </td>
+      `;
+      
+      // Event listeners for buttons
+      tr.querySelector('.add-to-cart').addEventListener('click', async () => {
+        // call API to add to cart
+        await addToCart(item.id);
+      });
+
+      tr.querySelector('.remove-from-compare').addEventListener('click', async () => {
+        await removeFromCompare(item.id);
+      });
+
+      return tr;
+    }
+
+    // Load products
+    async function loadProducts() {
+      try {
+        const list = await fetchJson('/api/buyer/compare');
+        const tbody = document.getElementById('compare-list');
+        tbody.innerHTML = '';
+
+        if (!list.items || list.items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4">No products marked for comparison.</td></tr>';
+          return;
+        }
+
+        list.items.forEach((product) => {
+          tbody.appendChild(buildProductRow(product));
+        });
+      } catch (error) {
+        console.error(error);
+        document.getElementById('buyer-message').textContent = error.message || 'Could not load comparison products.';
+      }
+    }
+
+    async function addToCart(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson('/api/buyer/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1
+          })
+        });
+
+        message.textContent = 'Item added to cart.';
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not add item to cart.';
+      }
+    }
+
+    async function removeFromCompare(productId) {
+      const message = document.getElementById('buyer-message');
+
+      try {
+        await fetchJson(`/api/buyer/compare/${productId}/remove`, {
+          method: 'POST'
+        });
+
+        message.textContent = 'Item removed from comparison list.';
+        await loadProducts();
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Could not remove item.';
+      }
+    }
+
+    loadProducts().catch((error) => {
+      console.error(error);
+      document.getElementById('buyer-message').textContent = error.message || 'Could not load list.';
+    });
+  </script>
+</body>
+</html>

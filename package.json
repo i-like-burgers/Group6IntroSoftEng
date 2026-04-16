@@ -1,0 +1,50 @@
+{
+  "name": "group6introsofteng",
+  "version": "1.0.0",
+  "description": "An e-commerce platform thing",
+  "homepage": "https://github.com/i-like-burgers/Group6IntroSoftEng#readme",
+  "bugs": {
+    "url": "https://github.com/i-like-burgers/Group6IntroSoftEng/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/i-like-burgers/Group6IntroSoftEng.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "frontend:dev": "vite --config vite.config.mjs",
+    "frontend:build": "vite build --config vite.config.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "node prisma/seed.js",
+    "db:reset": "prisma migrate reset --force",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:report": "jest --runInBand --json --outputFile=reports/jest-results.json"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^6.19.2"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "svelte": "^5.55.1",
+    "vite": "^8.0.3"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "keywords": []
+}

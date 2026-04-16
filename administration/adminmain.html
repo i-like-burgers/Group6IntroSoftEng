@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="header">
+        <h1>ADMINISTRATION HOME</h1>
+        <div class="header-nav">
+            <a href="/admin">Modern UI</a>
+            <form class="logout-form" method="POST" action="/logout">
+                <button type="submit">Log Out</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="box">
+            <h2>Moderation</h2>
+            <p class="section-copy">Manage users and seller listings.</p>
+            <p><a href="/admin/sub">User Management</a></p>
+        </div>
+
+        <div class="box">
+            <h2>Audit Log</h2>
+            <p class="section-copy">Review recent listing, delisting, and cart actions.</p>
+            <p><a href="/admin/audit">Open Audit Log</a></p>
+        </div>
+    </div>
+</body>
+</html>

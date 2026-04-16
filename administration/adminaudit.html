@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Audit Log</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>AUDIT LOG</h1>
+    <div class="header-nav">
+      <a href="/admin">Modern UI</a>
+      <a href="/admin/classic">Classic Home</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Recent Actions</h2>
+    <p class="section-copy">Shows the most recent listing creation, product delisting, and buyer cart additions.</p>
+
+    <table class="grid">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="audit-log-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleString();
+    }
+
+    function formatActionType(actionType) {
+      return actionType
+        .split('_')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function buildLogRow(log) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(formatDate(log.createdAt))}</td>
+        <td>${escapeHtml(log.username)}</td>
+        <td>${escapeHtml(formatActionType(log.actionType))}</td>
+        <td>${escapeHtml(log.details)}</td>
+      `;
+      return tr;
+    }
+
+    async function loadAuditLogs() {
+      const logs = await fetchJson('/api/admin/audit-logs');
+      const tbody = document.getElementById('audit-log-body');
+      tbody.innerHTML = '';
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">No audit log entries yet.</td></tr>';
+        return;
+      }
+
+      logs.forEach((log) => {
+        tbody.appendChild(buildLogRow(log));
+      });
+    }
+
+    loadAuditLogs().catch((error) => {
+      console.error(error);
+      alert(error.message || 'Could not load audit logs.');
+    });
+  </script>
+</body>
+</html>

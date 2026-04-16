@@ -1,0 +1,69 @@
+/* Universal values */
+* {
+    color:limegreen;
+    background-color:black;
+}
+
+/*Page content*/
+body {
+    text-align:left
+}
+
+/* Headings */
+h1 {
+    font-size:32px;
+    text-align:center
+}
+
+h2 {
+    font-size:24px;
+}
+
+/* Paragraph style*/
+p {
+    font-size: 16px;
+}
+
+a{
+    color:orange;
+}
+
+button {
+    border: 1px solid limegreen;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.page-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.table_container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    border: 1px solid white;
+    padding: 5px;
+    width: 70%;
+    margin: 0 auto;
+}
+
+.compare {
+    width: 90%;
+    border-collapse:separate;
+    text-align: left;
+    border: 2px solid white
+}
+
+.compare th {
+    background-color:black;
+    color: lime;
+}

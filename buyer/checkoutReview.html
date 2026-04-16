@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout Review</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>REVIEW YOUR ORDER</h1>
+    <div class="header-nav">
+      <a href="/buyer/classic/cart">Back To Cart</a>
+      <a href="/buyer/home">Modern UI</a>
+      <a href="/buyer/classic/home">Classic Home</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="box">
+      <h2>Items To Purchase</h2>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seller</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Line Total</th>
+          </tr>
+        </thead>
+        <tbody id="review-items-body"></tbody>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Confirm Purchase</h2>
+      <div class="summary-card">
+        <p>Subtotal: <strong id="subtotal">$0.00</strong></p>
+        <p>Estimated Tax: <strong id="tax">$0.00</strong></p>
+        <p>Total: <strong id="total">$0.00</strong></p>
+        <p class="muted-label">Select your payment method.</p>
+
+        <div class="row">
+          <label>Payment Method</label>
+        </div>
+        <div class="payment-option-grid">
+          <button
+            id="demo-card-option"
+            class="payment-option is-selectable"
+            type="button"
+            data-payment-method="demo_card"
+            aria-pressed="false"
+          >
+            <p class="payment-option-title">Demo Credit Card</p>
+            <p class="payment-option-copy">Visa ending in 4242</p>
+            <p class="payment-option-copy">Use this placeholder card to complete the simulated purchase.</p>
+          </button>
+
+          <div class="payment-option" aria-disabled="true">
+            <p class="payment-option-plus">+</p>
+            <p class="payment-option-title">Add Another Method</p>
+            <p class="payment-option-copy">Reserved for future cards and other payment options.</p>
+          </div>
+        </div>
+
+        <div class="action-group">
+          <button id="place-order-button" type="button">Place Order</button>
+          <a href="/buyer/classic/cart">Cancel</a>
+        </div>
+
+        <p id="checkout-message" class="status-message"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedPaymentMethod = '';
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function buildRow(item) {
+      const tr = document.createElement('tr');
+      const lineTotal = item.product.price * item.quantity;
+
+      tr.innerHTML = `
+        <td>${escapeHtml(item.product.name)}</td>
+        <td>${escapeHtml(item.product.seller.username)}</td>
+        <td>${escapeHtml(formatCurrency(item.product.price))}</td>
+        <td>${escapeHtml(String(item.quantity))}</td>
+        <td>${escapeHtml(formatCurrency(lineTotal))}</td>
+      `;
+
+      return tr;
+    }
+
+    async function loadCheckoutReview() {
+      const cart = await fetchJson('/api/buyer/cart');
+      const tbody = document.getElementById('review-items-body');
+      const button = document.getElementById('place-order-button');
+      const message = document.getElementById('checkout-message');
+
+      tbody.innerHTML = '';
+
+      if (cart.items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Your cart is empty. Return to the cart before checking out.</td></tr>';
+        button.disabled = true;
+        message.textContent = 'No items are available to purchase.';
+      } else {
+        cart.items.forEach((item) => {
+          tbody.appendChild(buildRow(item));
+        });
+        button.disabled = false;
+        message.textContent = '';
+      }
+
+      document.getElementById('subtotal').textContent = formatCurrency(cart.subtotal);
+      document.getElementById('tax').textContent = formatCurrency(cart.tax);
+      document.getElementById('total').textContent = formatCurrency(cart.total);
+    }
+
+    async function placeOrder() {
+      const button = document.getElementById('place-order-button');
+      const message = document.getElementById('checkout-message');
+      const paymentMethod = selectedPaymentMethod;
+
+      if (!paymentMethod) {
+        message.textContent = 'Select the demo card before placing the order.';
+        return;
+      }
+
+      try {
+        button.disabled = true;
+        message.textContent = 'Processing order...';
+
+        const result = await fetchJson('/api/buyer/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ paymentMethod })
+        });
+
+        message.textContent = `Order #${result.order.id} placed successfully.`;
+        window.location.href = `/buyer/orders/${result.order.id}/confirmation`;
+      } catch (error) {
+        console.error(error);
+        message.textContent = error.message || 'Checkout failed.';
+        await loadCheckoutReview();
+      }
+    }
+
+    function selectPaymentMethod(paymentMethod) {
+      selectedPaymentMethod = paymentMethod;
+
+      const demoCardOption = document.getElementById('demo-card-option');
+      const isSelected = paymentMethod === 'demo_card';
+      demoCardOption.classList.toggle('is-selected', isSelected);
+      demoCardOption.setAttribute('aria-pressed', String(isSelected));
+      document.getElementById('checkout-message').textContent = isSelected
+        ? 'Demo credit card selected.'
+        : '';
+    }
+
+    document.getElementById('demo-card-option').addEventListener('click', () => {
+      selectPaymentMethod('demo_card');
+    });
+    document.getElementById('place-order-button').addEventListener('click', placeOrder);
+
+    loadCheckoutReview().catch((error) => {
+      console.error(error);
+      alert(error.message || 'Could not load checkout review.');
+    });
+  </script>
+</body>
+</html>

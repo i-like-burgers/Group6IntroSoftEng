@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buyer Cart</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>YOUR CART</h1>
+    <div class="header-nav">
+      <a href="/buyer/classic/home">Classic Home</a>
+      <a href="/buyer/cart">Modern UI</a>
+      <a href="/buyer/classic/checkout">Classic Checkout</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="box">
+      <h2>Items</h2>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seller</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Line Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items-body"></tbody>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Summary</h2>
+      <div class="summary-card">
+        <p>Subtotal: <strong id="subtotal">$0.00</strong></p>
+        <p>Estimated Tax: <strong id="tax">$0.00</strong></p>
+        <p>Total: <strong id="total">$0.00</strong></p>
+        <p class="muted-label">Tax uses a simple placeholder rate of 7% for now.</p>
+        <a id="checkout-link" href="/buyer/checkout">Review Checkout</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function buildCartRow(item) {
+      const tr = document.createElement('tr');
+      const lineTotal = item.product.price * item.quantity;
+
+      tr.innerHTML = `
+        <td>${escapeHtml(item.product.name)}</td>
+        <td>${escapeHtml(item.product.seller.username)}</td>
+        <td>${escapeHtml(formatCurrency(item.product.price))}</td>
+        <td>${escapeHtml(String(item.quantity))}</td>
+        <td>${escapeHtml(formatCurrency(lineTotal))}</td>
+        <td><button data-cart-item-id="${item.id}" class="danger-button">Remove</button></td>
+      `;
+
+      tr.querySelector('button').addEventListener('click', async () => {
+        await removeItem(item.id);
+      });
+
+      return tr;
+    }
+
+    async function loadCart() {
+      const cart = await fetchJson('/api/buyer/cart');
+      const tbody = document.getElementById('cart-items-body');
+      const checkoutLink = document.getElementById('checkout-link');
+      tbody.innerHTML = '';
+
+      if (cart.items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
+        checkoutLink.style.pointerEvents = 'none';
+        checkoutLink.style.opacity = '0.45';
+      } else {
+        cart.items.forEach((item) => {
+          tbody.appendChild(buildCartRow(item));
+        });
+        checkoutLink.style.pointerEvents = 'auto';
+        checkoutLink.style.opacity = '1';
+      }
+
+      document.getElementById('subtotal').textContent = formatCurrency(cart.subtotal);
+      document.getElementById('tax').textContent = formatCurrency(cart.tax);
+      document.getElementById('total').textContent = formatCurrency(cart.total);
+    }
+
+    async function removeItem(cartItemId) {
+      try {
+        await fetchJson(`/api/buyer/cart/${cartItemId}/remove`, {
+          method: 'POST'
+        });
+
+        await loadCart();
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'Could not remove item.');
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadCart().catch((error) => {
+      console.error(error);
+      alert(error.message || 'Could not load cart.');
+    });
+  </script>
+</body>
+</html>

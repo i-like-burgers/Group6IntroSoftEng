@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  role      String
+  approved  Boolean   @default(false)
+  blocked   Boolean   @default(false)
+  banned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  products   Product[]  @relation("SellerProducts")
+  cartItems  CartItem[] @relation("BuyerCartItems")
+  orders     Order[]    @relation("BuyerOrders")
+  comparison Compare[]
+  authTokens AuthToken[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?   @db.Text
+  price       Float
+  stock       Int
+  createdAt   DateTime  @default(now())
+
+  isListed    Boolean   @default(true)
+  listingStatus String  @default("pending")
+
+  sellerId    Int
+  seller       User      @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
+  cartItems    CartItem[]
+  compareItems Compare[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  buyerId   Int
+  productId Int
+
+  buyer     User     @relation("BuyerCartItems", fields: [buyerId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([buyerId, productId])
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  status    String      @default("placed")
+  paymentMethod String
+  subtotal  Float
+  taxRate   Float
+  taxAmount Float
+  total     Float
+  createdAt DateTime    @default(now())
+
+  buyerId   Int
+
+  buyer     User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  sellerId    Int
+  productName String
+  unitPrice   Float
+  quantity    Int
+  lineTotal   Float
+
+  orderId     Int
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  actorId     Int?
+  username    String
+  actionType  String
+  details     String   @db.Text
+  createdAt   DateTime @default(now())
+}
+
+model Compare {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  buyerID   Int
+  productID Int
+
+  buyer     User     @relation(fields: [buyerID], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productID], references: [id], onDelete: Cascade)
+
+  @@unique([buyerID, productID])
+}
+
+model AuthToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  deleteAt  DateTime?
+
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

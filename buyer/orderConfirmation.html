@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Confirmation</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>ORDER CONFIRMATION</h1>
+    <div class="header-nav">
+      <a href="/buyer/home">Modern UI</a>
+      <a href="/buyer/classic/home">Classic Home</a>
+      <a href="/buyer/classic/cart">Classic Cart</a>
+      <form class="logout-form" method="POST" action="/logout">
+        <button type="submit">Log Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="box">
+      <h2>Purchased Items</h2>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seller Id</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Line Total</th>
+          </tr>
+        </thead>
+        <tbody id="order-items-body"></tbody>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Order Details</h2>
+      <div class="summary-card">
+        <p>Order Number: <strong id="order-id">-</strong></p>
+        <p>Status: <strong id="order-status">-</strong></p>
+        <p>Payment Method: <strong id="payment-method">-</strong></p>
+        <p>Placed At: <strong id="created-at">-</strong></p>
+        <p>Subtotal: <strong id="subtotal">$0.00</strong></p>
+        <p>Tax: <strong id="tax">$0.00</strong></p>
+        <p>Total: <strong id="total">$0.00</strong></p>
+        <p id="confirmation-message" class="status-message"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Request failed');
+      }
+
+      return data;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    }
+
+    function formatDate(value) {
+      return new Intl.DateTimeFormat('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(new Date(value));
+    }
+
+    function formatPaymentMethod(paymentMethod) {
+      if (paymentMethod === 'demo_card') {
+        return 'Demo Credit Card';
+      }
+
+      return paymentMethod;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function buildRow(item) {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${escapeHtml(item.productName)}</td>
+        <td>${escapeHtml(String(item.sellerId))}</td>
+        <td>${escapeHtml(formatCurrency(item.unitPrice))}</td>
+        <td>${escapeHtml(String(item.quantity))}</td>
+        <td>${escapeHtml(formatCurrency(item.lineTotal))}</td>
+      `;
+
+      return tr;
+    }
+
+    async function loadOrder() {
+      const orderId = window.location.pathname.split('/')[3];
+      const order = await fetchJson(`/api/buyer/orders/${orderId}`);
+      const tbody = document.getElementById('order-items-body');
+
+      tbody.innerHTML = '';
+      order.items.forEach((item) => {
+        tbody.appendChild(buildRow(item));
+      });
+
+      document.getElementById('order-id').textContent = order.id;
+      document.getElementById('order-status').textContent = order.status;
+      document.getElementById('payment-method').textContent = formatPaymentMethod(order.paymentMethod);
+      document.getElementById('created-at').textContent = formatDate(order.createdAt);
+      document.getElementById('subtotal').textContent = formatCurrency(order.subtotal);
+      document.getElementById('tax').textContent = formatCurrency(order.taxAmount);
+      document.getElementById('total').textContent = formatCurrency(order.total);
+      document.getElementById('confirmation-message').textContent = 'Your order has been placed successfully.';
+    }
+
+    loadOrder().catch((error) => {
+      console.error(error);
+      alert(error.message || 'Could not load order confirmation.');
+    });
+  </script>
+</body>
+</html>
