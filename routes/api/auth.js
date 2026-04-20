@@ -63,7 +63,9 @@ router.post('/login', async (req, res) => {
 
         const failureMessage = getLoginFailure(user, passwordMatches);
         if (failureMessage) {
-            return res.send(failureMessage);
+            return res.status(401).json({
+                error: failureMessage
+            })
         }
 
         const token = auth.generateToken();
@@ -76,13 +78,21 @@ router.post('/login', async (req, res) => {
 
         const redirectPath = getRedirectForRole(user.role);
         if (!redirectPath) {
-            return res.send('Internal server error');
+            return res.status(500).json({
+                error: 'Internal server error'
+            });
         }
 
-        res.redirect(redirectPath);
+        res.json({
+            success: true,
+            redirect: redirectPath
+        });
+
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal server error');
+        res.status(500).json({
+            error: 'Internal server error'
+        });
     }
 });
 

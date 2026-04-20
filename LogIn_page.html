@@ -1,19 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAM LogIn Page</title>
-    <link rel="stylesheet" href="/css/default_placeholder.css">
-</head>
-<body>
-    <h1>Random Access Market</h1>
-    <h2>Log in Page</h2>
-    <p>This will be used for logging in.</p>
-</body>
-<form action="/login" method="post">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RAM LogIn Page</title>
+        <link rel="stylesheet" href="/css/default_placeholder.css">
+    </head>
+    <body>
+            <h1>Random Access Market</h1>
+            <h2>Log in Page</h2>
+            <p>This will be used for logging in.</p>
+        <form id="loginForm">
+            <input id="username" type="text" name="username" placeholder="Username" required>
+            <input id="password" type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <p id="errorMessage" style="color:red;"></p>
+        </form>
+    </body>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault(); // Stop page reload
+
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+            const error = document.getElementById("errorMessage");
+            
+            error.textContent = "";
+
+            try{
+                const res = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username.value,
+                        password: password.value
+                    })
+                });
+
+                const data = await res.json();
+
+                if(!res.ok)
+                {
+                    error.textContent = data.error || "Login failed";
+                    password.value = "";
+                    return;
+                }
+
+                window.location.href = data.redirect;
+            }
+            catch(err)
+            {
+                console.error(err);
+                error.textContent = "Network error";
+            }
+        });
+    </script>
 </html>
