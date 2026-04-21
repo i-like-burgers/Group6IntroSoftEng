@@ -10,7 +10,7 @@ router.get("/css", (req, res) => {
 
 router.get('/',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminApp.html'));
     }
@@ -18,7 +18,7 @@ router.get('/',
 
 router.get('/sub',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminApp.html'));
     }
@@ -26,7 +26,7 @@ router.get('/sub',
 
 router.get('/audit',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminApp.html'));
     }
@@ -34,7 +34,7 @@ router.get('/audit',
 
 router.get('/classic',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminmain.html'));
     }
@@ -42,7 +42,7 @@ router.get('/classic',
 
 router.get('/classic/sub',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminsub.html'));
     }
@@ -50,7 +50,7 @@ router.get('/classic/sub',
 
 router.get('/classic/audit',
     auth.authenticateToken,
-    requireRole('admin'),
+    requireRole('admin', 'super-admin'),
     (req, res) => {
         res.sendFile(path.join(__dirname, '../administration/adminaudit.html'));
     }

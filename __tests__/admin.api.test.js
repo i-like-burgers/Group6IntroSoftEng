@@ -5,6 +5,7 @@ function loadAdminApiApp({ role = 'admin', prismaOverrides = {} } = {}) {
 
     const prismaMock = {
         user: {
+            findUnique: jest.fn(),
             findMany: jest.fn(),
             count: jest.fn(),
             update: jest.fn()
@@ -101,6 +102,10 @@ describe('admin api routes', () => {
 
     test('POST /api/admin/ban-user/:id bans a user', async () => {
         const { app, prismaMock } = loadAdminApiApp();
+        prismaMock.user.findUnique.mockResolvedValue({
+            id: 88,
+            role: 'buyer'
+        });
         prismaMock.user.update.mockResolvedValue({
             id: 88,
             username: 'problem-buyer',
@@ -139,6 +144,98 @@ describe('admin api routes', () => {
         expect(response.status).toBe(403);
         expect(response.body).toEqual({
             error: 'Admins cannot block their own account'
+        });
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
+    test('POST /api/admin/ban-user/:id rejects attempts to ban another admin', async () => {
+        const { app, prismaMock } = loadAdminApiApp();
+        prismaMock.user.findUnique.mockResolvedValue({
+            id: 22,
+            role: 'admin'
+        });
+
+        const response = await request(app).post('/api/admin/ban-user/22');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({
+            error: 'Admins cannot ban other admin accounts'
+        });
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
+    test('POST /api/admin/block-user/:id rejects attempts to block another admin', async () => {
+        const { app, prismaMock } = loadAdminApiApp();
+        prismaMock.user.findUnique.mockResolvedValue({
+            id: 22,
+            role: 'admin'
+        });
+
+        const response = await request(app).post('/api/admin/block-user/22');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({
+            error: 'Admins cannot block other admin accounts'
+        });
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
+    test('POST /api/admin/ban-user/:id allows super-admin to ban an admin account', async () => {
+        const { app, prismaMock } = loadAdminApiApp({ role: 'super-admin' });
+        prismaMock.user.findUnique.mockResolvedValue({
+            id: 22,
+            role: 'admin'
+        });
+        prismaMock.user.update.mockResolvedValue({
+            id: 22,
+            username: 'other-admin',
+            blocked: false,
+            banned: true
+        });
+
+        const response = await request(app).post('/api/admin/ban-user/22');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            id: 22,
+            username: 'other-admin',
+            blocked: false,
+            banned: true
+        });
+    });
+
+    test('POST /api/admin/block-user/:id allows super-admin to block an admin account', async () => {
+        const { app, prismaMock } = loadAdminApiApp({ role: 'super-admin' });
+        prismaMock.user.findUnique.mockResolvedValue({
+            id: 22,
+            role: 'admin'
+        });
+        prismaMock.user.update.mockResolvedValue({
+            id: 22,
+            username: 'other-admin',
+            blocked: true,
+            banned: false
+        });
+
+        const response = await request(app).post('/api/admin/block-user/22');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            id: 22,
+            username: 'other-admin',
+            blocked: true,
+            banned: false
+        });
+    });
+
+    test('POST /api/admin/ban-user/:id rejects super-admin self-ban attempts', async () => {
+        const { app, prismaMock } = loadAdminApiApp({ role: 'super-admin' });
+
+        const response = await request(app).post('/api/admin/ban-user/11');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({
+            error: 'Admins cannot ban their own account'
         });
         expect(prismaMock.user.update).not.toHaveBeenCalled();
     });

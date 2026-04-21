@@ -7,7 +7,7 @@ const { logAuditAction } = require('../../services/audit');
 
 const router = express.Router();
 
-router.use(auth.authenticateToken, requireRole('admin'));
+router.use(auth.authenticateToken, requireRole('admin', 'super-admin'));
 
 function validateTargetUserId(rawId) {
     const id = Number.parseInt(rawId, 10);
@@ -21,6 +21,24 @@ function validateTargetUserId(rawId) {
 
 function isSelfModeration(req, userId) {
     return req.user?.id === userId;
+}
+
+function isAdminRole(role) {
+    return role === 'admin' || role === 'super-admin';
+}
+
+function isSuperAdmin(req) {
+    return req.user?.role === 'super-admin';
+}
+
+async function getTargetUserForModeration(id) {
+    return prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            role: true
+        }
+    });
 }
 
 router.get('/pending-users', async (req, res) => {
@@ -94,6 +112,16 @@ router.post('/block-user/:id', async (req, res) => {
             return res.status(403).json({ error: 'Admins cannot block their own account' });
         }
 
+        const targetUser = await getTargetUserForModeration(id);
+
+        if (!targetUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (isAdminRole(targetUser.role) && !isSuperAdmin(req)) {
+            return res.status(403).json({ error: 'Admins cannot block other admin accounts' });
+        }
+
         const user = await prisma.user.update({
             where: { id },
             data: {
@@ -125,6 +153,16 @@ router.post('/ban-user/:id', async (req, res) => {
 
         if (isSelfModeration(req, id)) {
             return res.status(403).json({ error: 'Admins cannot ban their own account' });
+        }
+
+        const targetUser = await getTargetUserForModeration(id);
+
+        if (!targetUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (isAdminRole(targetUser.role) && !isSuperAdmin(req)) {
+            return res.status(403).json({ error: 'Admins cannot ban other admin accounts' });
         }
 
         const user = await prisma.user.update({

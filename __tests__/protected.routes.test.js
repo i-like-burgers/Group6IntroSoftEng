@@ -78,6 +78,14 @@ describe('protected routes', () => {
         expect(response.text).toContain('Admin Workspace');
     });
 
+    test('authenticated super-admin can access /admin', async () => {
+        const app = loadAppForRole('super-admin');
+        const response = await request(app).get('/admin');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Admin Workspace');
+    });
+
     test('authenticated admin can access /admin/sub', async () => {
         const app = loadAppForRole('admin');
         const response = await request(app).get('/admin/sub');

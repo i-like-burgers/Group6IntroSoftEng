@@ -5,6 +5,15 @@ const prisma = new PrismaClient();
 
 const seedUsers = [
   {
+    username: process.env.SEED_SUPER_ADMIN_USERNAME || 'superadmin',
+    email: process.env.SEED_SUPER_ADMIN_EMAIL || 'superadmin@ram.local',
+    password: process.env.SEED_SUPER_ADMIN_PASSWORD || 'superadmin1234',
+    role: 'super-admin',
+    approved: true,
+    blocked: false,
+    banned: false,
+  },
+  {
     username: process.env.SEED_ADMIN_USERNAME || 'admin',
     email: process.env.SEED_ADMIN_EMAIL || 'admin@ram.local',
     password: process.env.SEED_ADMIN_PASSWORD || 'admin1234',
@@ -59,7 +68,7 @@ async function upsertUser(user) {
 }
 
 async function main() {
-  const [admin, seller, buyer] = await Promise.all(seedUsers.map(upsertUser));
+  const [superAdmin, admin, seller, buyer] = await Promise.all(seedUsers.map(upsertUser));
 
   await prisma.product.upsert({
     where: { id: 1 },
@@ -85,9 +94,10 @@ async function main() {
   });
 
   console.log('Seed complete.');
-  console.log(`Admin: ${admin.username} / ${seedUsers[0].password}`);
-  console.log(`Seller: ${seller.username} / ${seedUsers[1].password}`);
-  console.log(`Buyer: ${buyer.username} / ${seedUsers[2].password}`);
+  console.log(`Super Admin: ${superAdmin.username} / ${seedUsers[0].password}`);
+  console.log(`Admin: ${admin.username} / ${seedUsers[1].password}`);
+  console.log(`Seller: ${seller.username} / ${seedUsers[2].password}`);
+  console.log(`Buyer: ${buyer.username} / ${seedUsers[3].password}`);
 }
 
 main()

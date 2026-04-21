@@ -39,6 +39,10 @@ function getRedirectForRole(role) {
         return '/admin';
     }
 
+    if (role === 'super-admin') {
+        return '/admin';
+    }
+
     return null;
 }
 

@@ -3,11 +3,13 @@
   on:
     push:
       branches:
+        - sprint4/staging
         - sprint3/Staging
         - staging
         - main
     pull_request:
       branches:
+        - sprint4/staging
         - sprint3/Staging
         - staging
         - main
