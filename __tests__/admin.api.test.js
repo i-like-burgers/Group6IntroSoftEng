@@ -119,6 +119,30 @@ describe('admin api routes', () => {
         });
     });
 
+    test('POST /api/admin/ban-user/:id rejects self-ban attempts', async () => {
+        const { app, prismaMock } = loadAdminApiApp();
+
+        const response = await request(app).post('/api/admin/ban-user/11');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({
+            error: 'Admins cannot ban their own account'
+        });
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
+    test('POST /api/admin/block-user/:id rejects self-block attempts', async () => {
+        const { app, prismaMock } = loadAdminApiApp();
+
+        const response = await request(app).post('/api/admin/block-user/11');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({
+            error: 'Admins cannot block their own account'
+        });
+        expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
     test('GET /api/admin/users returns paginated user data', async () => {
         const { app, prismaMock } = loadAdminApiApp();
         prismaMock.user.findMany.mockResolvedValue([

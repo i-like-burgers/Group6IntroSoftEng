@@ -9,6 +9,20 @@ const router = express.Router();
 
 router.use(auth.authenticateToken, requireRole('admin'));
 
+function validateTargetUserId(rawId) {
+    const id = Number.parseInt(rawId, 10);
+
+    if (Number.isNaN(id)) {
+        return null;
+    }
+
+    return id;
+}
+
+function isSelfModeration(req, userId) {
+    return req.user?.id === userId;
+}
+
 router.get('/pending-users', async (req, res) => {
     try {
         const users = await prisma.user.findMany({
@@ -38,9 +52,9 @@ router.get('/pending-users', async (req, res) => {
 
 router.post('/approve-user/:id', async (req, res) => {
     try {
-        const id = Number.parseInt(req.params.id, 10);
+        const id = validateTargetUserId(req.params.id);
 
-        if (Number.isNaN(id)) {
+        if (id === null) {
             return res.status(400).json({ error: 'Invalid user id' });
         }
 
@@ -70,10 +84,14 @@ router.post('/approve-user/:id', async (req, res) => {
 
 router.post('/block-user/:id', async (req, res) => {
     try {
-        const id = Number.parseInt(req.params.id, 10);
+        const id = validateTargetUserId(req.params.id);
 
-        if (Number.isNaN(id)) {
+        if (id === null) {
             return res.status(400).json({ error: 'Invalid user id' });
+        }
+
+        if (isSelfModeration(req, id)) {
+            return res.status(403).json({ error: 'Admins cannot block their own account' });
         }
 
         const user = await prisma.user.update({
@@ -99,10 +117,14 @@ router.post('/block-user/:id', async (req, res) => {
 
 router.post('/ban-user/:id', async (req, res) => {
     try {
-        const id = Number.parseInt(req.params.id, 10);
+        const id = validateTargetUserId(req.params.id);
 
-        if (Number.isNaN(id)) {
+        if (id === null) {
             return res.status(400).json({ error: 'Invalid user id' });
+        }
+
+        if (isSelfModeration(req, id)) {
+            return res.status(403).json({ error: 'Admins cannot ban their own account' });
         }
 
         const user = await prisma.user.update({
