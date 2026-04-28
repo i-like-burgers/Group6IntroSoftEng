@@ -911,6 +911,18 @@ textarea:focus-visible {
     gap: 14px;
 }
 
+.checkout-stack {
+    display: grid;
+    gap: 18px;
+}
+
+.shipping-panel {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+}
+
 .line-card {
     display: flex;
     align-items: center;

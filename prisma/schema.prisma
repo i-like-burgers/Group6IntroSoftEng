@@ -30,6 +30,7 @@ model User {
   orders     Order[]    @relation("BuyerOrders")
   comparison Compare[]
   authTokens AuthToken[]
+  sellerWebhookSubscription SellerWebhookSubscription?
 }
 
 model Product {
@@ -67,6 +68,13 @@ model Order {
   id        Int         @id @default(autoincrement())
   status    String      @default("placed")
   paymentMethod String
+  shipToName String
+  shipToLine1 String
+  shipToLine2 String?
+  shipToCity String
+  shipToState String
+  shipToPostalCode String
+  shipToCountry String
   subtotal  Float
   taxRate   Float
   taxAmount Float
@@ -77,6 +85,18 @@ model Order {
 
   buyer     User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
   items     OrderItem[]
+}
+
+model SellerWebhookSubscription {
+  id            Int      @id @default(autoincrement())
+  endpointUrl   String?
+  signingSecret String
+  isActive      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sellerId      Int      @unique
+  seller        User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 }
 
 model OrderItem {

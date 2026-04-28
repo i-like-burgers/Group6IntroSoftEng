@@ -5,6 +5,7 @@ const auth = require('../../authenticate');
 const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
 const { addCompareItem, getCompareItems, removeCompareItem } = require('../../buyer/product_handling');
+const { deliverSellerOrderPlacedWebhooks } = require('../../services/seller-webhooks');
 
 const router = express.Router();
 const PAYMENT_METHODS = new Set([
@@ -12,6 +13,29 @@ const PAYMENT_METHODS = new Set([
     'demo_paypal',
     'cash_on_delivery'
 ]);
+
+function normalizeShippingAddress(input) {
+    const shippingAddress = input && typeof input === 'object' ? input : {};
+
+    return {
+        name: String(shippingAddress.name || '').trim(),
+        line1: String(shippingAddress.line1 || '').trim(),
+        line2: String(shippingAddress.line2 || '').trim(),
+        city: String(shippingAddress.city || '').trim(),
+        state: String(shippingAddress.state || '').trim(),
+        postalCode: String(shippingAddress.postalCode || '').trim(),
+        country: String(shippingAddress.country || '').trim()
+    };
+}
+
+function isShippingAddressComplete(shippingAddress) {
+    return shippingAddress.name
+        && shippingAddress.line1
+        && shippingAddress.city
+        && shippingAddress.state
+        && shippingAddress.postalCode
+        && shippingAddress.country;
+}
 
 router.use(auth.authenticateToken, requireRole('buyer'));
 
@@ -313,9 +337,14 @@ router.post('/checkout', async (req, res) => {
     try {
         const taxRate = 0.07;
         const paymentMethod = String(req.body.paymentMethod || '');
+        const shippingAddress = normalizeShippingAddress(req.body.shippingAddress);
 
         if (!PAYMENT_METHODS.has(paymentMethod)) {
             return res.status(400).json({ error: 'A valid payment method is required' });
+        }
+
+        if (!isShippingAddressComplete(shippingAddress)) {
+            return res.status(400).json({ error: 'A complete shipping address is required' });
         }
 
         const order = await prisma.$transaction(async (tx) => {
@@ -370,6 +399,13 @@ router.post('/checkout', async (req, res) => {
                 data: {
                     buyerId: req.user.id,
                     paymentMethod,
+                    shipToName: shippingAddress.name,
+                    shipToLine1: shippingAddress.line1,
+                    shipToLine2: shippingAddress.line2 || null,
+                    shipToCity: shippingAddress.city,
+                    shipToState: shippingAddress.state,
+                    shipToPostalCode: shippingAddress.postalCode,
+                    shipToCountry: shippingAddress.country,
                     subtotal,
                     taxRate,
                     taxAmount,
@@ -436,6 +472,10 @@ router.post('/checkout', async (req, res) => {
             });
 
             return order;
+        });
+
+        await deliverSellerOrderPlacedWebhooks(order).catch((error) => {
+            console.error(error);
         });
 
         res.status(201).json({

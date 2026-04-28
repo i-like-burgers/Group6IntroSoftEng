@@ -34,6 +34,14 @@
         <strong>{formatPaymentMethod(order.paymentMethod)}</strong>
         <p>Placed at</p>
         <strong>{formatDate(order.createdAt)}</strong>
+        <p>Ship to</p>
+        <strong>{order.shipToName}</strong>
+        <strong>{order.shipToLine1}</strong>
+        {#if order.shipToLine2}
+            <strong>{order.shipToLine2}</strong>
+        {/if}
+        <strong>{order.shipToCity}, {order.shipToState} {order.shipToPostalCode}</strong>
+        <strong>{order.shipToCountry}</strong>
         <p>Subtotal</p>
         <strong>{formatCurrency(order.subtotal)}</strong>
         <p>Tax</p>

@@ -18,6 +18,11 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
         auditLog: {
             create: jest.fn()
         },
+        sellerWebhookSubscription: {
+            findUnique: jest.fn(),
+            create: jest.fn(),
+            upsert: jest.fn()
+        },
         ...prismaOverrides
     };
 
@@ -56,6 +61,12 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
     jest.doMock('../services/audit', () => ({
         logAuditAction: jest.fn().mockResolvedValue(undefined)
     }));
+    const webhookHandlers = {
+        getSellerWebhookConfig: jest.fn(),
+        upsertSellerWebhookConfig: jest.fn(),
+        deliverSellerOrderPlacedWebhooks: jest.fn()
+    };
+    jest.doMock('../services/seller-webhooks', () => webhookHandlers);
     jest.doMock('../buyer/product_handling', () => ({
         addCompareItem: jest.fn(),
         getCompareItems: jest.fn().mockResolvedValue([]),
@@ -64,7 +75,8 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
 
     return {
         app: require('../index'),
-        prismaMock
+        prismaMock,
+        webhookHandlers
     };
 }
 
@@ -75,6 +87,7 @@ describe('seller api routes', () => {
         jest.dontMock('../authenticate');
         jest.dontMock('../authorize');
         jest.dontMock('../services/audit');
+        jest.dontMock('../services/seller-webhooks');
         jest.dontMock('../buyer/product_handling');
     });
 
@@ -157,6 +170,74 @@ describe('seller api routes', () => {
                 isListed: false,
                 listingStatus: 'pending'
             }
+        });
+    });
+
+    test('GET /api/seller/webhook returns the current seller webhook configuration', async () => {
+        const { app, webhookHandlers } = loadSellerApiApp();
+        webhookHandlers.getSellerWebhookConfig.mockResolvedValue({
+            sellerId: 9,
+            endpointUrl: 'https://warehouse.example.test/order-hook',
+            signingSecret: 'secret-123',
+            isActive: true
+        });
+
+        const response = await request(app).get('/api/seller/webhook');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            sellerId: 9,
+            endpointUrl: 'https://warehouse.example.test/order-hook',
+            signingSecret: 'secret-123',
+            isActive: true
+        });
+    });
+
+    test('PUT /api/seller/webhook validates active webhook configuration', async () => {
+        const { app } = loadSellerApiApp();
+
+        const response = await request(app)
+            .put('/api/seller/webhook')
+            .send({
+                endpointUrl: '',
+                isActive: true
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'An active webhook must include an endpoint URL'
+        });
+    });
+
+    test('PUT /api/seller/webhook saves seller webhook configuration', async () => {
+        const { app, webhookHandlers } = loadSellerApiApp();
+        webhookHandlers.upsertSellerWebhookConfig.mockResolvedValue({
+            sellerId: 9,
+            endpointUrl: 'https://warehouse.example.test/order-hook',
+            signingSecret: 'secret-456',
+            isActive: true
+        });
+
+        const response = await request(app)
+            .put('/api/seller/webhook')
+            .send({
+                endpointUrl: 'https://warehouse.example.test/order-hook',
+                isActive: true,
+                regenerateSecret: true
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            sellerId: 9,
+            endpointUrl: 'https://warehouse.example.test/order-hook',
+            signingSecret: 'secret-456',
+            isActive: true
+        });
+        expect(webhookHandlers.upsertSellerWebhookConfig).toHaveBeenCalledWith({
+            sellerId: 9,
+            endpointUrl: 'https://warehouse.example.test/order-hook',
+            isActive: true,
+            regenerateSecret: true
         });
     });
 });

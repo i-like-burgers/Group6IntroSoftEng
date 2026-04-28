@@ -74,6 +74,15 @@
     };
     let adminUserSearch = '';
     let selectedPaymentMethod = 'demo_card';
+    let shippingAddress = {
+        name: '',
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: 'US'
+    };
     let currentTheme = 'accessible';
     let themeMenuOpen = false;
     let loading = true;
@@ -325,6 +334,13 @@
         };
     }
 
+    function updateShippingAddress(field, event) {
+        shippingAddress = {
+            ...shippingAddress,
+            [field]: event.currentTarget.value
+        };
+    }
+
     function updateAdminUserSearch(event) {
         adminUserSearch = event.currentTarget.value;
     }
@@ -541,7 +557,8 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    paymentMethod: selectedPaymentMethod
+                    paymentMethod: selectedPaymentMethod,
+                    shippingAddress
                 })
             });
 
@@ -654,6 +671,8 @@
                 {cart}
                 {placeOrder}
                 {formatCurrency}
+                {shippingAddress}
+                onShippingInput={updateShippingAddress}
             />
         {:else if currentPage === 'confirmation' && order}
             <OrderConfirmationView

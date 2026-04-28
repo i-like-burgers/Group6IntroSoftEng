@@ -37,6 +37,9 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
         auditLog: {
             create: jest.fn()
         },
+        sellerWebhookSubscription: {
+            findMany: jest.fn()
+        },
         ...prismaOverrides
     };
 
@@ -75,12 +78,17 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
     jest.doMock('../services/audit', () => ({
         logAuditAction: jest.fn().mockResolvedValue(undefined)
     }));
+    const webhookHandlers = {
+        deliverSellerOrderPlacedWebhooks: jest.fn().mockResolvedValue(undefined)
+    };
+    jest.doMock('../services/seller-webhooks', () => webhookHandlers);
     jest.doMock('../buyer/product_handling', () => compareHandlers);
 
     return {
         app: require('../index'),
         prismaMock,
-        compareHandlers
+        compareHandlers,
+        webhookHandlers
     };
 }
 
@@ -91,6 +99,7 @@ describe('buyer api routes', () => {
         jest.dontMock('../authenticate');
         jest.dontMock('../authorize');
         jest.dontMock('../services/audit');
+        jest.dontMock('../services/seller-webhooks');
         jest.dontMock('../buyer/product_handling');
     });
 
@@ -355,5 +364,131 @@ describe('buyer api routes', () => {
             buyerID: 7,
             productID: 88
         });
+    });
+
+    test('POST /api/buyer/checkout requires a complete shipping address', async () => {
+        const { app } = loadBuyerApiApp({
+            prismaOverrides: {
+                $transaction: jest.fn()
+            }
+        });
+
+        const response = await request(app)
+            .post('/api/buyer/checkout')
+            .send({
+                paymentMethod: 'demo_card',
+                shippingAddress: {
+                    name: 'Ada Lovelace'
+                }
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'A complete shipping address is required'
+        });
+    });
+
+    test('POST /api/buyer/checkout creates an order with shipping data and triggers seller webhooks', async () => {
+        const txMock = {
+            cartItem: {
+                findMany: jest.fn().mockResolvedValue([
+                    {
+                        id: 1,
+                        quantity: 2,
+                        productId: 42,
+                        product: {
+                            id: 42,
+                            name: 'Warehouse Keyboard',
+                            price: 99.5,
+                            stock: 10,
+                            isListed: true,
+                            listingStatus: 'approved',
+                            sellerId: 9,
+                            seller: {
+                                id: 9,
+                                username: 'seller-user',
+                                banned: false
+                            }
+                        }
+                    }
+                ])
+            },
+            order: {
+                create: jest.fn().mockImplementation(async ({ data }) => ({
+                    id: 901,
+                    buyerId: 7,
+                    paymentMethod: data.paymentMethod,
+                    shipToName: data.shipToName,
+                    shipToLine1: data.shipToLine1,
+                    shipToLine2: data.shipToLine2,
+                    shipToCity: data.shipToCity,
+                    shipToState: data.shipToState,
+                    shipToPostalCode: data.shipToPostalCode,
+                    shipToCountry: data.shipToCountry,
+                    subtotal: data.subtotal,
+                    taxRate: data.taxRate,
+                    taxAmount: data.taxAmount,
+                    total: data.total,
+                    createdAt: '2026-04-28T00:00:00.000Z',
+                    items: [
+                        {
+                            sellerId: 9,
+                            productName: 'Warehouse Keyboard',
+                            quantity: 2
+                        }
+                    ]
+                }))
+            },
+            product: {
+                updateMany: jest.fn().mockResolvedValue({ count: 1 })
+            },
+            cartItemDeleteMany: jest.fn(),
+            auditLog: {
+                create: jest.fn()
+            }
+        };
+        txMock.cartItem.deleteMany = jest.fn().mockResolvedValue({ count: 1 });
+
+        const { app, prismaMock, webhookHandlers } = loadBuyerApiApp({
+            prismaOverrides: {
+                $transaction: jest.fn(async (handler) => handler(txMock))
+            }
+        });
+
+        const response = await request(app)
+            .post('/api/buyer/checkout')
+            .send({
+                paymentMethod: 'demo_card',
+                shippingAddress: {
+                    name: 'Ada Lovelace',
+                    line1: '123 Main St',
+                    line2: 'Apt 4B',
+                    city: 'Bismarck',
+                    state: 'ND',
+                    postalCode: '58501',
+                    country: 'US'
+                }
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body.order.shipToName).toBe('Ada Lovelace');
+        expect(txMock.order.create).toHaveBeenCalledWith(expect.objectContaining({
+            data: expect.objectContaining({
+                shipToName: 'Ada Lovelace',
+                shipToLine1: '123 Main St',
+                shipToLine2: 'Apt 4B',
+                shipToCity: 'Bismarck',
+                shipToState: 'ND',
+                shipToPostalCode: '58501',
+                shipToCountry: 'US'
+            })
+        }));
+        expect(webhookHandlers.deliverSellerOrderPlacedWebhooks).toHaveBeenCalledWith(
+            expect.objectContaining({
+                id: 901,
+                shipToName: 'Ada Lovelace'
+            })
+        );
+        expect(prismaMock.$transaction).toHaveBeenCalled();
     });
 });

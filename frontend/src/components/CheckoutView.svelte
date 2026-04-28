@@ -2,6 +2,8 @@
     export let cart;
     export let placeOrder;
     export let formatCurrency;
+    export let shippingAddress;
+    export let onShippingInput;
 </script>
 
 <div class="cart-layout">
@@ -9,21 +11,49 @@
         {#if cart.items.length === 0}
             <div class="state-card">Your cart is empty. Return to the storefront before checking out.</div>
         {:else}
-            <div class="list-grid">
-                {#each cart.items as item}
-                    <article class="line-card">
-                        <div>
-                            <p class="seller">{item.product.seller.username}</p>
-                            <h3>{item.product.name}</h3>
-                            <p class="description">
-                                Quantity {item.quantity} at {formatCurrency(item.product.price)} each
-                            </p>
-                        </div>
-                        <div class="line-actions">
-                            <p class="price">{formatCurrency(item.product.price * item.quantity)}</p>
-                        </div>
-                    </article>
-                {/each}
+            <div class="checkout-stack">
+                <div class="shipping-panel">
+                    <p class="section-kicker">Shipping address</p>
+                    <div class="stack-form">
+                        <label for="ship-name">Full name</label>
+                        <input id="ship-name" value={shippingAddress.name} on:input={(event) => onShippingInput('name', event)} type="text" required />
+
+                        <label for="ship-line1">Address line 1</label>
+                        <input id="ship-line1" value={shippingAddress.line1} on:input={(event) => onShippingInput('line1', event)} type="text" required />
+
+                        <label for="ship-line2">Address line 2</label>
+                        <input id="ship-line2" value={shippingAddress.line2} on:input={(event) => onShippingInput('line2', event)} type="text" />
+
+                        <label for="ship-city">City</label>
+                        <input id="ship-city" value={shippingAddress.city} on:input={(event) => onShippingInput('city', event)} type="text" required />
+
+                        <label for="ship-state">State / region</label>
+                        <input id="ship-state" value={shippingAddress.state} on:input={(event) => onShippingInput('state', event)} type="text" required />
+
+                        <label for="ship-postal">Postal code</label>
+                        <input id="ship-postal" value={shippingAddress.postalCode} on:input={(event) => onShippingInput('postalCode', event)} type="text" required />
+
+                        <label for="ship-country">Country</label>
+                        <input id="ship-country" value={shippingAddress.country} on:input={(event) => onShippingInput('country', event)} type="text" required />
+                    </div>
+                </div>
+
+                <div class="list-grid">
+                    {#each cart.items as item}
+                        <article class="line-card">
+                            <div>
+                                <p class="seller">{item.product.seller.username}</p>
+                                <h3>{item.product.name}</h3>
+                                <p class="description">
+                                    Quantity {item.quantity} at {formatCurrency(item.product.price)} each
+                                </p>
+                            </div>
+                            <div class="line-actions">
+                                <p class="price">{formatCurrency(item.product.price * item.quantity)}</p>
+                            </div>
+                        </article>
+                    {/each}
+                </div>
             </div>
         {/if}
     </div>

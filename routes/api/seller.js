@@ -4,10 +4,64 @@ const prisma = require('../../lib/prisma');
 const auth = require('../../authenticate');
 const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
+const {
+    getSellerWebhookConfig,
+    upsertSellerWebhookConfig
+} = require('../../services/seller-webhooks');
 
 const router = express.Router();
 
 router.use(auth.authenticateToken, requireRole('seller'));
+
+router.get('/webhook', async (req, res) => {
+    try {
+        const config = await getSellerWebhookConfig(req.user.id);
+        res.json(config);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load seller webhook configuration' });
+    }
+});
+
+router.put('/webhook', async (req, res) => {
+    try {
+        const endpointUrl = req.body.endpointUrl == null
+            ? null
+            : String(req.body.endpointUrl).trim();
+        const isActive = Boolean(req.body.isActive);
+        const regenerateSecret = Boolean(req.body.regenerateSecret);
+
+        if (endpointUrl) {
+            let parsedUrl;
+
+            try {
+                parsedUrl = new URL(endpointUrl);
+            } catch (error) {
+                return res.status(400).json({ error: 'A valid webhook URL is required' });
+            }
+
+            if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+                return res.status(400).json({ error: 'A valid webhook URL is required' });
+            }
+        }
+
+        if (isActive && !endpointUrl) {
+            return res.status(400).json({ error: 'An active webhook must include an endpoint URL' });
+        }
+
+        const config = await upsertSellerWebhookConfig({
+            sellerId: req.user.id,
+            endpointUrl,
+            isActive,
+            regenerateSecret
+        });
+
+        res.json(config);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to save seller webhook configuration' });
+    }
+});
 
 router.get('/products', async (req, res) => {
     try {
