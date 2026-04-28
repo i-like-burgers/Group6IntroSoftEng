@@ -29,6 +29,18 @@
         truncate
     } from './lib/app-shell.js';
 
+    const THEME_OPTIONS = [
+        { value: 'accessible', label: 'Winter Ice' },
+        { value: 'warm', label: 'Warm' },
+        { value: 'terminal', label: 'Terminal' },
+        { value: 'cool-grey', label: 'Cool Grey' },
+        { value: 'accessible-dark', label: 'Deep Blue' },
+        { value: 'accessible-blue-gold', label: 'Honeycomb' },
+        { value: 'accessible-mono', label: 'Monochrome' }
+    ];
+
+    const VALID_THEMES = new Set(THEME_OPTIONS.map((option) => option.value));
+
     let appMode = 'buyer';
     let currentPage = 'storefront';
     let products = [];
@@ -62,6 +74,8 @@
     };
     let adminUserSearch = '';
     let selectedPaymentMethod = 'demo_card';
+    let currentTheme = 'accessible';
+    let themeMenuOpen = false;
     let loading = true;
     let errorMessage = '';
     let statusMessage = '';
@@ -78,6 +92,27 @@
         }
 
         return data;
+    }
+
+    function applyTheme(theme) {
+        currentTheme = VALID_THEMES.has(theme) ? theme : 'accessible';
+
+        if (typeof document !== 'undefined') {
+            document.documentElement.dataset.theme = currentTheme;
+        }
+
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('ram-theme', currentTheme);
+        }
+    }
+
+    function toggleThemeMenu() {
+        themeMenuOpen = !themeMenuOpen;
+    }
+
+    function selectTheme(theme) {
+        applyTheme(theme);
+        themeMenuOpen = false;
     }
 
     function mergeAdminUser(existingUser, nextUser) {
@@ -532,6 +567,8 @@
     }
 
     onMount(async () => {
+        const storedTheme = typeof localStorage === 'undefined' ? null : localStorage.getItem('ram-theme');
+        applyTheme(storedTheme || 'accessible');
         await loadCurrentPage();
     });
 </script>
@@ -541,7 +578,11 @@
 </svelte:head>
 
 <div class="page-shell" data-page={currentPage}>
-    <AppHero {appMode} {currentPage} onLogout={logout} />
+    <AppHero
+        {appMode}
+        {currentPage}
+        onLogout={logout}
+    />
 
     <section class="catalog">
         <CatalogHeader
@@ -642,4 +683,36 @@
             <p class="status-banner">{statusMessage}</p>
         {/if}
     </section>
+
+    <div class="theme-dock">
+        {#if themeMenuOpen}
+            <div class="theme-dock-menu" role="menu" aria-label="Theme picker">
+                {#each THEME_OPTIONS as option}
+                    <button
+                        class:active-theme={currentTheme === option.value}
+                        class="theme-dock-option"
+                        type="button"
+                        role="menuitemradio"
+                        aria-checked={currentTheme === option.value}
+                        on:click={() => selectTheme(option.value)}
+                    >
+                        <span>{option.label}</span>
+                        {#if currentTheme === option.value}
+                            <span class="theme-dock-check">Current</span>
+                        {/if}
+                    </button>
+                {/each}
+            </div>
+        {/if}
+
+        <button
+            class="theme-dock-toggle"
+            type="button"
+            aria-expanded={themeMenuOpen}
+            aria-haspopup="menu"
+            on:click={toggleThemeMenu}
+        >
+            Theme
+        </button>
+    </div>
 </div>
