@@ -184,4 +184,29 @@ describe('database integration', () => {
         createdUserId = createdUser.id;
         expect(createdUser.password).not.toBe('register-password');
     });
+
+    test('POST /api/register rejects privileged roles', async () => {
+        const username = `integration-admin-register-${uniqueSuffix}`;
+        const email = `integration-admin-register-${uniqueSuffix}@ram.local`;
+
+        const response = await request(app)
+            .post('/api/register')
+            .send({
+                username,
+                email,
+                password: 'register-password',
+                role: 'admin'
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'Invalid registration role'
+        });
+
+        const createdUser = await prisma.user.findUnique({
+            where: { username }
+        });
+
+        expect(createdUser).toBeNull();
+    });
 });

@@ -5,6 +5,7 @@ const prisma = require('../../lib/prisma');
 const auth = require('../../authenticate');
 
 const router = express.Router();
+const PUBLIC_REGISTRATION_ROLES = new Set(['buyer', 'seller']);
 
 function getLoginFailure(user, passwordMatches) {
     if (!user || !passwordMatches) {
@@ -149,6 +150,10 @@ router.post('/api/login', async (req, res) => {
 router.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
+
+        if (!PUBLIC_REGISTRATION_ROLES.has(role)) {
+            return res.status(400).json({ error: 'Invalid registration role' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
