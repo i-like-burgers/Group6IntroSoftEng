@@ -173,4 +173,12 @@ describe('protected routes', () => {
         expect(response.status).toBe(200);
         expect(response.text).toContain('Buyer Frontend Preview');
     });
+
+    test('authenticated buyer can access /buyer/orders', async () => {
+        const app = loadAppForRole('buyer');
+        const response = await request(app).get('/buyer/orders');
+
+        expect(response.status).toBe(200);
+        expect(response.text).toContain('Buyer Frontend Preview');
+    });
 });

@@ -50,6 +50,7 @@
         <strong>{formatCurrency(order.total)}</strong>
         <div class="checkout-actions">
             <a class="checkout-link" href="/buyer/home">Continue shopping</a>
+            <a class="checkout-link secondary-link" href="/buyer/orders">View order history</a>
         </div>
     </aside>
 </div>

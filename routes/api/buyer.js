@@ -29,7 +29,7 @@ function normalizeShippingAddress(input) {
         city: String(shippingAddress.city || '').trim(),
         state: String(shippingAddress.state || '').trim(),
         postalCode: String(shippingAddress.postalCode || '').trim(),
-        country: String(shippingAddress.country || '').trim()
+        country: 'US'
     };
 }
 
@@ -38,8 +38,7 @@ function isShippingAddressComplete(shippingAddress) {
         && shippingAddress.line1
         && shippingAddress.city
         && shippingAddress.state
-        && shippingAddress.postalCode
-        && shippingAddress.country;
+        && shippingAddress.postalCode;
 }
 
 router.use(auth.authenticateToken, requireRole('buyer'));
@@ -179,6 +178,44 @@ router.get('/compare', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to load comparison list' });
+    }
+});
+
+router.get('/orders', async (req, res) => {
+    try {
+        const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+        const pageSize = 10;
+        const where = {
+            buyerId: req.user.id
+        };
+
+        const [orders, totalCount] = await Promise.all([
+            prisma.order.findMany({
+                where,
+                include: {
+                    items: true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                skip: (page - 1) * pageSize,
+                take: pageSize
+            }),
+            prisma.order.count({ where })
+        ]);
+
+        res.json({
+            orders,
+            page,
+            pageSize,
+            totalCount,
+            totalPages: Math.max(Math.ceil(totalCount / pageSize), 1),
+            hasPreviousPage: page > 1,
+            hasNextPage: page * pageSize < totalCount
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load order history' });
     }
 });
 

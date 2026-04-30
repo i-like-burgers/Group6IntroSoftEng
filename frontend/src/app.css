@@ -1020,6 +1020,33 @@ textarea:focus-visible {
     gap: 16px;
 }
 
+.order-history-card .checkout-link {
+    margin-top: 0;
+}
+
+.history-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.history-pagination button {
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--accent-strong);
+    cursor: pointer;
+}
+
+.history-pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .summary-panel {
     display: grid;
     gap: 8px;

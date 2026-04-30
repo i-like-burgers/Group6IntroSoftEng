@@ -32,9 +32,7 @@
 
                         <label for="ship-postal">Postal code</label>
                         <input id="ship-postal" value={shippingAddress.postalCode} on:input={(event) => onShippingInput('postalCode', event)} type="text" required />
-
-                        <label for="ship-country">Country</label>
-                        <input id="ship-country" value={shippingAddress.country} on:input={(event) => onShippingInput('country', event)} type="text" required />
+                        <p class="field-hint">Shipping currently supports United States addresses only.</p>
                     </div>
                 </div>
 

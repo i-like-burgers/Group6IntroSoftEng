@@ -44,6 +44,11 @@ export const PAGE_CONTENT = {
         kicker: 'Purchase complete',
         heading: 'Order confirmation'
     },
+    orders: {
+        title: 'Order History',
+        kicker: 'Buyer records',
+        heading: 'Order history'
+    },
     product: {
         title: 'Product Detail',
         kicker: 'Product spotlight',
@@ -69,6 +74,7 @@ export const NAV_LINKS = {
     buyer: [
         { href: '/buyer/home', label: 'Storefront' },
         { href: '/buyer/cart', label: 'Cart' },
+        { href: '/buyer/orders', label: 'Orders' },
         { href: '/buyer/compare', label: 'Compare' }
     ]
 };
@@ -126,6 +132,10 @@ export function detectPage(path = getPath()) {
 
     if (path === '/buyer/compare') {
         return 'compare';
+    }
+
+    if (path === '/buyer/orders') {
+        return 'orders';
     }
 
     if (/\/buyer\/orders\/\d+\/confirmation$/.test(path)) {

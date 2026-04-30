@@ -38,6 +38,14 @@ router.get("/orders/:id/confirmation",
     }
 );
 
+router.get("/orders",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../buyer/buyerApp.html"));
+    }
+);
+
 router.get("/products/:id",
     auth.authenticateToken,
     requireRole("buyer"),

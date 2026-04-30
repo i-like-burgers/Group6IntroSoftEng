@@ -9,6 +9,7 @@
     import CheckoutView from './components/CheckoutView.svelte';
     import CompareView from './components/CompareView.svelte';
     import OrderConfirmationView from './components/OrderConfirmationView.svelte';
+    import OrderHistoryView from './components/OrderHistoryView.svelte';
     import ProductDetailView from './components/ProductDetailView.svelte';
     import SellerHomeView from './components/SellerHomeView.svelte';
     import SellerInventoryView from './components/SellerInventoryView.svelte';
@@ -54,6 +55,13 @@
         total: 0
     };
     let order = null;
+    let orderHistory = [];
+    let orderHistoryPageInfo = {
+        page: 1,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false
+    };
     let sellerProducts = [];
     let sellerForm = {
         name: '',
@@ -279,6 +287,27 @@
         }
     }
 
+    async function loadOrderHistory(page = 1) {
+        loading = true;
+        errorMessage = '';
+        statusMessage = '';
+
+        try {
+            const response = await fetchJson(`/api/buyer/orders?page=${page}`);
+            orderHistory = response.orders || [];
+            orderHistoryPageInfo = {
+                page: response.page,
+                totalPages: response.totalPages,
+                hasPreviousPage: response.hasPreviousPage,
+                hasNextPage: response.hasNextPage
+            };
+        } catch (error) {
+            errorMessage = error.message || 'Could not load order history.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadCurrentPage() {
         appMode = getAppMode();
         currentPage = detectPage();
@@ -316,6 +345,11 @@
 
         if (currentPage === 'confirmation') {
             await loadOrderConfirmation();
+            return;
+        }
+
+        if (currentPage === 'orders') {
+            await loadOrderHistory();
             return;
         }
 
@@ -540,6 +574,14 @@
     async function clearProductSearch() {
         productSearch = '';
         await preserveScrollDuring(() => loadProducts(true));
+    }
+
+    async function goToOrderHistoryPage(nextPage) {
+        if (nextPage < 1 || nextPage > orderHistoryPageInfo.totalPages) {
+            return;
+        }
+
+        await preserveScrollDuring(() => loadOrderHistory(nextPage));
     }
 
     function showCartNotification(message, type = 'success') {
@@ -787,6 +829,15 @@
         {:else if currentPage === 'confirmation' && order}
             <OrderConfirmationView
                 {order}
+                {formatCurrency}
+                {formatDate}
+                {formatPaymentMethod}
+            />
+        {:else if currentPage === 'orders'}
+            <OrderHistoryView
+                orders={orderHistory}
+                pageInfo={orderHistoryPageInfo}
+                {goToOrderHistoryPage}
                 {formatCurrency}
                 {formatDate}
                 {formatPaymentMethod}

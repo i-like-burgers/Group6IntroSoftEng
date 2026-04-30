@@ -26,7 +26,9 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
             deleteMany: jest.fn()
         },
         order: {
-            findFirst: jest.fn()
+            count: jest.fn(),
+            findFirst: jest.fn(),
+            findMany: jest.fn()
         },
         compare: {
             findUnique: jest.fn()
@@ -300,6 +302,68 @@ describe('buyer api routes', () => {
         });
     });
 
+    test('GET /api/buyer/orders returns paginated order history for the current buyer', async () => {
+        const orders = [
+            {
+                id: 702,
+                buyerId: 7,
+                total: 129.99,
+                createdAt: '2026-04-30T12:00:00.000Z',
+                items: []
+            }
+        ];
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.order.findMany.mockResolvedValue(orders);
+        prismaMock.order.count.mockResolvedValue(12);
+
+        const response = await request(app).get('/api/buyer/orders?page=2');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            orders,
+            page: 2,
+            pageSize: 10,
+            totalCount: 12,
+            totalPages: 2,
+            hasPreviousPage: true,
+            hasNextPage: false
+        });
+        expect(prismaMock.order.findMany).toHaveBeenCalledWith({
+            where: {
+                buyerId: 7
+            },
+            include: {
+                items: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            skip: 10,
+            take: 10
+        });
+        expect(prismaMock.order.count).toHaveBeenCalledWith({
+            where: {
+                buyerId: 7
+            }
+        });
+    });
+
+    test('GET /api/buyer/orders/:id returns 404 for another buyer order', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.order.findFirst.mockResolvedValue(null);
+
+        const response = await request(app).get('/api/buyer/orders/999');
+
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({ error: 'Order not found' });
+        expect(prismaMock.order.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                id: 999,
+                buyerId: 7
+            }
+        }));
+    });
+
     test('GET /api/buyer/compare returns the comparison list for the current buyer', async () => {
         const { app, compareHandlers } = loadBuyerApiApp();
         compareHandlers.getCompareItems.mockResolvedValue([
@@ -525,7 +589,7 @@ describe('buyer api routes', () => {
                     city: 'Bismarck',
                     state: 'ND',
                     postalCode: '58501',
-                    country: 'US'
+                    country: 'CA'
                 }
             });
 
