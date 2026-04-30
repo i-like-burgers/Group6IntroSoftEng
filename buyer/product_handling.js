@@ -69,9 +69,35 @@ async function removeCompareItem({ buyerID, productID }) {
     });
 }
 
+async function randomAccess()
+{
+    const count = await prisma.product.count({
+        where: {isListed:true, listingStatus:"approved"}
+    });
+
+    if(count === 0) return null
+
+    for(let i=0; i<3; i++)
+    {
+        const rand = Math.floor(Math.random() * count)
+
+        const product = await prisma.product.findFirst({
+            where: {isListed:true},
+            skip: rand,
+            take: 1,
+            orderBy: {id: 'asc'}
+        });
+
+        if(product) return product;
+    }
+
+    return null
+}
+
 module.exports = {
     addCompareItem,
     getCompareItems,
     getSimilar,
-    removeCompareItem
+    removeCompareItem,
+    randomAccess
 };

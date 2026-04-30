@@ -6,6 +6,7 @@ const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
 const { addCompareItem, getCompareItems, removeCompareItem } = require('../../buyer/product_handling');
 const { deliverSellerOrderPlacedWebhooks } = require('../../services/seller-webhooks');
+const {randomAccess} = require('../../buyer/product_handling')
 
 const router = express.Router();
 const PAYMENT_METHODS = new Set([
@@ -187,6 +188,26 @@ router.get('/orders/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to load order' });
     }
 });
+
+/*
+router.get('/random_access', async (req, res) => {
+    try{
+        const product = await randomAccess();
+
+        if(!product)
+        {
+            return res.status(404).send("No Products Available");
+        }
+
+        res.redirect(`/products/${product.id}`);
+    }
+    catch(err)
+    {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+});
+*/
 
 router.post('/cart', async (req, res) => {
     try {

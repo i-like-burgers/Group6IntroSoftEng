@@ -97,4 +97,16 @@ router.get("/classic/orders/:id/confirmation",
     }
 );
 
+router.get("/buyer/random_access",
+    auth.authenticateToken,
+    requireRole("buyer"),
+    async (req, res) => {
+        const product = await randomAccess();
+
+        if(!product) return res.status(404).send("No products found");
+
+        return res.redirect(302, `/products/${product.id}`);
+    }
+);
+
 module.exports = router;
