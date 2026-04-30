@@ -762,6 +762,32 @@ textarea:focus-visible {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-row input {
+    width: auto;
+}
+
+.webhook-secret {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.webhook-secret code {
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--field-bg);
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
 .admin-panel-header,
 .admin-pagination,
 .admin-search {

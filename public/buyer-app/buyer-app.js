@@ -22,8 +22,8 @@ function o() {
 }
 var s, c, l, u, d, f, p, m, h, g, _, v, y = e((() => {
 	s = Array.isArray, c = Array.prototype.indexOf, l = Array.prototype.includes, u = Array.from, d = Object.defineProperty, f = Object.getOwnPropertyDescriptor, p = Object.getOwnPropertyDescriptors, m = Object.prototype, h = Array.prototype, g = Object.getPrototypeOf, _ = Object.isExtensible, v = () => {};
-})), b, x, S, C, ee, te, ne, w, T, E, re, ie, D, ae, oe, se, ce, le, ue, de, fe, O = e((() => {
-	b = 1024, x = 2048, S = 4096, C = 8192, ee = 16384, te = 32768, ne = 1 << 25, w = 65536, T = 1 << 18, E = 1 << 19, re = 1 << 20, ie = 1 << 25, D = 65536, ae = 1 << 21, oe = 1 << 22, se = 1 << 23, ce = Symbol("$state"), le = Symbol("legacy props"), ue = Symbol(""), de = new class extends Error {
+})), b, x, S, C, ee, te, ne, re, w, T, E, ie, ae, D, oe, se, ce, le, ue, de, fe, O = e((() => {
+	b = 1024, x = 2048, S = 4096, C = 8192, ee = 16384, te = 32768, ne = 1 << 25, re = 65536, w = 1 << 18, T = 1 << 19, E = 1 << 20, ie = 1 << 25, ae = 65536, D = 1 << 21, oe = 1 << 22, se = 1 << 23, ce = Symbol("$state"), le = Symbol("legacy props"), ue = Symbol(""), de = new class extends Error {
 		name = "StaleReactionError";
 		message = "The reaction that called `getAbortSignal()` was re-run or destroyed";
 	}(), fe = !!globalThis.document?.contentType && /* @__PURE__ */ globalThis.document.contentType.includes("xml");
@@ -249,7 +249,7 @@ var ut, dt = e((() => {
 //#endregion
 //#region node_modules/svelte/src/internal/client/reactivity/utils.js
 function ft(e) {
-	if (e !== null) for (let t of e) !(t.f & 2) || !(t.f & 65536) || (t.f ^= D, ft(t.deps));
+	if (e !== null) for (let t of e) !(t.f & 2) || !(t.f & 65536) || (t.f ^= ae, ft(t.deps));
 }
 function pt(e, t, n) {
 	e.f & 2048 ? t.add(e) : e.f & 4096 && n.add(e), ft(e.deps), F(e, b);
@@ -599,7 +599,7 @@ function Wt(e, t, n, r) {
 	new Kt(e, t, n, r);
 }
 var Gt, Kt, qt = e((() => {
-	O(), Ae(), P(), ct(), H(), J(), M(), at(), Ee(), Ne(), r(), Vt(), bn(), Ye(), Ut(), Rn(), mt(), dt(), Gt = w | E, Kt = class {
+	O(), Ae(), P(), ct(), H(), J(), M(), at(), Ee(), Ne(), r(), Vt(), bn(), Ye(), Ut(), Rn(), mt(), dt(), Gt = re | T, Kt = class {
 		parent;
 		is_pending = !1;
 		transform_error;
@@ -811,7 +811,7 @@ var Qt = e((() => {
 /* @__NO_SIDE_EFFECTS__ */
 function $t(e) {
 	var t = 2 | x, n = K !== null && K.f & 2 ? K : null;
-	return q !== null && (q.f |= E), {
+	return q !== null && (q.f |= T), {
 		ctx: N,
 		deps: null,
 		effects: null,
@@ -903,7 +903,7 @@ function on(e) {
 	var t, n = q;
 	Cr(an(e));
 	try {
-		e.f &= ~D, rn(e), t = Ar(e);
+		e.f &= ~ae, rn(e), t = Ar(e);
 	} finally {
 		Cr(n);
 	}
@@ -978,7 +978,7 @@ function gn(e, t, n) {
 			var l = (c & x) === 0;
 			if (l && F(s, t), c & 2) {
 				var u = s;
-				jt?.delete(u), c & 65536 || (c & 512 && (s.f |= D), gn(u, S, n));
+				jt?.delete(u), c & 65536 || (c & 512 && (s.f |= ae), gn(u, S, n));
 			} else if (l) {
 				var d = s;
 				c & 16 && Bt !== null && Bt.add(d), n === null ? Dt(d) : n.push(d);
@@ -1243,7 +1243,7 @@ function qn(e, t) {
 		} catch (e) {
 			throw dr(r), e;
 		}
-		i.deps === null && i.teardown === null && i.nodes === null && i.first === i.last && !(i.f & 524288) && (i = i.first, e & 16 && e & 65536 && i !== null && (i.f |= w));
+		i.deps === null && i.teardown === null && i.nodes === null && i.first === i.last && !(i.f & 524288) && (i = i.first, e & 16 && e & 65536 && i !== null && (i.f |= re));
 	}
 	if (i !== null && (i.parent = n, n !== null && Kn(i, n), K !== null && K.f & 2 && !(e & 64))) {
 		var a = K;
@@ -1267,14 +1267,14 @@ function Xn(e) {
 	} else return Zn(e);
 }
 function Zn(e) {
-	return qn(4 | re, e);
+	return qn(4 | E, e);
 }
 function Qn(e) {
-	return Gn("$effect.pre"), qn(8 | re, e);
+	return Gn("$effect.pre"), qn(8 | E, e);
 }
 function $n(e) {
 	zt.ensure();
-	let t = qn(64 | E, e);
+	let t = qn(64 | T, e);
 	return (e = {}) => new Promise((n) => {
 		e.outro ? mr(t, () => {
 			dr(t), n(void 0);
@@ -1313,7 +1313,7 @@ function nr() {
 	});
 }
 function rr(e) {
-	return qn(oe | E, e);
+	return qn(oe | T, e);
 }
 function ir(e, t = 0) {
 	return qn(8 | t, e);
@@ -1333,7 +1333,7 @@ function or(e, t = 0) {
 	return qn(16 | t, e);
 }
 function sr(e) {
-	return qn(32 | E, e);
+	return qn(32 | T, e);
 }
 function cr(e) {
 	var t = e.teardown;
@@ -1456,7 +1456,7 @@ function Dr() {
 function Or(e) {
 	var t = e.f;
 	if (t & 2048) return !0;
-	if (t & 2 && (e.f &= ~D), t & 4096) {
+	if (t & 2 && (e.f &= ~ae), t & 4096) {
 		for (var n = e.deps, r = n.length, i = 0; i < r; i++) {
 			var a = n[i];
 			if (Or(a) && sn(a), a.wv > e.wv) return !0;
@@ -1478,7 +1478,7 @@ function Ar(e) {
 		e.ac.abort(de);
 	}), e.ac = null);
 	try {
-		e.f |= ae;
+		e.f |= D;
 		var u = e.fn, d = u();
 		e.f |= te;
 		var f = e.deps, p = I?.is_fork;
@@ -1498,7 +1498,7 @@ function Ar(e) {
 	} catch (e) {
 		return ot(e);
 	} finally {
-		e.f ^= ae, Hr = t, Ur = n, Wr = r, K = i, Vr = a, Ze(o), Br = s, qr = c;
+		e.f ^= D, Hr = t, Ur = n, Wr = r, K = i, Vr = a, Ze(o), Br = s, qr = c;
 	}
 }
 function jr(e, t) {
@@ -1512,7 +1512,7 @@ function jr(e, t) {
 	}
 	if (n === null && t.f & 2 && (Hr === null || !l.call(Hr, t))) {
 		var a = t;
-		a.f & 512 && (a.f ^= 512, a.f &= ~D), lt(a), cn(a), Mr(a, 0);
+		a.f & 512 && (a.f ^= 512, a.f &= ~ae), lt(a), cn(a), Mr(a, 0);
 	}
 }
 function Mr(e, t) {
@@ -1612,7 +1612,7 @@ function Lr(e, t = /* @__PURE__ */ new Set()) {
 var Rr, zr, K, Br, q, Vr, Hr, Ur, Wr, Gr, Kr, qr, J = e((() => {
 	r(), y(), H(), O(), bn(), un(), qe(), Ye(), Xe(), P(), Vt(), ct(), Ae(), br(), Wn(), dt(), Ne(), Rr = !1, zr = !1, K = null, Br = !1, q = null, Vr = null, Hr = null, Ur = 0, Wr = null, Gr = 1, Kr = 0, qr = Kr;
 })), Jr = e((() => {
-	Ja(), $a(), H();
+	Ya(), eo(), H();
 }));
 //#endregion
 //#region node_modules/svelte/src/utils.js
@@ -1887,7 +1887,7 @@ var yi, bi, xi, Si = e((() => {
 function Mi(e, t, n = !1) {
 	var r;
 	A && (r = j, Ie());
-	var i = new ki(e), a = n ? w : 0;
+	var i = new ki(e), a = n ? re : 0;
 	function o(e, t) {
 		if (A) {
 			var n = ze(r);
@@ -2108,7 +2108,7 @@ function na(e, t) {
 	}
 	A || (i = document.head.appendChild(Tn()));
 	try {
-		or(() => t(i), T | E);
+		or(() => t(i), w | T);
 	} finally {
 		r && (Pe(!0), Fe(n));
 	}
@@ -2166,11 +2166,11 @@ function ma(e) {
 			if (!t) {
 				if (t = !0, e.hasAttribute("value")) {
 					var n = e.value;
-					ga(e, "value", null), e.value = n;
+					_a(e, "value", null), e.value = n;
 				}
 				if (e.hasAttribute("checked")) {
 					var r = e.checked;
-					ga(e, "checked", null), e.checked = r;
+					_a(e, "checked", null), e.checked = r;
 				}
 			}
 		};
@@ -2178,64 +2178,68 @@ function ma(e) {
 	}
 }
 function ha(e, t) {
-	var n = _a(e);
-	n.value === (n.value = t ?? void 0) || e.value === t && (t !== 0 || e.nodeName !== Sa) || (e.value = t ?? "");
+	var n = va(e);
+	n.value === (n.value = t ?? void 0) || e.value === t && (t !== 0 || e.nodeName !== Ca) || (e.value = t ?? "");
 }
-function ga(e, t, n, r) {
-	var i = _a(e);
-	A && (i[t] = e.getAttribute(t), t === "src" || t === "srcset" || t === "href" && e.nodeName === xa) || i[t] !== (i[t] = n) && (t === "loading" && (e[ue] = n), n == null ? e.removeAttribute(t) : typeof n != "string" && va(e).includes(t) ? e[t] = n : e.setAttribute(t, n));
+function ga(e, t) {
+	var n = va(e);
+	n.checked !== (n.checked = t ?? void 0) && (e.checked = t);
 }
-function _a(e) {
-	return e.__attributes ??= {
-		[ya]: e.nodeName.includes("-"),
-		[ba]: e.namespaceURI === ke
-	};
+function _a(e, t, n, r) {
+	var i = va(e);
+	A && (i[t] = e.getAttribute(t), t === "src" || t === "srcset" || t === "href" && e.nodeName === Sa) || i[t] !== (i[t] = n) && (t === "loading" && (e[ue] = n), n == null ? e.removeAttribute(t) : typeof n != "string" && ya(e).includes(t) ? e[t] = n : e.setAttribute(t, n));
 }
 function va(e) {
-	var t = e.getAttribute("is") || e.nodeName, n = Ca.get(t);
+	return e.__attributes ??= {
+		[ba]: e.nodeName.includes("-"),
+		[xa]: e.namespaceURI === ke
+	};
+}
+function ya(e) {
+	var t = e.getAttribute("is") || e.nodeName, n = wa.get(t);
 	if (n) return n;
-	Ca.set(t, n = []);
+	wa.set(t, n = []);
 	for (var r, i = e, a = Element.prototype; a !== i;) {
 		for (var o in r = p(i), r) r[o].set && n.push(o);
 		i = g(i);
 	}
 	return n;
 }
-var ya, ba, xa, Sa, Ca, wa = e((() => {
-	r(), M(), y(), ci(), Hn(), Ne(), O(), at(), $r(), J(), oa(), la(), da(), fa(), Ae(), H(), pa(), Qt(), ya = Symbol("is custom element"), ba = Symbol("is html"), xa = fe ? "link" : "LINK", Sa = fe ? "progress" : "PROGRESS", Ca = /* @__PURE__ */ new Map();
-})), Ta = e((() => {
-	M(), Rn(), fi(), oa();
+var ba, xa, Sa, Ca, wa, Ta = e((() => {
+	r(), M(), y(), ci(), Hn(), Ne(), O(), at(), $r(), J(), oa(), la(), da(), fa(), Ae(), H(), pa(), Qt(), ba = Symbol("is custom element"), xa = Symbol("is html"), Sa = fe ? "link" : "LINK", Ca = fe ? "progress" : "PROGRESS", wa = /* @__PURE__ */ new Map();
 })), Ea = e((() => {
-	Wn();
+	M(), Rn(), fi(), oa();
 })), Da = e((() => {
-	H(), Wn(), Ee(), Sn(), at(), M(), J(), P(), Vt();
-})), Oa = e((() => {
-	H(), Wn();
-})), ka = e((() => {
 	Wn();
+})), Oa = e((() => {
+	H(), Wn(), Ee(), Sn(), at(), M(), J(), P(), Vt();
+})), ka = e((() => {
+	H(), Wn();
 })), Aa = e((() => {
-	H(), y();
+	Wn();
 })), ja = e((() => {
+	H(), y();
+})), Ma = e((() => {
 	H(), J();
 }));
 //#endregion
 //#region node_modules/svelte/src/internal/client/dom/elements/bindings/this.js
-function Ma(e, t) {
+function Na(e, t) {
 	return e === t || e?.[ce] === t;
 }
-function Na(e = {}, t, n, r) {
+function Pa(e = {}, t, n, r) {
 	var i = N.r, a = q;
 	return er(() => {
 		var o, s;
 		return ir(() => {
 			o = s, s = r?.() || [], W(() => {
-				e !== n(...s) && (t(e, ...s), o && Ma(n(...o), e) && t(null, ...o));
+				e !== n(...s) && (t(e, ...s), o && Na(n(...o), e) && t(null, ...o));
 			});
 		}), () => {
 			let r = a;
 			for (; r !== i && r.parent !== null && r.parent.f & 33554432;) r = r.parent;
 			let o = () => {
-				s && Ma(n(...s), e) && t(null, ...s);
+				s && Na(n(...s), e) && t(null, ...s);
 			}, c = r.teardown;
 			r.teardown = () => {
 				o(), c?.();
@@ -2243,26 +2247,26 @@ function Na(e = {}, t, n, r) {
 		};
 	}), e;
 }
-var Pa = e((() => {
+var Fa = e((() => {
 	O(), P(), H(), J();
-})), Fa = e((() => {
-	H(), Wn();
 })), Ia = e((() => {
+	H(), Wn();
+})), La = e((() => {
 	H(), Wn();
 }));
 //#endregion
 //#region node_modules/svelte/src/internal/client/dom/legacy/event-modifiers.js
-function La(e) {
+function Ra(e) {
 	return function(...t) {
 		return t[0].preventDefault(), e?.apply(this, t);
 	};
 }
-var Ra = e((() => {
+var za = e((() => {
 	y(), H(), ci();
 }));
 //#endregion
 //#region node_modules/svelte/src/internal/client/dom/legacy/lifecycle.js
-function za(e = !1) {
+function Ba(e = !1) {
 	let t = N, n = t.l.u;
 	if (!n) return;
 	let r = () => G(t.s);
@@ -2275,23 +2279,23 @@ function za(e = !1) {
 		r = () => U(i);
 	}
 	n.b.length && Qn(() => {
-		Ba(t, r), a(n.b);
+		Va(t, r), a(n.b);
 	}), Xn(() => {
 		let e = W(() => n.m.map(i));
 		return () => {
 			for (let t of e) typeof t == "function" && t();
 		};
 	}), n.a.length && Xn(() => {
-		Ba(t, r), a(n.a);
+		Va(t, r), a(n.a);
 	});
 }
-function Ba(e, t) {
+function Va(e, t) {
 	if (e.l.s) for (let t of e.l.s) U(t);
 	t();
 }
-var Va = e((() => {
+var Ha = e((() => {
 	y(), P(), un(), H(), J();
-})), Ha = e((() => {
+})), Ua = e((() => {
 	bn(), J(), y();
 }));
 //#endregion
@@ -2330,33 +2334,33 @@ function $(e, t, n, r) {
 		return zr && _ || y.f & 16384 ? v.v : U(v);
 	});
 }
-var Ua = e((() => {
+var Wa = e((() => {
 	r(), Ae(), y(), bn(), un(), J(), Ee(), O(), Sn(), bt(), qe(), H();
-})), Wa = e((() => {
-	P(), H(), bt(), Qt();
 })), Ga = e((() => {
-	O(), H(), bn(), Si(), J(), Vt(), y(), Ee(), P(), qe(), dt(), Ra();
+	P(), H(), bt(), Qt();
 })), Ka = e((() => {
-	Ga(), H(), gi(), y(), Rn();
+	O(), H(), bn(), Si(), J(), Vt(), y(), Ee(), P(), qe(), dt(), za();
 })), qa = e((() => {
-	O(), Je(), J();
+	Ka(), H(), gi(), y(), Rn();
 })), Ja = e((() => {
-	Jr(), P(), ei(), ti(), Ci(), wi(), Ti(), Ye(), Ei(), Di(), Oi(), ji(), Ni(), Pi(), Fi(), Ki(), qi(), Ji(), Xi(), Zi(), ta(), ra(), ia(), aa(), oa(), wa(), da(), ci(), Hn(), Ta(), fa(), ea(), Ea(), Da(), Oa(), ka(), Aa(), pa(), ja(), Pa(), Fa(), Ia(), M(), Ra(), Va(), Ha(), gi(), Qt(), Vt(), un(), H(), bn(), Ua(), bt(), qt(), br(), Si(), J(), Wa(), Qi(), Sn(), Ka(), Rn(), la(), Je(), y(), Yi(), Cn(), qa(), ct();
+	O(), Je(), J();
 })), Ya = e((() => {
+	Jr(), P(), ei(), ti(), Ci(), wi(), Ti(), Ye(), Ei(), Di(), Oi(), ji(), Ni(), Pi(), Fi(), Ki(), qi(), Ji(), Xi(), Zi(), ta(), ra(), ia(), aa(), oa(), Ta(), da(), ci(), Hn(), Ea(), fa(), ea(), Da(), Oa(), ka(), Aa(), ja(), pa(), Ma(), Fa(), Ia(), La(), M(), za(), Ha(), Ua(), gi(), Qt(), Vt(), un(), H(), bn(), Wa(), bt(), qt(), br(), Si(), J(), Ga(), Qi(), Sn(), qa(), Rn(), la(), Je(), y(), Yi(), Cn(), Ja(), ct();
+})), Xa = e((() => {
 	M(), Ee();
 }));
 //#endregion
 //#region node_modules/svelte/src/index-client.js
-function Xa(e) {
-	N === null && pe("onMount"), Ke && N.l !== null ? Qa(N).m.push(e) : Xn(() => {
+function Za(e) {
+	N === null && pe("onMount"), Ke && N.l !== null ? $a(N).m.push(e) : Xn(() => {
 		let t = W(e);
 		if (typeof t == "function") return t;
 	});
 }
-function Za(e) {
-	N === null && pe("onDestroy"), Xa(() => () => W(e));
-}
 function Qa(e) {
+	N === null && pe("onDestroy"), Za(() => () => W(e));
+}
+function $a(e) {
 	var t = e.l;
 	return t.u ??= {
 		a: [],
@@ -2364,73 +2368,73 @@ function Qa(e) {
 		m: []
 	};
 }
-var $a = e((() => {
-	J(), y(), Ja(), Ee(), qe(), P(), r(), Vt(), Ya(), Si(), Xi();
-})), eo = e((() => {})), to = e((() => {
-	eo(), typeof window < "u" && ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add("5");
-})), no = e((() => {
+var eo = e((() => {
+	J(), y(), Ya(), Ee(), qe(), P(), r(), Vt(), Xa(), Si(), Xi();
+})), to = e((() => {})), no = e((() => {
+	to(), typeof window < "u" && ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add("5");
+})), ro = e((() => {
 	qe(), We();
 }));
 //#endregion
 //#region frontend/src/lib/app-shell.js
-function ro() {
+function io() {
 	return typeof window > "u" ? "/buyer/home" : window.location.pathname;
 }
-function io() {
-	let e = ro().match(/\/buyer\/products\/(\d+)/);
-	return e ? Number(e[1]) : null;
-}
 function ao() {
-	let e = ro().match(/\/buyer\/orders\/(\d+)\/confirmation/);
+	let e = io().match(/\/buyer\/products\/(\d+)/);
 	return e ? Number(e[1]) : null;
 }
-function oo(e = ro()) {
+function oo() {
+	let e = io().match(/\/buyer\/orders\/(\d+)\/confirmation/);
+	return e ? Number(e[1]) : null;
+}
+function so(e = io()) {
 	return e.startsWith("/admin") ? "admin" : e.startsWith("/seller") ? "seller" : "buyer";
 }
-function so(e = ro()) {
+function co(e = io()) {
 	return e === "/admin" ? "admin-home" : e === "/admin/sub" ? "admin-moderation" : e === "/admin/audit" ? "admin-audit" : e === "/seller/home" ? "seller-home" : e === "/seller/inventory" ? "seller-inventory" : e === "/buyer/cart" ? "cart" : e === "/buyer/checkout" ? "checkout" : e === "/buyer/compare" ? "compare" : e === "/buyer/orders" ? "orders" : /\/buyer\/orders\/\d+\/confirmation$/.test(e) ? "confirmation" : /\/buyer\/products\/\d+$/.test(e) ? "product" : "storefront";
 }
-function co(e) {
-	return bo[e] || bo.storefront;
-}
 function lo(e) {
-	return co(e).title;
+	return xo[e] || xo.storefront;
 }
 function uo(e) {
+	return lo(e).title;
+}
+function fo(e) {
 	return e === "admin-moderation" ? "/admin/classic/sub" : e === "admin-audit" ? "/admin/classic/audit" : "/admin/classic";
 }
-function fo(e, t) {
-	return e === "admin" ? uo(t) : e === "seller" ? "/seller/classic/home" : "/buyer/classic/home";
+function po(e, t) {
+	return e === "admin" ? fo(t) : e === "seller" ? "/seller/classic/home" : "/buyer/classic/home";
 }
-function po(e) {
+function mo(e) {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: "USD"
 	}).format(e);
 }
-function mo(e) {
+function ho(e) {
 	return new Intl.DateTimeFormat("en-US", {
 		dateStyle: "medium",
 		timeStyle: "short"
 	}).format(new Date(e));
 }
-function ho(e) {
+function go(e) {
 	return e === "demo_card" ? "Demo Credit Card" : e;
 }
-function go(e, t) {
+function _o(e, t) {
 	return e ? e.length > t ? `${e.slice(0, t)}...` : e : "";
 }
-function _o(e) {
+function vo(e) {
 	return e ? e.charAt(0).toUpperCase() + e.slice(1) : "";
 }
-function vo(e) {
+function yo(e) {
 	return e.banned ? "Banned" : e.blocked ? "Blocked" : e.approved ? "Approved" : "Pending";
 }
-function yo(e) {
+function bo(e) {
 	return e ? e.split("_").map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ") : "";
 }
-var bo, xo, So = e((() => {
-	bo = {
+var xo, So, Co = e((() => {
+	xo = {
 		"admin-home": {
 			title: "Admin Home",
 			kicker: "Administration",
@@ -2491,7 +2495,7 @@ var bo, xo, So = e((() => {
 			kicker: "Live inventory",
 			heading: "Available hardware"
 		}
-	}, xo = {
+	}, So = {
 		admin: [
 			{
 				href: "/admin",
@@ -2535,7 +2539,7 @@ var bo, xo, So = e((() => {
 }));
 //#endregion
 //#region frontend/src/components/AppHero.svelte
-function Co(e, t) {
+function wo(e, t) {
 	Qe(t, !1);
 	let n = /* @__PURE__ */ L(), r = /* @__PURE__ */ L(), i = $(t, "appMode", 8), a = $(t, "currentPage", 8), o = $(t, "onLogout", 8), s = {
 		admin: "Admin Workspace",
@@ -2543,34 +2547,34 @@ function Co(e, t) {
 		buyer: "Buyer Workspace"
 	};
 	tr(() => G(i()), () => {
-		R(n, xo[i()] || xo.buyer);
+		R(n, So[i()] || So.buyer);
 	}), tr(() => (G(i()), G(a())), () => {
-		R(r, fo(i(), a()));
-	}), nr(), za();
-	var c = To(), l = z(c), u = z(l), d = z(u, !0);
+		R(r, po(i(), a()));
+	}), nr(), Ba();
+	var c = Eo(), l = z(c), u = z(l), d = z(u, !0);
 	k(u), Le(2), k(l);
 	var f = B(l, 2), p = z(f);
 	zi(p, 1, () => U(n), Ii, (e, t) => {
-		var n = wo(), r = z(n, !0);
+		var n = To(), r = z(n, !0);
 		k(n), V(() => {
-			ga(n, "href", (U(t), W(() => U(t).href))), Q(r, (U(t), W(() => U(t).label)));
+			_a(n, "href", (U(t), W(() => U(t).href))), Q(r, (U(t), W(() => U(t).label)));
 		}), Z(e, n);
 	});
 	var m = B(p, 2), h = B(m, 2);
 	k(f), k(c), V(() => {
-		Q(d, (G(i()), W(() => s[i()] || s.buyer))), ga(m, "href", U(r));
+		Q(d, (G(i()), W(() => s[i()] || s.buyer))), _a(m, "href", U(r));
 	}), Y("click", h, function(...e) {
 		o()?.apply(this, e);
 	}), Z(e, c), $e();
 }
-var wo, To, Eo = e((() => {
-	to(), no(), Ja(), So(), wo = /* @__PURE__ */ X("<a class=\"action-link\"> </a>"), To = /* @__PURE__ */ X("<section class=\"hero\"><div><p class=\"eyebrow\"> </p> <h1>Random Access Market</h1></div> <div class=\"hero-actions\"><!> <a class=\"action-link secondary\">Classic UI</a> <button class=\"action-link logout-button\">Log Out</button></div></section>");
+var To, Eo, Do = e((() => {
+	no(), ro(), Ya(), Co(), To = /* @__PURE__ */ X("<a class=\"action-link\"> </a>"), Eo = /* @__PURE__ */ X("<section class=\"hero\"><div><p class=\"eyebrow\"> </p> <h1>Random Access Market</h1></div> <div class=\"hero-actions\"><!> <a class=\"action-link secondary\">Classic UI</a> <button class=\"action-link logout-button\">Log Out</button></div></section>");
 }));
 //#endregion
 //#region frontend/src/components/CatalogHeader.svelte
-function Do(e, t) {
+function Oo(e, t) {
 	let n = $(t, "kicker", 8), r = $(t, "heading", 8), i = $(t, "onRefresh", 8);
-	var a = Oo(), o = z(a), s = z(o), c = z(s, !0);
+	var a = ko(), o = z(a), s = z(o), c = z(s, !0);
 	k(s);
 	var l = B(s, 2), u = z(l, !0);
 	k(l), k(o);
@@ -2581,21 +2585,21 @@ function Do(e, t) {
 		i()?.apply(this, e);
 	}), Z(e, a);
 }
-var Oo, ko = e((() => {
-	to(), no(), Ja(), Oo = /* @__PURE__ */ X("<div class=\"catalog-header\"><div><p class=\"section-kicker\"> </p> <h2> </h2></div> <button class=\"refresh-button\">Refresh</button></div>");
+var ko, Ao = e((() => {
+	no(), ro(), Ya(), ko = /* @__PURE__ */ X("<div class=\"catalog-header\"><div><p class=\"section-kicker\"> </p> <h2> </h2></div> <button class=\"refresh-button\">Refresh</button></div>");
 }));
 //#endregion
 //#region frontend/src/components/AdminAuditView.svelte
-function Ao(e, t) {
+function jo(e, t) {
 	Qe(t, !1);
 	let n = $(t, "adminAuditLogs", 24, () => []), r = $(t, "formatActionType", 8), i = $(t, "formatDate", 8);
-	za();
+	Ba();
 	var a = hi(), o = On(a), s = (e) => {
-		Z(e, jo());
+		Z(e, Mo());
 	}, c = (e) => {
-		var t = No(), a = B(z(t), 2);
+		var t = Po(), a = B(z(t), 2);
 		zi(a, 5, n, Ii, (e, t) => {
-			var n = Mo(), a = z(n), o = z(a, !0);
+			var n = No(), a = z(n), o = z(a, !0);
 			k(a);
 			var s = B(a, 2), c = z(s, !0);
 			k(s);
@@ -2611,31 +2615,31 @@ function Ao(e, t) {
 		G(n()), W(() => n().length === 0) ? e(s) : e(c, -1);
 	}), Z(e, a), $e();
 }
-var jo, Mo, No, Po = e((() => {
-	to(), no(), Ja(), jo = /* @__PURE__ */ X("<div class=\"state-card\">No audit log entries yet.</div>"), Mo = /* @__PURE__ */ X("<article class=\"admin-audit-row\"><p class=\"seller admin-audit-when\"> </p> <p class=\"admin-audit-user\"> </p> <p class=\"admin-audit-action\"> </p> <p class=\"admin-audit-details\"> </p></article>"), No = /* @__PURE__ */ X("<div class=\"panel admin-box\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Recent actions</p> <h3>Recorded system activity</h3></div></div> <div class=\"admin-audit-list\"></div></div>");
+var Mo, No, Po, Fo = e((() => {
+	no(), ro(), Ya(), Mo = /* @__PURE__ */ X("<div class=\"state-card\">No audit log entries yet.</div>"), No = /* @__PURE__ */ X("<article class=\"admin-audit-row\"><p class=\"seller admin-audit-when\"> </p> <p class=\"admin-audit-user\"> </p> <p class=\"admin-audit-action\"> </p> <p class=\"admin-audit-details\"> </p></article>"), Po = /* @__PURE__ */ X("<div class=\"panel admin-box\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Recent actions</p> <h3>Recorded system activity</h3></div></div> <div class=\"admin-audit-list\"></div></div>");
 }));
 //#endregion
 //#region frontend/src/components/AdminHomeView.svelte
-function Fo(e) {
-	Z(e, Io());
+function Io(e) {
+	Z(e, Lo());
 }
-var Io, Lo = e((() => {
-	to(), no(), Ja(), Io = /* @__PURE__ */ X("<div class=\"admin-columns admin-columns--two\"><article class=\"admin-region admin-region--products\"><p class=\"section-kicker\">Moderation</p> <h3>User and listing review</h3> <p class=\"detail-description\">Review pending registrations, approve or reject seller listings, and handle active account status changes.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/admin/sub\">User management</a></div></article> <article class=\"admin-region\"><p class=\"section-kicker\">Audit</p> <h3>Recent platform activity</h3> <p class=\"detail-description\">Review the most recent approval, rejection, delisting, and other system actions recorded by the backend.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/admin/audit\">Open audit log</a></div></article></div>");
+var Lo, Ro = e((() => {
+	no(), ro(), Ya(), Lo = /* @__PURE__ */ X("<div class=\"admin-columns admin-columns--two\"><article class=\"admin-region admin-region--products\"><p class=\"section-kicker\">Moderation</p> <h3>User and listing review</h3> <p class=\"detail-description\">Review pending registrations, approve or reject seller listings, and handle active account status changes.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/admin/sub\">User management</a></div></article> <article class=\"admin-region\"><p class=\"section-kicker\">Audit</p> <h3>Recent platform activity</h3> <p class=\"detail-description\">Review the most recent approval, rejection, delisting, and other system actions recorded by the backend.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/admin/audit\">Open audit log</a></div></article></div>");
 }));
 //#endregion
 //#region frontend/src/components/AdminModerationView.svelte
-function Ro(e, t) {
+function zo(e, t) {
 	Qe(t, !1);
 	let n = $(t, "adminPendingUsers", 24, () => []), r = $(t, "adminProducts", 24, () => []), i = $(t, "adminUsers", 24, () => []), a = $(t, "adminUsersPageInfo", 8), o = $(t, "adminUserSearch", 8, ""), s = $(t, "onAdminUserSearchInput", 8), c = $(t, "approveUser", 8), l = $(t, "blockUser", 8), u = $(t, "banUser", 8), d = $(t, "approveProduct", 8), f = $(t, "rejectProduct", 8), p = $(t, "delistProduct", 8), m = $(t, "searchAdminUsers", 8), h = $(t, "clearAdminUserSearch", 8), g = $(t, "goToAdminUsersPage", 8), _ = $(t, "capitalizeRole", 8), v = $(t, "formatCurrency", 8), y = $(t, "formatDate", 8), b = $(t, "getUserStatus", 8);
-	za();
-	var x = Zo(), S = z(x), C = z(S), ee = B(z(C), 2), te = z(ee, !0);
+	Ba();
+	var x = Qo(), S = z(x), C = z(S), ee = B(z(C), 2), te = z(ee, !0);
 	k(ee), k(C);
-	var ne = B(C, 2), w = (e) => {
-		Z(e, zo());
-	}, T = (e) => {
-		var t = Vo(), r = z(t), i = B(z(r));
+	var ne = B(C, 2), re = (e) => {
+		Z(e, Bo());
+	}, w = (e) => {
+		var t = Ho(), r = z(t), i = B(z(r));
 		zi(i, 5, n, Ii, (e, t) => {
-			var n = Bo(), r = z(n), i = z(r, !0);
+			var n = Vo(), r = z(n), i = z(r, !0);
 			k(r);
 			var a = B(r), o = z(a, !0);
 			k(a);
@@ -2650,16 +2654,16 @@ function Ro(e, t) {
 		}), k(i), k(r), k(t), Z(e, t);
 	};
 	Mi(ne, (e) => {
-		G(n()), W(() => n().length === 0) ? e(w) : e(T, -1);
+		G(n()), W(() => n().length === 0) ? e(re) : e(w, -1);
 	}), k(S);
-	var E = B(S, 2), re = z(E), ie = B(z(re), 2), D = z(ie, !0);
-	k(ie), k(re);
-	var ae = B(re, 2), oe = (e) => {
-		Z(e, Ho());
+	var T = B(S, 2), E = z(T), ie = B(z(E), 2), ae = z(ie, !0);
+	k(ie), k(E);
+	var D = B(E, 2), oe = (e) => {
+		Z(e, Uo());
 	}, se = (e) => {
-		var t = qo(), n = z(t), i = B(z(n));
+		var t = Jo(), n = z(t), i = B(z(n));
 		zi(i, 5, r, Ii, (e, t) => {
-			var n = Ko(), r = z(n), i = z(r, !0);
+			var n = qo(), r = z(n), i = z(r, !0);
 			k(r);
 			var a = B(r), o = z(a, !0);
 			k(a);
@@ -2682,36 +2686,36 @@ function Ro(e, t) {
 				U(t), W(() => U(t).listingStatus === "pending") ? e(y) : (U(t), W(() => U(t).listingStatus === "rejected") ? e(b, 1) : (U(t), W(() => U(t).isListed) ? e(x, 2) : e(S, -1)));
 			}), k(g);
 			var C = B(g), ee = z(C), te = (e) => {
-				var n = Uo(), r = z(n), i = B(r, 2);
+				var n = Wo(), r = z(n), i = B(r, 2);
 				k(n), Y("click", r, () => d()(U(t).id)), Y("click", i, () => f()(U(t).id)), Z(e, n);
 			}, ne = (e) => {
-				var n = Wo();
+				var n = Go();
 				Y("click", n, () => p()(U(t).id)), Z(e, n);
-			}, w = (e) => {
-				Z(e, Go());
+			}, re = (e) => {
+				Z(e, Ko());
 			};
 			Mi(ee, (e) => {
-				U(t), W(() => U(t).listingStatus === "pending") ? e(te) : (U(t), W(() => U(t).isListed) ? e(ne, 1) : e(w, -1));
+				U(t), W(() => U(t).listingStatus === "pending") ? e(te) : (U(t), W(() => U(t).isListed) ? e(ne, 1) : e(re, -1));
 			}), k(C), k(n), V((e) => {
 				Q(i, (U(t), W(() => U(t).name))), Q(o, (U(t), W(() => U(t).seller?.username || "Unknown seller"))), Q(c, (U(t), W(() => U(t).description || "No description provided."))), Q(u, e), Q(h, (U(t), W(() => U(t).stock)));
 			}, [() => (G(v()), U(t), W(() => v()(U(t).price)))]), Z(e, n);
 		}), k(i), k(n), k(t), Z(e, t);
 	};
-	Mi(ae, (e) => {
+	Mi(D, (e) => {
 		G(r()), W(() => r().length === 0) ? e(oe) : e(se, -1);
-	}), k(E);
-	var ce = B(E, 2), le = z(ce), ue = B(z(le), 2), de = z(ue);
+	}), k(T);
+	var ce = B(T, 2), le = z(ce), ue = B(z(le), 2), de = z(ue);
 	k(ue), k(le);
 	var fe = B(le, 2), O = z(fe);
 	ma(O);
 	var pe = B(O, 4);
 	k(fe);
 	var me = B(fe, 2), he = (e) => {
-		Z(e, Jo());
+		Z(e, Yo());
 	}, ge = (e) => {
-		var t = Xo(), n = z(t), r = B(z(n));
+		var t = Zo(), n = z(t), r = B(z(n));
 		zi(r, 5, i, Ii, (e, t) => {
-			var n = Yo(), r = z(n), i = z(r, !0);
+			var n = Xo(), r = z(n), i = z(r, !0);
 			k(r);
 			var a = B(r), o = z(a, !0);
 			k(a);
@@ -2736,30 +2740,30 @@ function Ro(e, t) {
 	k(ye);
 	var xe = B(ye, 2);
 	k(_e), k(ce), k(x), V(() => {
-		Q(te, (G(n()), W(() => n().length))), Q(D, (G(r()), W(() => r().length))), Q(de, `${(G(a()), W(() => a().totalPages)) ?? ""} page${(G(a()), W(() => a().totalPages === 1 ? "" : "s")) ?? ""}`), ha(O, o()), ve.disabled = (G(a()), W(() => !a().hasPreviousPage)), Q(be, `Page ${(G(a()), W(() => a().page)) ?? ""} of ${(G(a()), W(() => a().totalPages)) ?? ""}`), xe.disabled = (G(a()), W(() => !a().hasNextPage));
+		Q(te, (G(n()), W(() => n().length))), Q(ae, (G(r()), W(() => r().length))), Q(de, `${(G(a()), W(() => a().totalPages)) ?? ""} page${(G(a()), W(() => a().totalPages === 1 ? "" : "s")) ?? ""}`), ha(O, o()), ve.disabled = (G(a()), W(() => !a().hasPreviousPage)), Q(be, `Page ${(G(a()), W(() => a().page)) ?? ""} of ${(G(a()), W(() => a().totalPages)) ?? ""}`), xe.disabled = (G(a()), W(() => !a().hasNextPage));
 	}), Y("input", O, function(...e) {
 		s()?.apply(this, e);
 	}), Y("click", pe, function(...e) {
 		h()?.apply(this, e);
-	}), Y("submit", fe, La(function(...e) {
+	}), Y("submit", fe, Ra(function(...e) {
 		m()?.apply(this, e);
 	})), Y("click", ve, () => g()(a().page - 1)), Y("click", xe, () => g()(a().page + 1)), Z(e, x), $e();
 }
-var zo, Bo, Vo, Ho, Uo, Wo, Go, Ko, qo, Jo, Yo, Xo, Zo, Qo = e((() => {
-	to(), no(), Ja(), zo = /* @__PURE__ */ X("<div class=\"state-card\">No pending users right now.</div>"), Bo = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td><div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button admin-button-danger\">Block</button></div></td></tr>"), Vo = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid\"><thead><tr><th>Username</th><th>Role</th><th>Email</th><th>Requested</th><th>Actions</th></tr></thead><tbody></tbody></table></div>"), Ho = /* @__PURE__ */ X("<div class=\"state-card\">No seller listings are available for review.</div>"), Uo = /* @__PURE__ */ X("<div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button admin-button-danger\">Reject</button></div>"), Wo = /* @__PURE__ */ X("<button class=\"admin-button admin-button-danger\">Delist</button>"), Go = /* @__PURE__ */ X("<span class=\"seller\">No further action</span>"), Ko = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td> </td><td><!></td><td><!></td></tr>"), qo = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid admin-grid--products\"><thead><tr><th>Product</th><th>Seller</th><th>Description</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div>"), Jo = /* @__PURE__ */ X("<div class=\"state-card\">No users matched that search.</div>"), Yo = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td><div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button\">Block</button> <button class=\"admin-button admin-button-danger\">Ban</button></div></td></tr>"), Xo = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid\"><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody></tbody></table></div>"), Zo = /* @__PURE__ */ X("<div class=\"admin-columns admin-columns--three\"><article class=\"admin-region\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Pending registration requests</p> <h3>Users awaiting approval</h3></div> <p class=\"admin-count\"> </p></div> <!></article> <article class=\"admin-region admin-region--products\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Seller listings</p> <h3>Listing moderation</h3></div> <p class=\"admin-count\"> </p></div> <!></article> <article class=\"admin-region\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Recent users</p> <h3>Browse and filter accounts</h3></div> <p class=\"admin-count\"> </p></div> <form class=\"admin-search\"><input type=\"search\" placeholder=\"Search username\"/> <button class=\"admin-button\" type=\"submit\">Search</button> <button type=\"button\" class=\"admin-button\">Clear</button></form> <!> <div class=\"admin-pagination\"><button class=\"admin-button\">Previous</button> <p class=\"seller\"> </p> <button class=\"admin-button\">Next</button></div></article></div>");
+var Bo, Vo, Ho, Uo, Wo, Go, Ko, qo, Jo, Yo, Xo, Zo, Qo, $o = e((() => {
+	no(), ro(), Ya(), Bo = /* @__PURE__ */ X("<div class=\"state-card\">No pending users right now.</div>"), Vo = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td><div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button admin-button-danger\">Block</button></div></td></tr>"), Ho = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid\"><thead><tr><th>Username</th><th>Role</th><th>Email</th><th>Requested</th><th>Actions</th></tr></thead><tbody></tbody></table></div>"), Uo = /* @__PURE__ */ X("<div class=\"state-card\">No seller listings are available for review.</div>"), Wo = /* @__PURE__ */ X("<div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button admin-button-danger\">Reject</button></div>"), Go = /* @__PURE__ */ X("<button class=\"admin-button admin-button-danger\">Delist</button>"), Ko = /* @__PURE__ */ X("<span class=\"seller\">No further action</span>"), qo = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td> </td><td><!></td><td><!></td></tr>"), Jo = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid admin-grid--products\"><thead><tr><th>Product</th><th>Seller</th><th>Description</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div>"), Yo = /* @__PURE__ */ X("<div class=\"state-card\">No users matched that search.</div>"), Xo = /* @__PURE__ */ X("<tr><td> </td><td> </td><td> </td><td> </td><td><div class=\"admin-action-group\"><button class=\"admin-button\">Approve</button> <button class=\"admin-button\">Block</button> <button class=\"admin-button admin-button-danger\">Ban</button></div></td></tr>"), Zo = /* @__PURE__ */ X("<div class=\"admin-table-wrap\"><table class=\"admin-grid\"><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody></tbody></table></div>"), Qo = /* @__PURE__ */ X("<div class=\"admin-columns admin-columns--three\"><article class=\"admin-region\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Pending registration requests</p> <h3>Users awaiting approval</h3></div> <p class=\"admin-count\"> </p></div> <!></article> <article class=\"admin-region admin-region--products\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Seller listings</p> <h3>Listing moderation</h3></div> <p class=\"admin-count\"> </p></div> <!></article> <article class=\"admin-region\"><div class=\"admin-panel-header\"><div><p class=\"section-kicker\">Recent users</p> <h3>Browse and filter accounts</h3></div> <p class=\"admin-count\"> </p></div> <form class=\"admin-search\"><input type=\"search\" placeholder=\"Search username\"/> <button class=\"admin-button\" type=\"submit\">Search</button> <button type=\"button\" class=\"admin-button\">Clear</button></form> <!> <div class=\"admin-pagination\"><button class=\"admin-button\">Previous</button> <p class=\"seller\"> </p> <button class=\"admin-button\">Next</button></div></article></div>");
 }));
 //#endregion
 //#region frontend/src/components/CartView.svelte
-function $o(e, t) {
+function es(e, t) {
 	Qe(t, !1);
 	let n = $(t, "cart", 8), r = $(t, "removeFromCart", 8), i = $(t, "formatCurrency", 8);
-	za();
-	var a = rs(), o = z(a), s = z(o), c = (e) => {
-		Z(e, es());
+	Ba();
+	var a = is(), o = z(a), s = z(o), c = (e) => {
+		Z(e, ts());
 	}, l = (e) => {
-		var t = ns();
+		var t = rs();
 		zi(t, 5, () => (G(n()), W(() => n().items)), Ii, (e, t) => {
-			var n = ts(), a = z(n), o = z(a), s = z(o, !0);
+			var n = ns(), a = z(n), o = z(a), s = z(o, !0);
 			k(o);
 			var c = B(o, 2), l = z(c, !0);
 			k(c);
@@ -2792,19 +2796,19 @@ function $o(e, t) {
 		() => (G(i()), G(n()), W(() => i()(n().total)))
 	]), Z(e, a), $e();
 }
-var es, ts, ns, rs, is = e((() => {
-	to(), no(), Ja(), es = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty.</div>"), ts = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <button class=\"secondary\">Remove</button></div></article>"), ns = /* @__PURE__ */ X("<div class=\"list-grid\"></div>"), rs = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <a class=\"checkout-link\" href=\"/buyer/checkout\">Checkout</a></aside></div>");
+var ts, ns, rs, is, as = e((() => {
+	no(), ro(), Ya(), ts = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty.</div>"), ns = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <button class=\"secondary\">Remove</button></div></article>"), rs = /* @__PURE__ */ X("<div class=\"list-grid\"></div>"), is = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <a class=\"checkout-link\" href=\"/buyer/checkout\">Checkout</a></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/CheckoutView.svelte
-function as(e, t) {
+function os(e, t) {
 	Qe(t, !1);
 	let n = $(t, "cart", 8), r = $(t, "placeOrder", 8), i = $(t, "formatCurrency", 8), a = $(t, "shippingAddress", 8), o = $(t, "onShippingInput", 8);
-	za();
-	var s = ls(), c = z(s), l = z(c), u = (e) => {
-		Z(e, os());
+	Ba();
+	var s = us(), c = z(s), l = z(c), u = (e) => {
+		Z(e, ss());
 	}, d = (e) => {
-		var t = cs(), r = z(t), s = B(z(r), 2), c = B(z(s), 2);
+		var t = ls(), r = z(t), s = B(z(r), 2), c = B(z(s), 2);
 		ma(c);
 		var l = B(c, 4);
 		ma(l);
@@ -2818,7 +2822,7 @@ function as(e, t) {
 		ma(p), Le(2), k(s), k(r);
 		var m = B(r, 2);
 		zi(m, 5, () => (G(n()), W(() => n().items)), Ii, (e, t) => {
-			var n = ss(), r = z(n), a = z(r), o = z(a, !0);
+			var n = cs(), r = z(n), a = z(r), o = z(a, !0);
 			k(a);
 			var s = B(a, 2), c = z(s, !0);
 			k(s);
@@ -2855,21 +2859,21 @@ function as(e, t) {
 		r()?.apply(this, e);
 	}), Z(e, s), $e();
 }
-var os, ss, cs, ls, us = e((() => {
-	to(), no(), Ja(), os = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty. Return to the storefront before checking out.</div>"), ss = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), cs = /* @__PURE__ */ X("<div class=\"checkout-stack\"><div class=\"shipping-panel\"><p class=\"section-kicker\">Shipping address</p> <div class=\"stack-form\"><label for=\"ship-name\">Full name</label> <input id=\"ship-name\" type=\"text\" required=\"\"/> <label for=\"ship-line1\">Address line 1</label> <input id=\"ship-line1\" type=\"text\" required=\"\"/> <label for=\"ship-line2\">Address line 2</label> <input id=\"ship-line2\" type=\"text\"/> <label for=\"ship-city\">City</label> <input id=\"ship-city\" type=\"text\" required=\"\"/> <label for=\"ship-state\">State / region</label> <input id=\"ship-state\" type=\"text\" required=\"\"/> <label for=\"ship-postal\">Postal code</label> <input id=\"ship-postal\" type=\"text\" required=\"\"/> <p class=\"field-hint\">Shipping currently supports United States addresses only.</p></div></div> <div class=\"list-grid\"></div></div>"), ls = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"payment-box\"><p class=\"payment-label\">Payment method</p> <div class=\"payment-choice selected\"><div><p class=\"payment-title\">Demo credit card ending in 4242</p></div></div> <div class=\"payment-choice payment-placeholder\" aria-disabled=\"true\"><span class=\"payment-plus\">+</span> <div><p class=\"payment-title\">Add another method</p> <p class=\"payment-copy\">Reserved for future cards and other payment options.</p></div></div></div> <div class=\"checkout-actions\"><button class=\"checkout-link place-order-button\">Place order</button> <a class=\"checkout-link secondary-link\" href=\"/buyer/cart\">Back to cart</a></div></aside></div>");
+var ss, cs, ls, us, ds = e((() => {
+	no(), ro(), Ya(), ss = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty. Return to the storefront before checking out.</div>"), cs = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), ls = /* @__PURE__ */ X("<div class=\"checkout-stack\"><div class=\"shipping-panel\"><p class=\"section-kicker\">Shipping address</p> <div class=\"stack-form\"><label for=\"ship-name\">Full name</label> <input id=\"ship-name\" type=\"text\" required=\"\"/> <label for=\"ship-line1\">Address line 1</label> <input id=\"ship-line1\" type=\"text\" required=\"\"/> <label for=\"ship-line2\">Address line 2</label> <input id=\"ship-line2\" type=\"text\"/> <label for=\"ship-city\">City</label> <input id=\"ship-city\" type=\"text\" required=\"\"/> <label for=\"ship-state\">State / region</label> <input id=\"ship-state\" type=\"text\" required=\"\"/> <label for=\"ship-postal\">Postal code</label> <input id=\"ship-postal\" type=\"text\" required=\"\"/> <p class=\"field-hint\">Shipping currently supports United States addresses only.</p></div></div> <div class=\"list-grid\"></div></div>"), us = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"payment-box\"><p class=\"payment-label\">Payment method</p> <div class=\"payment-choice selected\"><div><p class=\"payment-title\">Demo credit card ending in 4242</p></div></div> <div class=\"payment-choice payment-placeholder\" aria-disabled=\"true\"><span class=\"payment-plus\">+</span> <div><p class=\"payment-title\">Add another method</p> <p class=\"payment-copy\">Reserved for future cards and other payment options.</p></div></div></div> <div class=\"checkout-actions\"><button class=\"checkout-link place-order-button\">Place order</button> <a class=\"checkout-link secondary-link\" href=\"/buyer/cart\">Back to cart</a></div></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/CompareView.svelte
-function ds(e, t) {
+function fs(e, t) {
 	Qe(t, !1);
 	let n = $(t, "compareItems", 24, () => []), r = $(t, "addToCart", 8), i = $(t, "removeFromCompare", 8), a = $(t, "formatCurrency", 8), o = $(t, "truncate", 8);
-	za();
+	Ba();
 	var s = hi(), c = On(s), l = (e) => {
-		Z(e, fs());
+		Z(e, ps());
 	}, u = (e) => {
-		var t = ms();
+		var t = hs();
 		zi(t, 5, n, Ii, (e, t) => {
-			var n = ps(), s = z(n), c = B(z(s), 2), l = z(c, !0);
+			var n = ms(), s = z(n), c = B(z(s), 2), l = z(c, !0);
 			k(c), k(s);
 			var u = B(s, 2), d = z(u, !0);
 			k(u);
@@ -2879,7 +2883,7 @@ function ds(e, t) {
 			k(h);
 			var _ = B(h, 2), v = z(_), y = B(v, 2);
 			k(_), k(m), k(n), V((e, n) => {
-				Q(l, e), Q(d, (U(t), W(() => U(t).name))), Q(p, n), ga(g, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
+				Q(l, e), Q(d, (U(t), W(() => U(t).name))), Q(p, n), _a(g, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
 			}, [() => (G(a()), U(t), W(() => a()(U(t).price))), () => (G(o()), U(t), W(() => o()(U(t).description || "", 160)))]), Y("click", v, () => r()(U(t).id)), Y("click", y, () => i()(U(t).id)), Z(e, n);
 		}), k(t), Z(e, t);
 	};
@@ -2887,18 +2891,18 @@ function ds(e, t) {
 		G(n()), W(() => n().length === 0) ? e(l) : e(u, -1);
 	}), Z(e, s), $e();
 }
-var fs, ps, ms, hs = e((() => {
-	to(), no(), Ja(), fs = /* @__PURE__ */ X("<div class=\"state-card\">No products marked for comparison.</div>"), ps = /* @__PURE__ */ X("<article class=\"product-card\"><div class=\"card-topline\"><span class=\"seller\">Comparison item</span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Remove</button></div></div></article>"), ms = /* @__PURE__ */ X("<div class=\"product-grid compare-grid\"></div>");
+var ps, ms, hs, gs = e((() => {
+	no(), ro(), Ya(), ps = /* @__PURE__ */ X("<div class=\"state-card\">No products marked for comparison.</div>"), ms = /* @__PURE__ */ X("<article class=\"product-card\"><div class=\"card-topline\"><span class=\"seller\">Comparison item</span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Remove</button></div></div></article>"), hs = /* @__PURE__ */ X("<div class=\"product-grid compare-grid\"></div>");
 }));
 //#endregion
 //#region frontend/src/components/OrderConfirmationView.svelte
-function gs(e, t) {
+function _s(e, t) {
 	Qe(t, !1);
 	let n = $(t, "order", 8), r = $(t, "formatCurrency", 8), i = $(t, "formatDate", 8), a = $(t, "formatPaymentMethod", 8);
-	za();
-	var o = ys(), s = z(o), c = z(s);
+	Ba();
+	var o = bs(), s = z(o), c = z(s);
 	zi(c, 5, () => (G(n()), W(() => n().items)), Ii, (e, t) => {
-		var n = _s(), i = z(n), a = z(i), o = z(a);
+		var n = vs(), i = z(n), a = z(i), o = z(a);
 		k(a);
 		var s = B(a, 2), c = z(s, !0);
 		k(s);
@@ -2922,7 +2926,7 @@ function gs(e, t) {
 	var b = B(v, 2), x = z(b, !0);
 	k(b);
 	var S = B(b, 2), C = (e) => {
-		var t = vs(), r = z(t, !0);
+		var t = ys(), r = z(t, !0);
 		k(t), V(() => Q(r, (G(n()), W(() => n().shipToLine2)))), Z(e, t);
 	};
 	Mi(S, (e) => {
@@ -2930,17 +2934,17 @@ function gs(e, t) {
 	});
 	var ee = B(S, 2), te = z(ee);
 	k(ee);
-	var ne = B(ee, 2), w = z(ne, !0);
+	var ne = B(ee, 2), re = z(ne, !0);
 	k(ne);
-	var T = B(ne, 4), E = z(T, !0);
-	k(T);
-	var re = B(T, 4), ie = z(re, !0);
-	k(re);
-	var D = B(re, 4), ae = z(D, !0);
-	k(D);
-	var oe = B(D, 4), se = z(oe, !0);
+	var w = B(ne, 4), T = z(w, !0);
+	k(w);
+	var E = B(w, 4), ie = z(E, !0);
+	k(E);
+	var ae = B(E, 4), D = z(ae, !0);
+	k(ae);
+	var oe = B(ae, 4), se = z(oe, !0);
 	k(oe), Le(2), k(l), k(o), V((e, t, r, i, a, o) => {
-		Q(d, `#${(G(n()), W(() => n().id)) ?? ""}`), Q(p, (G(n()), W(() => n().status))), Q(h, e), Q(_, t), Q(y, (G(n()), W(() => n().shipToName))), Q(x, (G(n()), W(() => n().shipToLine1))), Q(te, `${(G(n()), W(() => n().shipToCity)) ?? ""}, ${(G(n()), W(() => n().shipToState)) ?? ""} ${(G(n()), W(() => n().shipToPostalCode)) ?? ""}`), Q(w, (G(n()), W(() => n().shipToCountry))), Q(E, r), Q(ie, i), Q(ae, a), Q(se, o);
+		Q(d, `#${(G(n()), W(() => n().id)) ?? ""}`), Q(p, (G(n()), W(() => n().status))), Q(h, e), Q(_, t), Q(y, (G(n()), W(() => n().shipToName))), Q(x, (G(n()), W(() => n().shipToLine1))), Q(te, `${(G(n()), W(() => n().shipToCity)) ?? ""}, ${(G(n()), W(() => n().shipToState)) ?? ""} ${(G(n()), W(() => n().shipToPostalCode)) ?? ""}`), Q(re, (G(n()), W(() => n().shipToCountry))), Q(T, r), Q(ie, i), Q(D, a), Q(se, o);
 	}, [
 		() => (G(a()), G(n()), W(() => a()(n().paymentMethod))),
 		() => (G(i()), G(n()), W(() => i()(n().createdAt))),
@@ -2950,21 +2954,21 @@ function gs(e, t) {
 		() => (G(r()), G(n()), W(() => r()(n().total)))
 	]), Z(e, o), $e();
 }
-var _s, vs, ys, bs = e((() => {
-	to(), no(), Ja(), _s = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), vs = /* @__PURE__ */ X("<strong> </strong>"), ys = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><div class=\"list-grid\"></div></div> <aside class=\"summary-panel\"><p>Order number</p> <strong> </strong> <p>Status</p> <strong> </strong> <p>Payment method</p> <strong> </strong> <p>Placed at</p> <strong> </strong> <p>Ship to</p> <strong> </strong> <strong> </strong> <!> <strong> </strong> <strong> </strong> <p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/buyer/home\">Continue shopping</a> <a class=\"checkout-link secondary-link\" href=\"/buyer/orders\">View order history</a></div></aside></div>");
+var vs, ys, bs, xs = e((() => {
+	no(), ro(), Ya(), vs = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), ys = /* @__PURE__ */ X("<strong> </strong>"), bs = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><div class=\"list-grid\"></div></div> <aside class=\"summary-panel\"><p>Order number</p> <strong> </strong> <p>Status</p> <strong> </strong> <p>Payment method</p> <strong> </strong> <p>Placed at</p> <strong> </strong> <p>Ship to</p> <strong> </strong> <strong> </strong> <!> <strong> </strong> <strong> </strong> <p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/buyer/home\">Continue shopping</a> <a class=\"checkout-link secondary-link\" href=\"/buyer/orders\">View order history</a></div></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/OrderHistoryView.svelte
-function xs(e, t) {
+function Ss(e, t) {
 	Qe(t, !1);
 	let n = $(t, "orders", 24, () => []), r = $(t, "pageInfo", 8), i = $(t, "goToOrderHistoryPage", 8), a = $(t, "formatCurrency", 8), o = $(t, "formatDate", 8), s = $(t, "formatPaymentMethod", 8);
-	za();
+	Ba();
 	var c = hi(), l = On(c), u = (e) => {
-		Z(e, Ss());
+		Z(e, Cs());
 	}, d = (e) => {
-		var t = ws(), c = On(t);
+		var t = Ts(), c = On(t);
 		zi(c, 5, n, Ii, (e, t) => {
-			var n = Cs(), r = z(n), i = z(r), c = z(i);
+			var n = ws(), r = z(n), i = z(r), c = z(i);
 			k(i);
 			var l = B(i, 2), u = z(l, !0);
 			k(l);
@@ -2976,7 +2980,7 @@ function xs(e, t) {
 			k(g);
 			var v = B(g, 2);
 			k(h), k(n), V((e, n, r) => {
-				Q(c, `Order #${(U(t), W(() => U(t).id)) ?? ""}`), Q(u, e), Q(f, `${n ?? ""} - ${r ?? ""} - ${(U(t), W(() => U(t).items.length)) ?? ""} item${(U(t), W(() => U(t).items.length === 1 ? "" : "s")) ?? ""}`), Q(m, `Ship to ${(U(t), W(() => U(t).shipToCity)) ?? ""}, ${(U(t), W(() => U(t).shipToState)) ?? ""} ${(U(t), W(() => U(t).shipToPostalCode)) ?? ""}`), Q(_, (U(t), W(() => U(t).status))), ga(v, "href", (U(t), W(() => `/buyer/orders/${U(t).id}/confirmation`)));
+				Q(c, `Order #${(U(t), W(() => U(t).id)) ?? ""}`), Q(u, e), Q(f, `${n ?? ""} - ${r ?? ""} - ${(U(t), W(() => U(t).items.length)) ?? ""} item${(U(t), W(() => U(t).items.length === 1 ? "" : "s")) ?? ""}`), Q(m, `Ship to ${(U(t), W(() => U(t).shipToCity)) ?? ""}, ${(U(t), W(() => U(t).shipToState)) ?? ""} ${(U(t), W(() => U(t).shipToPostalCode)) ?? ""}`), Q(_, (U(t), W(() => U(t).status))), _a(v, "href", (U(t), W(() => `/buyer/orders/${U(t).id}/confirmation`)));
 			}, [
 				() => (G(a()), U(t), W(() => a()(U(t).total))),
 				() => (G(o()), U(t), W(() => o()(U(t).createdAt))),
@@ -2994,16 +2998,16 @@ function xs(e, t) {
 		G(n()), W(() => n().length === 0) ? e(u) : e(d, -1);
 	}), Z(e, c), $e();
 }
-var Ss, Cs, ws, Ts = e((() => {
-	to(), no(), Ja(), Ss = /* @__PURE__ */ X("<div class=\"state-card\">You have not placed any orders yet.</div>"), Cs = /* @__PURE__ */ X("<article class=\"line-card order-history-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <a class=\"checkout-link secondary-link\">View details</a></div></article>"), ws = /* @__PURE__ */ X("<div class=\"list-grid\"></div> <div class=\"history-pagination\"><button class=\"secondary\" type=\"button\">Previous page</button> <span> </span> <button class=\"secondary\" type=\"button\">Next page</button></div>", 1);
+var Cs, ws, Ts, Es = e((() => {
+	no(), ro(), Ya(), Cs = /* @__PURE__ */ X("<div class=\"state-card\">You have not placed any orders yet.</div>"), ws = /* @__PURE__ */ X("<article class=\"line-card order-history-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <a class=\"checkout-link secondary-link\">View details</a></div></article>"), Ts = /* @__PURE__ */ X("<div class=\"list-grid\"></div> <div class=\"history-pagination\"><button class=\"secondary\" type=\"button\">Previous page</button> <span> </span> <button class=\"secondary\" type=\"button\">Next page</button></div>", 1);
 }));
 //#endregion
 //#region frontend/src/components/ProductDetailView.svelte
-function Es(e, t) {
+function Ds(e, t) {
 	Qe(t, !1);
 	let n = $(t, "product", 8), r = $(t, "addToCart", 8), i = $(t, "addToComparison", 8), a = $(t, "formatCurrency", 8);
-	za();
-	var o = Ds(), s = z(o), c = B(s, 2), l = z(c), u = z(l, !0);
+	Ba();
+	var o = Os(), s = z(o), c = B(s, 2), l = z(c), u = z(l, !0);
 	k(l);
 	var d = B(l, 2), f = z(d);
 	k(d), k(c);
@@ -3015,33 +3019,54 @@ function Es(e, t) {
 	k(y), k(p);
 	var S = B(p, 2), C = z(S, !0);
 	k(S), Le(2), k(o), V((e) => {
-		ga(s, "src", (G(n()), W(() => n().imageUrl || "/images/product-placeholder.png"))), ga(s, "alt", (G(n()), W(() => n().name))), Q(u, (G(n()), W(() => n().seller.username))), Q(f, `${(G(n()), W(() => n().stock)) ?? ""} in stock`), Q(g, (G(n()), W(() => n().name))), Q(v, e), Q(C, (G(n()), W(() => n().description || "No description provided.")));
+		_a(s, "src", (G(n()), W(() => n().imageUrl || "/images/product-placeholder.png"))), _a(s, "alt", (G(n()), W(() => n().name))), Q(u, (G(n()), W(() => n().seller.username))), Q(f, `${(G(n()), W(() => n().stock)) ?? ""} in stock`), Q(g, (G(n()), W(() => n().name))), Q(v, e), Q(C, (G(n()), W(() => n().description || "No description provided.")));
 	}, [() => (G(a()), G(n()), W(() => a()(n().price)))]), Y("click", b, () => r()(n().id)), Y("click", x, () => i()(n().id)), Z(e, o), $e();
 }
-var Ds, Os = e((() => {
-	to(), no(), Ja(), Ds = /* @__PURE__ */ X("<article class=\"detail-card\"><img class=\"product-detail-image\"/> <div class=\"detail-meta\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <div class=\"detail-layout\"><div><h3> </h3> <p class=\"detail-price\"> </p></div> <div class=\"detail-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div> <p class=\"detail-description\"> </p> <a class=\"detail-link\" href=\"/buyer/home\">Back to storefront</a></article>");
+var Os, ks = e((() => {
+	no(), ro(), Ya(), Os = /* @__PURE__ */ X("<article class=\"detail-card\"><img class=\"product-detail-image\"/> <div class=\"detail-meta\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <div class=\"detail-layout\"><div><h3> </h3> <p class=\"detail-price\"> </p></div> <div class=\"detail-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div> <p class=\"detail-description\"> </p> <a class=\"detail-link\" href=\"/buyer/home\">Back to storefront</a></article>");
 }));
 //#endregion
 //#region frontend/src/components/SellerHomeView.svelte
-function ks(e) {
-	Z(e, As());
+function As(e, t) {
+	Qe(t, !1);
+	let n = $(t, "sellerWebhook", 8), r = $(t, "onSellerWebhookInput", 8), i = $(t, "saveSellerWebhook", 8);
+	Ba();
+	var a = Ms(), o = B(z(a), 2), s = B(z(o), 6), c = B(z(s), 2);
+	ma(c);
+	var l = B(c, 2), u = z(l);
+	ma(u), Le(), k(l), Le(2), k(s);
+	var d = B(s, 2), f = (e) => {
+		var t = js(), r = B(z(t), 2), i = z(r, !0);
+		k(r);
+		var a = B(r, 4), o = z(a);
+		k(a), k(t), V(() => {
+			Q(i, (G(n()), W(() => n().signingSecret))), Q(o, `WEBHOOK_SECRET='${(G(n()), W(() => n().signingSecret)) ?? ""}' PORT=4010 node scripts/demo-webhook-receiver.js`);
+		}), Z(e, t);
+	};
+	Mi(d, (e) => {
+		G(n()), W(() => n().signingSecret) && e(f);
+	}), k(o), k(a), V(() => {
+		ha(c, (G(n()), W(() => n().endpointUrl))), ga(u, (G(n()), W(() => n().isActive)));
+	}), Y("input", c, (e) => r()("endpointUrl", e)), Y("change", u, (e) => r()("isActive", e)), Y("submit", s, Ra(function(...e) {
+		i()?.apply(this, e);
+	})), Z(e, a), $e();
 }
-var As, js = e((() => {
-	to(), no(), Ja(), As = /* @__PURE__ */ X("<div class=\"seller-home-grid\"><article class=\"detail-card\"><p class=\"section-kicker\">Modern seller mode</p> <h3>Manage your storefront</h3> <p class=\"detail-description\">Use the inventory workspace to create new listings, review approval status, and keep track of stock.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/seller/inventory\">Open inventory</a></div></article></div>");
+var js, Ms, Ns = e((() => {
+	no(), ro(), Ya(), js = /* @__PURE__ */ X("<div class=\"webhook-secret\"><p class=\"seller\">Signing secret</p> <code> </code> <p class=\"detail-description\">Receiver command:</p> <code> </code></div>"), Ms = /* @__PURE__ */ X("<div class=\"seller-home-grid\"><article class=\"detail-card\"><p class=\"section-kicker\">Modern seller mode</p> <h3>Manage your storefront</h3> <p class=\"detail-description\">Use the inventory workspace to create new listings, review approval status, and keep track of stock.</p> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/seller/inventory\">Open inventory</a></div></article> <article class=\"detail-card\"><p class=\"section-kicker\">Warehouse integration</p> <h3>Order webhook setup</h3> <p class=\"detail-description\">Send order notifications to warehouse software when buyers place orders for your products.</p> <form class=\"stack-form webhook-form\"><label for=\"webhook-url\">Receiver URL</label> <input id=\"webhook-url\" type=\"url\" placeholder=\"http://localhost:4010/seller-webhook\"/> <label class=\"checkbox-row\" for=\"webhook-active\"><input id=\"webhook-active\" type=\"checkbox\"/> Webhook active</label> <button class=\"checkout-link place-order-button\" type=\"submit\">Save webhook setup</button></form> <!></article></div>");
 }));
 //#endregion
 //#region frontend/src/components/SellerInventoryView.svelte
-function Ms(e, t) {
+function Ps(e, t) {
 	Qe(t, !1);
 	let n = $(t, "sellerForm", 8), r = $(t, "sellerProducts", 24, () => []), i = $(t, "sellerListingForm", 12), a = $(t, "createSellerListing", 8), o = $(t, "onSellerFormInput", 8), s = $(t, "onSellerImageInput", 8), c = $(t, "formatCurrency", 8);
-	za();
-	var l = Ls(), u = On(l), d = z(u), f = z(d), p = B(z(f), 2);
+	Ba();
+	var l = zs(), u = On(l), d = z(u), f = z(d), p = B(z(f), 2);
 	ma(p);
 	var m = B(p, 4);
 	zn(m);
 	var h = B(m, 4), g = B(h, 4), _ = (e) => {
-		var t = Ns();
-		V(() => ga(t, "src", (G(n()), W(() => n().imagePreviewUrl)))), Z(e, t);
+		var t = Fs();
+		V(() => _a(t, "src", (G(n()), W(() => n().imagePreviewUrl)))), Z(e, t);
 	};
 	Mi(g, (e) => {
 		G(n()), W(() => n().imagePreviewUrl) && e(_);
@@ -3049,15 +3074,15 @@ function Ms(e, t) {
 	var v = B(g, 4);
 	ma(v);
 	var y = B(v, 4);
-	ma(y), Le(2), k(f), Na(f, (e) => i(e), () => i()), k(d);
+	ma(y), Le(2), k(f), Pa(f, (e) => i(e), () => i()), k(d);
 	var b = B(d, 2), x = B(z(b), 2), S = z(x, !0);
 	k(x), k(b), k(u);
 	var C = B(u, 2), ee = (e) => {
-		Z(e, Ps());
+		Z(e, Is());
 	}, te = (e) => {
-		var t = Is();
+		var t = Rs();
 		zi(t, 5, r, Ii, (e, t) => {
-			var n = Fs(), r = z(n), i = B(r, 2), a = z(i), o = z(a), s = (e) => {
+			var n = Ls(), r = z(n), i = B(r, 2), a = z(i), o = z(a), s = (e) => {
 				Z(e, mi("Pending approval"));
 			}, l = (e) => {
 				Z(e, mi("Rejected"));
@@ -3079,7 +3104,7 @@ function Ms(e, t) {
 			k(b);
 			var S = B(b, 2), C = z(S);
 			k(S), k(y), k(v), k(n), V((e, n) => {
-				ga(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), ga(r, "alt", (U(t), W(() => U(t).name))), Q(p, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(h, (U(t), W(() => U(t).name))), Q(_, (U(t), W(() => U(t).description || "No description provided."))), Q(x, e), Q(C, `Created ${n ?? ""}`);
+				_a(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), _a(r, "alt", (U(t), W(() => U(t).name))), Q(p, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(h, (U(t), W(() => U(t).name))), Q(_, (U(t), W(() => U(t).description || "No description provided."))), Q(x, e), Q(C, `Created ${n ?? ""}`);
 			}, [() => (G(c()), U(t), W(() => c()(U(t).price))), () => (U(t), W(() => new Date(U(t).createdAt).toLocaleDateString()))]), Z(e, n);
 		}), k(t), Z(e, t);
 	};
@@ -3089,23 +3114,23 @@ function Ms(e, t) {
 		ha(p, (G(n()), W(() => n().name))), ha(m, (G(n()), W(() => n().description))), ha(v, (G(n()), W(() => n().price))), ha(y, (G(n()), W(() => n().stock))), Q(S, (G(r()), W(() => r().length)));
 	}), Y("input", p, (e) => o()("name", e)), Y("input", m, (e) => o()("description", e)), Y("change", h, function(...e) {
 		s()?.apply(this, e);
-	}), Y("input", v, (e) => o()("price", e)), Y("input", y, (e) => o()("stock", e)), Y("submit", f, La(function(...e) {
+	}), Y("input", v, (e) => o()("price", e)), Y("input", y, (e) => o()("stock", e)), Y("submit", f, Ra(function(...e) {
 		a()?.apply(this, e);
 	})), Z(e, l), $e();
 }
-var Ns, Ps, Fs, Is, Ls, Rs = e((() => {
-	to(), no(), Ja(), Ns = /* @__PURE__ */ X("<img class=\"product-image-preview\" alt=\"Selected product preview\"/>"), Ps = /* @__PURE__ */ X("<div class=\"state-card\">No listings yet.</div>"), Fs = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"><!></span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <p class=\"seller\"> </p></div></div></article>"), Is = /* @__PURE__ */ X("<div class=\"product-grid inventory-grid\"></div>"), Ls = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><form class=\"stack-form\"><label for=\"seller-name\">Product name</label> <input id=\"seller-name\" type=\"text\" required=\"\"/> <label for=\"seller-description\">Description</label> <textarea id=\"seller-description\" rows=\"4\"></textarea> <label for=\"seller-image\">Product image</label> <input id=\"seller-image\" type=\"file\" accept=\"image/jpeg,image/png\"/> <p class=\"field-hint\">Optional. JPEG or PNG up to 2 MB.</p> <!> <label for=\"seller-price\">Price</label> <input id=\"seller-price\" type=\"number\" min=\"0\" step=\"0.01\" required=\"\"/> <label for=\"seller-stock\">Stock</label> <input id=\"seller-stock\" type=\"number\" min=\"0\" step=\"1\" required=\"\"/> <button class=\"checkout-link place-order-button\" type=\"submit\">Create listing</button></form></div> <aside class=\"summary-panel inventory-panel\"><p>Active records</p> <strong> </strong></aside></div> <!>", 1);
+var Fs, Is, Ls, Rs, zs, Bs = e((() => {
+	no(), ro(), Ya(), Fs = /* @__PURE__ */ X("<img class=\"product-image-preview\" alt=\"Selected product preview\"/>"), Is = /* @__PURE__ */ X("<div class=\"state-card\">No listings yet.</div>"), Ls = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"><!></span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <p class=\"seller\"> </p></div></div></article>"), Rs = /* @__PURE__ */ X("<div class=\"product-grid inventory-grid\"></div>"), zs = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><form class=\"stack-form\"><label for=\"seller-name\">Product name</label> <input id=\"seller-name\" type=\"text\" required=\"\"/> <label for=\"seller-description\">Description</label> <textarea id=\"seller-description\" rows=\"4\"></textarea> <label for=\"seller-image\">Product image</label> <input id=\"seller-image\" type=\"file\" accept=\"image/jpeg,image/png\"/> <p class=\"field-hint\">Optional. JPEG or PNG up to 2 MB.</p> <!> <label for=\"seller-price\">Price</label> <input id=\"seller-price\" type=\"number\" min=\"0\" step=\"0.01\" required=\"\"/> <label for=\"seller-stock\">Stock</label> <input id=\"seller-stock\" type=\"number\" min=\"0\" step=\"1\" required=\"\"/> <button class=\"checkout-link place-order-button\" type=\"submit\">Create listing</button></form></div> <aside class=\"summary-panel inventory-panel\"><p>Active records</p> <strong> </strong></aside></div> <!>", 1);
 }));
 //#endregion
 //#region frontend/src/components/StorefrontView.svelte
-function zs(e, t) {
+function Vs(e, t) {
 	Qe(t, !1);
 	let n = $(t, "products", 24, () => []), r = $(t, "productSearch", 8, ""), i = $(t, "addToCart", 8), a = $(t, "addToComparison", 8), o = $(t, "openRandomProduct", 8), s = $(t, "onProductSearchInput", 8), c = $(t, "searchProducts", 8), l = $(t, "clearProductSearch", 8), u = $(t, "formatCurrency", 8);
-	za();
-	var d = Ws(), f = On(d), p = z(f), m = B(z(p), 2), h = z(m);
+	Ba();
+	var d = Ks(), f = On(d), p = z(f), m = B(z(p), 2), h = z(m);
 	ma(h);
 	var g = B(h, 4), _ = (e) => {
-		var t = Bs();
+		var t = Hs();
 		Y("click", t, function(...e) {
 			l()?.apply(this, e);
 		}), Z(e, t);
@@ -3116,12 +3141,12 @@ function zs(e, t) {
 	var y = B(p, 2), b = z(y);
 	k(y), k(f);
 	var x = B(f, 2), S = (e) => {
-		var t = Vs(), n = z(t, !0);
+		var t = Us(), n = z(t, !0);
 		k(t), V((e) => Q(n, e), [() => (G(r()), W(() => r().trim() ? "No products match your search." : "No listed products are available right now."))]), Z(e, t);
 	}, C = (e) => {
-		var t = Us();
+		var t = Gs();
 		zi(t, 5, n, Ii, (e, t) => {
-			var n = Hs(), r = z(n), o = B(r, 2), s = z(o), c = z(s, !0);
+			var n = Ws(), r = z(n), o = B(r, 2), s = z(o), c = z(s, !0);
 			k(s);
 			var l = B(s, 2), d = z(l);
 			k(l), k(o);
@@ -3135,7 +3160,7 @@ function zs(e, t) {
 			k(_);
 			var x = B(_, 2), S = z(x), C = B(S, 2);
 			k(x), k(g), k(n), V((e) => {
-				ga(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), ga(r, "alt", (U(t), W(() => U(t).name))), Q(c, (U(t), W(() => U(t).seller.username))), Q(d, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(p, (U(t), W(() => U(t).name))), Q(h, (U(t), W(() => U(t).description || "No description provided."))), Q(y, e), ga(b, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
+				_a(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), _a(r, "alt", (U(t), W(() => U(t).name))), Q(c, (U(t), W(() => U(t).seller.username))), Q(d, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(p, (U(t), W(() => U(t).name))), Q(h, (U(t), W(() => U(t).description || "No description provided."))), Q(y, e), _a(b, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
 			}, [() => (G(u()), U(t), W(() => u()(U(t).price)))]), Y("click", S, () => i()(U(t).id)), Y("click", C, () => a()(U(t).id)), Z(e, n);
 		}), k(t), Z(e, t);
 	};
@@ -3143,18 +3168,18 @@ function zs(e, t) {
 		G(n()), W(() => n().length === 0) ? e(S) : e(C, -1);
 	}), V(() => ha(h, r())), Y("input", h, function(...e) {
 		s()?.apply(this, e);
-	}), Y("submit", p, La(function(...e) {
+	}), Y("submit", p, Ra(function(...e) {
 		c()?.apply(this, e);
 	})), Y("click", b, function(...e) {
 		o()?.apply(this, e);
 	}), Z(e, d), $e();
 }
-var Bs, Vs, Hs, Us, Ws, Gs = e((() => {
-	to(), no(), Ja(), Bs = /* @__PURE__ */ X("<button class=\"secondary\" type=\"button\">Clear</button>"), Vs = /* @__PURE__ */ X("<div class=\"state-card\"> </div>"), Hs = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div></article>"), Us = /* @__PURE__ */ X("<div class=\"product-grid\"></div>"), Ws = /* @__PURE__ */ X("<div class=\"storefront-tools\"><form class=\"storefront-search\"><label for=\"product-search\">Search products</label> <div class=\"storefront-search-row\"><input id=\"product-search\" type=\"search\" placeholder=\"Search by product name or description\"/> <button type=\"submit\">Search</button> <!></div></form> <div class=\"storefront-actions\"><button class=\"checkout-link random-product-button\" type=\"button\">Random product</button></div></div> <!>", 1);
+var Hs, Us, Ws, Gs, Ks, qs = e((() => {
+	no(), ro(), Ya(), Hs = /* @__PURE__ */ X("<button class=\"secondary\" type=\"button\">Clear</button>"), Us = /* @__PURE__ */ X("<div class=\"state-card\"> </div>"), Ws = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div></article>"), Gs = /* @__PURE__ */ X("<div class=\"product-grid\"></div>"), Ks = /* @__PURE__ */ X("<div class=\"storefront-tools\"><form class=\"storefront-search\"><label for=\"product-search\">Search products</label> <div class=\"storefront-search-row\"><input id=\"product-search\" type=\"search\" placeholder=\"Search by product name or description\"/> <button type=\"submit\">Search</button> <!></div></form> <div class=\"storefront-actions\"><button class=\"checkout-link random-product-button\" type=\"button\">Random product</button></div></div> <!>", 1);
 }));
 //#endregion
 //#region frontend/src/App.svelte
-function Ks(e, t) {
+function Js(e, t) {
 	Qe(t, !1);
 	let n = /* @__PURE__ */ L(), r = [
 		{
@@ -3201,19 +3226,23 @@ function Ks(e, t) {
 		hasPreviousPage: !1,
 		hasNextPage: !1
 	}), h = /* @__PURE__ */ L([]), g = /* @__PURE__ */ L({
+		endpointUrl: "",
+		signingSecret: "",
+		isActive: !1
+	}), _ = /* @__PURE__ */ L({
 		name: "",
 		description: "",
 		imageDataUrl: "",
 		imagePreviewUrl: "",
 		price: "",
 		stock: ""
-	}), _ = /* @__PURE__ */ L(), v = /* @__PURE__ */ L([]), y = /* @__PURE__ */ L([]), b = /* @__PURE__ */ L([]), x = /* @__PURE__ */ L([]), S = /* @__PURE__ */ L({
+	}), v = /* @__PURE__ */ L(), y = /* @__PURE__ */ L([]), b = /* @__PURE__ */ L([]), x = /* @__PURE__ */ L([]), S = /* @__PURE__ */ L([]), C = /* @__PURE__ */ L({
 		page: 1,
 		totalPages: 1,
 		hasPreviousPage: !1,
 		hasNextPage: !1,
 		search: ""
-	}), C = /* @__PURE__ */ L(""), ee = /* @__PURE__ */ L({
+	}), ee = /* @__PURE__ */ L(""), te = /* @__PURE__ */ L({
 		name: "",
 		line1: "",
 		line2: "",
@@ -3221,37 +3250,37 @@ function Ks(e, t) {
 		state: "",
 		postalCode: "",
 		country: "US"
-	}), te = /* @__PURE__ */ L("accessible-blue-gold"), ne = /* @__PURE__ */ L(!1), w = /* @__PURE__ */ L(!0), T = /* @__PURE__ */ L(""), E = /* @__PURE__ */ L(""), re = /* @__PURE__ */ L([]), ie = /* @__PURE__ */ new Map();
+	}), ne = /* @__PURE__ */ L("accessible-blue-gold"), re = /* @__PURE__ */ L(!1), w = /* @__PURE__ */ L(!0), T = /* @__PURE__ */ L(""), E = /* @__PURE__ */ L(""), ie = /* @__PURE__ */ L([]), ae = /* @__PURE__ */ new Map();
 	async function D(e, t = {}) {
 		let n = await fetch(e, t), r = (n.headers.get("content-type") || "").includes("application/json") ? await n.json() : null;
 		if (!n.ok) throw Error(r?.error || "Request failed");
 		return r;
 	}
-	function ae(e) {
-		R(te, i.has(e) ? e : "accessible-blue-gold"), typeof document < "u" && (document.documentElement.dataset.theme = U(te)), typeof localStorage < "u" && localStorage.setItem("ram-theme", U(te));
+	function oe(e) {
+		R(ne, i.has(e) ? e : "accessible-blue-gold"), typeof document < "u" && (document.documentElement.dataset.theme = U(ne)), typeof localStorage < "u" && localStorage.setItem("ram-theme", U(ne));
 	}
-	function oe() {
-		R(ne, !U(ne));
+	function se() {
+		R(re, !U(re));
 	}
-	function se(e) {
-		ae(e), R(ne, !1);
+	function ce(e) {
+		oe(e), R(re, !1);
 	}
-	function ce(e, t) {
+	function le(e, t) {
 		return {
 			...e,
 			...t
 		};
 	}
-	function le(e) {
-		R(v, U(v).filter((t) => t.id !== e.id)), R(b, U(b).map((t) => t.id === e.id ? ce(t, e) : t));
-	}
 	function ue(e) {
-		R(y, U(y).map((t) => t.id === e.id ? {
+		R(y, U(y).filter((t) => t.id !== e.id)), R(x, U(x).map((t) => t.id === e.id ? le(t, e) : t));
+	}
+	function de(e) {
+		R(b, U(b).map((t) => t.id === e.id ? {
 			...t,
 			...e
 		} : t));
 	}
-	async function de(e = !1) {
+	async function fe(e = !1) {
 		R(w, !0), R(T, ""), e && R(E, "");
 		try {
 			let e = U(c).trim();
@@ -3262,17 +3291,17 @@ function Ks(e, t) {
 			R(w, !1);
 		}
 	}
-	async function fe() {
+	async function O() {
 		R(w, !0), R(T, ""), R(E, "");
 		try {
-			R(l, await D(`/api/buyer/products/${io()}`));
+			R(l, await D(`/api/buyer/products/${ao()}`));
 		} catch (e) {
 			R(T, e.message || "Could not load product.");
 		} finally {
 			R(w, !1);
 		}
 	}
-	async function O() {
+	async function pe() {
 		R(w, !0), R(T, ""), R(E, "");
 		try {
 			R(d, await D("/api/buyer/cart"));
@@ -3282,7 +3311,7 @@ function Ks(e, t) {
 			R(w, !1);
 		}
 	}
-	async function pe() {
+	async function me() {
 		R(w, !0), R(T, ""), R(E, "");
 		try {
 			R(u, (await D("/api/buyer/compare")).items || []);
@@ -3292,7 +3321,7 @@ function Ks(e, t) {
 			R(w, !1);
 		}
 	}
-	async function me() {
+	async function he() {
 		R(w, !0), R(T, "");
 		try {
 			R(h, await D("/api/seller/products"));
@@ -3302,17 +3331,32 @@ function Ks(e, t) {
 			R(w, !1);
 		}
 	}
-	async function he() {
+	async function ge() {
 		R(w, !0), R(T, "");
 		try {
-			R(x, await D("/api/admin/audit-logs"));
+			let e = await D("/api/seller/webhook");
+			R(g, {
+				endpointUrl: e.endpointUrl || "",
+				signingSecret: e.signingSecret || "",
+				isActive: !!e.isActive
+			});
+		} catch (e) {
+			R(T, e.message || "Could not load webhook setup.");
+		} finally {
+			R(w, !1);
+		}
+	}
+	async function _e() {
+		R(w, !0), R(T, "");
+		try {
+			R(S, await D("/api/admin/audit-logs"));
 		} catch (e) {
 			R(T, e.message || "Could not load audit logs.");
 		} finally {
 			R(w, !1);
 		}
 	}
-	async function ge(e = 1, t = U(C)) {
+	async function ve(e = 1, t = U(ee)) {
 		R(w, !0), R(T, "");
 		try {
 			let [n, r, i] = await Promise.all([
@@ -3320,30 +3364,30 @@ function Ks(e, t) {
 				D("/api/admin/products"),
 				D(`/api/admin/users?page=${e}&search=${encodeURIComponent(t)}`)
 			]);
-			R(v, n), R(y, r), R(b, i.users), R(S, {
+			R(y, n), R(b, r), R(x, i.users), R(C, {
 				page: i.page,
 				totalPages: i.totalPages,
 				hasPreviousPage: i.hasPreviousPage,
 				hasNextPage: i.hasNextPage,
 				search: i.search
-			}), R(C, i.search || "");
+			}), R(ee, i.search || "");
 		} catch (e) {
 			R(T, e.message || "Could not load moderation data.");
 		} finally {
 			R(w, !1);
 		}
 	}
-	async function _e() {
+	async function ye() {
 		R(w, !0), R(T, ""), R(E, "");
 		try {
-			R(f, await D(`/api/buyer/orders/${ao()}`)), R(E, "Your order has been placed successfully.");
+			R(f, await D(`/api/buyer/orders/${oo()}`)), R(E, "Your order has been placed successfully.");
 		} catch (e) {
 			R(T, e.message || "Could not load order confirmation.");
 		} finally {
 			R(w, !1);
 		}
 	}
-	async function ve(e = 1) {
+	async function be(e = 1) {
 		R(w, !0), R(T, ""), R(E, "");
 		try {
 			let t = await D(`/api/buyer/orders?page=${e}`);
@@ -3359,60 +3403,70 @@ function Ks(e, t) {
 			R(w, !1);
 		}
 	}
-	async function ye() {
-		if (R(a, oo()), R(o, so()), U(o) === "admin-home" || U(o) === "seller-home") {
+	async function xe() {
+		if (R(a, so()), R(o, co()), U(o) === "admin-home") {
 			R(w, !1), R(T, "");
 			return;
 		}
-		if (U(o) === "admin-moderation") {
+		if (U(o) === "seller-home") {
 			await ge();
 			return;
 		}
-		if (U(o) === "admin-audit") {
-			await he();
-			return;
-		}
-		if (U(o) === "seller-inventory") {
-			await me();
-			return;
-		}
-		if (U(o) === "cart" || U(o) === "checkout") {
-			await O();
-			return;
-		}
-		if (U(o) === "compare") {
-			await pe();
-			return;
-		}
-		if (U(o) === "confirmation") {
-			await _e();
-			return;
-		}
-		if (U(o) === "orders") {
+		if (U(o) === "admin-moderation") {
 			await ve();
 			return;
 		}
-		if (U(o) === "product") {
-			await fe();
+		if (U(o) === "admin-audit") {
+			await _e();
 			return;
 		}
-		await de();
+		if (U(o) === "seller-inventory") {
+			await he();
+			return;
+		}
+		if (U(o) === "cart" || U(o) === "checkout") {
+			await pe();
+			return;
+		}
+		if (U(o) === "compare") {
+			await me();
+			return;
+		}
+		if (U(o) === "confirmation") {
+			await ye();
+			return;
+		}
+		if (U(o) === "orders") {
+			await be();
+			return;
+		}
+		if (U(o) === "product") {
+			await O();
+			return;
+		}
+		await fe();
 	}
-	async function be(e) {
+	async function Se(e) {
 		let t = typeof window > "u" ? 0 : window.scrollY;
 		await e(), await Pr(), typeof window < "u" && window.scrollTo({ top: t });
 	}
-	function xe(e, t) {
-		R(g, {
-			...U(g),
+	function Ce(e, t) {
+		R(_, {
+			...U(_),
 			[e]: t.currentTarget.value
 		});
 	}
-	function Se(e) {
+	function we(e, t) {
+		R(g, {
+			...U(g),
+			[e]: e === "isActive" ? t.currentTarget.checked : t.currentTarget.value
+		});
+	}
+	function Te(e) {
 		let [t] = e.currentTarget.files || [];
 		if (!t) {
-			R(g, {
-				...U(g),
+			R(_, {
+				...U(_),
 				imageDataUrl: "",
 				imagePreviewUrl: ""
 			});
@@ -3428,8 +3482,8 @@ function Ks(e, t) {
 		}
 		let n = new FileReader();
 		n.onload = () => {
-			R(g, {
-				...U(g),
+			R(_, {
+				...U(_),
 				imageDataUrl: String(n.result || ""),
 				imagePreviewUrl: String(n.result || "")
 			}), R(E, "");
@@ -3437,19 +3491,19 @@ function Ks(e, t) {
 			R(E, "Could not read selected image.");
 		}, n.readAsDataURL(t);
 	}
-	function Ce(e, t) {
-		R(ee, {
-			...U(ee),
+	function Ee(e, t) {
+		R(te, {
+			...U(te),
 			[e]: t.currentTarget.value
 		});
 	}
-	function we(e) {
-		R(C, e.currentTarget.value);
+	function De(e) {
+		R(ee, e.currentTarget.value);
 	}
-	async function Te() {
+	async function Oe() {
 		R(E, "");
-		let e = String(U(g).price).trim(), t = String(U(g).stock).trim(), n = Number(e), r = Number(t);
-		if (U(_)?.reportValidity()) {
+		let e = String(U(_).price).trim(), t = String(U(_).stock).trim(), n = Number(e), r = Number(t);
+		if (U(v)?.reportValidity()) {
 			if (e === "" || !Number.isFinite(n)) {
 				R(E, "Enter a valid number for price.");
 				return;
@@ -3463,113 +3517,133 @@ function Ks(e, t) {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						name: U(g).name,
-						description: U(g).description,
-						imageDataUrl: U(g).imageDataUrl,
+						name: U(_).name,
+						description: U(_).description,
+						imageDataUrl: U(_).imageDataUrl,
 						price: n,
 						stock: r
 					})
-				}), R(g, {
+				}), R(_, {
 					name: "",
 					description: "",
 					imageDataUrl: "",
 					imagePreviewUrl: "",
 					price: "",
 					stock: ""
-				}), U(_)?.reset(), R(E, "Listing submitted for admin approval."), await me();
+				}), U(v)?.reset(), R(E, "Listing submitted for admin approval."), await he();
 			} catch (e) {
 				R(E, e.message || "Could not create listing.");
 			}
 		}
 	}
-	async function Ee(e) {
+	async function ke() {
 		R(E, "");
 		try {
-			let t = await D(`/api/admin/approve-user/${e}`, { method: "POST" });
-			R(E, "User approved."), le(t);
+			let e = await D("/api/seller/webhook", {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					endpointUrl: U(g).endpointUrl,
+					isActive: U(g).isActive
+				})
+			});
+			R(g, {
+				endpointUrl: e.endpointUrl || "",
+				signingSecret: e.signingSecret || "",
+				isActive: !!e.isActive
+			}), R(E, "Webhook setup saved.");
 		} catch (e) {
-			R(E, e.message || "Could not approve user.");
-		}
-	}
-	async function De(e) {
-		R(E, "");
-		try {
-			let t = await D(`/api/admin/block-user/${e}`, { method: "POST" });
-			R(E, "User blocked."), le(t);
-		} catch (e) {
-			R(E, e.message || "Could not block user.");
-		}
-	}
-	async function Oe(e) {
-		R(E, "");
-		try {
-			let t = await D(`/api/admin/ban-user/${e}`, { method: "POST" });
-			R(E, "User banned."), le(t);
-		} catch (e) {
-			R(E, e.message || "Could not ban user.");
-		}
-	}
-	async function ke(e) {
-		R(E, "");
-		try {
-			let t = await D(`/api/admin/products/${e}/approve`, { method: "POST" });
-			R(E, "Product approved."), ue(t);
-		} catch (e) {
-			R(E, e.message || "Could not approve product.");
+			R(E, e.message || "Could not save webhook setup.");
 		}
 	}
 	async function Ae(e) {
 		R(E, "");
 		try {
-			let t = await D(`/api/admin/products/${e}/reject`, { method: "POST" });
-			R(E, "Product rejected."), ue(t);
+			let t = await D(`/api/admin/approve-user/${e}`, { method: "POST" });
+			R(E, "User approved."), ue(t);
 		} catch (e) {
-			R(E, e.message || "Could not reject product.");
+			R(E, e.message || "Could not approve user.");
 		}
 	}
 	async function je(e) {
 		R(E, "");
 		try {
+			let t = await D(`/api/admin/block-user/${e}`, { method: "POST" });
+			R(E, "User blocked."), ue(t);
+		} catch (e) {
+			R(E, e.message || "Could not block user.");
+		}
+	}
+	async function Me(e) {
+		R(E, "");
+		try {
+			let t = await D(`/api/admin/ban-user/${e}`, { method: "POST" });
+			R(E, "User banned."), ue(t);
+		} catch (e) {
+			R(E, e.message || "Could not ban user.");
+		}
+	}
+	async function Ne(e) {
+		R(E, "");
+		try {
+			let t = await D(`/api/admin/products/${e}/approve`, { method: "POST" });
+			R(E, "Product approved."), de(t);
+		} catch (e) {
+			R(E, e.message || "Could not approve product.");
+		}
+	}
+	async function Pe(e) {
+		R(E, "");
+		try {
+			let t = await D(`/api/admin/products/${e}/reject`, { method: "POST" });
+			R(E, "Product rejected."), de(t);
+		} catch (e) {
+			R(E, e.message || "Could not reject product.");
+		}
+	}
+	async function Fe(e) {
+		R(E, "");
+		try {
 			let t = await D(`/api/admin/products/${e}/delist`, { method: "POST" });
-			R(E, "Product delisted."), ue(t);
+			R(E, "Product delisted."), de(t);
 		} catch (e) {
 			R(E, e.message || "Could not delist product.");
 		}
 	}
-	async function Me() {
-		await be(() => ge(1, U(C)));
-	}
-	async function Ne() {
-		R(C, ""), await be(() => ge(1, ""));
-	}
-	async function Pe(e) {
-		e < 1 || e > U(S).totalPages || await be(() => ge(e, U(S).search));
-	}
-	function Fe(e) {
-		R(c, e.target.value);
-	}
 	async function Ie() {
-		await be(() => de(!0));
+		await Se(() => ve(1, U(ee)));
 	}
 	async function Le() {
-		R(c, ""), await be(() => de(!0));
+		R(ee, ""), await Se(() => ve(1, ""));
 	}
 	async function Re(e) {
-		e < 1 || e > U(m).totalPages || await be(() => ve(e));
+		e < 1 || e > U(C).totalPages || await Se(() => ve(e, U(C).search));
 	}
-	function ze(e, t = "success") {
+	function ze(e) {
+		R(c, e.target.value);
+	}
+	async function A() {
+		await Se(() => fe(!0));
+	}
+	async function j() {
+		R(c, ""), await Se(() => fe(!0));
+	}
+	async function M(e) {
+		e < 1 || e > U(m).totalPages || await Se(() => be(e));
+	}
+	function Be(e, t = "success") {
 		let n = typeof crypto < "u" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-		R(re, [...U(re), {
+		R(ie, [...U(ie), {
 			id: n,
 			message: e,
 			type: t
 		}]);
 		let r = setTimeout(() => {
-			R(re, U(re).filter((e) => e.id !== n)), ie.delete(n);
+			R(ie, U(ie).filter((e) => e.id !== n)), ae.delete(n);
 		}, 3200);
-		ie.set(n, r);
+		ae.set(n, r);
 	}
-	async function A(e) {
+	async function Ve(e) {
 		R(E, "");
 		try {
 			await D("/api/buyer/cart", {
@@ -3579,12 +3653,12 @@ function Ks(e, t) {
 					productId: e,
 					quantity: 1
 				})
-			}), R(E, "Item added to cart."), ze("Item added to cart.");
+			}), R(E, "Item added to cart."), Be("Item added to cart.");
 		} catch (e) {
-			R(E, e.message || "Could not add item to cart."), ze(U(E), "error");
+			R(E, e.message || "Could not add item to cart."), Be(U(E), "error");
 		}
 	}
-	async function j() {
+	async function He() {
 		R(E, "");
 		try {
 			let e = await D("/api/buyer/random_access");
@@ -3593,7 +3667,7 @@ function Ks(e, t) {
 			R(E, e.message || "Could not load a random product.");
 		}
 	}
-	async function M(e) {
+	async function Ue(e) {
 		R(E, "");
 		try {
 			await D("/api/buyer/compare", {
@@ -3605,23 +3679,23 @@ function Ks(e, t) {
 			R(E, e.message || "Could not add item to list.");
 		}
 	}
-	async function Be(e) {
+	async function We(e) {
 		R(E, "");
 		try {
-			await D(`/api/buyer/cart/${e}/remove`, { method: "POST" }), R(E, "Item removed from cart."), await O();
+			await D(`/api/buyer/cart/${e}/remove`, { method: "POST" }), R(E, "Item removed from cart."), await pe();
 		} catch (e) {
 			R(E, e.message || "Could not remove item.");
 		}
 	}
-	async function Ve(e) {
+	async function Ge(e) {
 		R(E, "");
 		try {
-			await D(`/api/buyer/compare/${e}/remove`, { method: "POST" }), R(E, "Item removed from comparison list."), await pe();
+			await D(`/api/buyer/compare/${e}/remove`, { method: "POST" }), R(E, "Item removed from comparison list."), await me();
 		} catch (e) {
 			R(E, e.message || "Could not remove item.");
 		}
 	}
-	async function He() {
+	async function Ke() {
 		R(E, "");
 		try {
 			let e = await D("/api/buyer/checkout", {
@@ -3629,15 +3703,15 @@ function Ks(e, t) {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					paymentMethod: "demo_card",
-					shippingAddress: U(ee)
+					shippingAddress: U(te)
 				})
 			});
 			window.location.href = `/buyer/orders/${e.order.id}/confirmation`;
 		} catch (e) {
-			R(E, e.message || "Checkout failed."), await O();
+			R(E, e.message || "Checkout failed."), await pe();
 		}
 	}
-	async function Ue() {
+	async function qe() {
 		R(E, "");
 		try {
 			await D("/api/logout", { method: "POST" }), window.location.href = "/login";
@@ -3645,238 +3719,244 @@ function Ks(e, t) {
 			R(E, e.message || "Could not log out.");
 		}
 	}
-	Xa(async () => {
-		ae((typeof localStorage > "u" ? null : localStorage.getItem("ram-theme")) || "accessible-blue-gold"), await ye();
-	}), Za(() => {
-		ie.forEach((e) => clearTimeout(e)), ie.clear();
+	Za(async () => {
+		oe((typeof localStorage > "u" ? null : localStorage.getItem("ram-theme")) || "accessible-blue-gold"), await xe();
+	}), Qa(() => {
+		ae.forEach((e) => clearTimeout(e)), ae.clear();
 	}), tr(() => U(o), () => {
-		R(n, co(U(o)));
-	}), nr(), za();
-	var We = tc();
+		R(n, lo(U(o)));
+	}), nr(), Ba();
+	var Je = rc();
 	na("13zv0lp", (e) => {
 		ar((e) => {
 			Pn.title = e ?? "";
-		}, [() => (G(lo), U(o), W(() => lo(U(o))))]);
+		}, [() => (G(uo), U(o), W(() => uo(U(o))))]);
 	});
-	var Ge = z(We);
-	Co(Ge, {
+	var Ye = z(Je);
+	wo(Ye, {
 		get appMode() {
 			return U(a);
 		},
 		get currentPage() {
 			return U(o);
 		},
-		onLogout: Ue
+		onLogout: qe
 	});
-	var Ke = B(Ge, 2), qe = z(Ke);
-	Do(qe, {
+	var Xe = B(Ye, 2), Ze = z(Xe);
+	Oo(Ze, {
 		get kicker() {
 			return U(n), W(() => U(n).kicker);
 		},
 		get heading() {
 			return U(n), W(() => U(n).heading);
 		},
-		onRefresh: ye
+		onRefresh: xe
 	});
-	var Je = B(qe, 2), Ye = (e) => {
-		Z(e, qs());
-	}, Xe = (e) => {
-		var t = Js(), n = z(t, !0);
+	var et = B(Ze, 2), N = (e) => {
+		Z(e, Ys());
+	}, P = (e) => {
+		var t = Xs(), n = z(t, !0);
 		k(t), V(() => Q(n, U(T))), Z(e, t);
-	}, Ze = (e) => {
-		Fo(e, {});
-	}, et = (e) => {
-		Ro(e, {
+	}, tt = (e) => {
+		Io(e, {});
+	}, nt = (e) => {
+		zo(e, {
 			get adminPendingUsers() {
-				return U(v);
-			},
-			get adminProducts() {
 				return U(y);
 			},
-			get adminUsers() {
+			get adminProducts() {
 				return U(b);
 			},
-			get adminUsersPageInfo() {
-				return U(S);
-			},
-			get adminUserSearch() {
-				return U(C);
-			},
-			onAdminUserSearchInput: we,
-			approveUser: Ee,
-			blockUser: De,
-			banUser: Oe,
-			approveProduct: ke,
-			rejectProduct: Ae,
-			delistProduct: je,
-			searchAdminUsers: Me,
-			clearAdminUserSearch: Ne,
-			goToAdminUsersPage: Pe,
-			get capitalizeRole() {
-				return _o;
-			},
-			get formatCurrency() {
-				return po;
-			},
-			get formatDate() {
-				return mo;
-			},
-			get getUserStatus() {
-				return vo;
-			}
-		});
-	}, N = (e) => {
-		Ao(e, {
-			get adminAuditLogs() {
+			get adminUsers() {
 				return U(x);
 			},
-			get formatActionType() {
-				return yo;
+			get adminUsersPageInfo() {
+				return U(C);
+			},
+			get adminUserSearch() {
+				return U(ee);
+			},
+			onAdminUserSearchInput: De,
+			approveUser: Ae,
+			blockUser: je,
+			banUser: Me,
+			approveProduct: Ne,
+			rejectProduct: Pe,
+			delistProduct: Fe,
+			searchAdminUsers: Ie,
+			clearAdminUserSearch: Le,
+			goToAdminUsersPage: Re,
+			get capitalizeRole() {
+				return vo;
+			},
+			get formatCurrency() {
+				return mo;
 			},
 			get formatDate() {
-				return mo;
+				return ho;
+			},
+			get getUserStatus() {
+				return yo;
 			}
 		});
-	}, P = (e) => {
-		ks(e, {});
-	}, tt = (e) => {
-		Ms(e, {
-			get sellerForm() {
+	}, rt = (e) => {
+		jo(e, {
+			get adminAuditLogs() {
+				return U(S);
+			},
+			get formatActionType() {
+				return bo;
+			},
+			get formatDate() {
+				return ho;
+			}
+		});
+	}, it = (e) => {
+		As(e, {
+			get sellerWebhook() {
 				return U(g);
+			},
+			onSellerWebhookInput: we,
+			saveSellerWebhook: ke
+		});
+	}, at = (e) => {
+		Ps(e, {
+			get sellerForm() {
+				return U(_);
 			},
 			get sellerProducts() {
 				return U(h);
 			},
-			createSellerListing: Te,
-			onSellerFormInput: xe,
-			onSellerImageInput: Se,
+			createSellerListing: Oe,
+			onSellerFormInput: Ce,
+			onSellerImageInput: Te,
 			get formatCurrency() {
-				return po;
+				return mo;
 			},
 			get sellerListingForm() {
-				return U(_);
+				return U(v);
 			},
 			set sellerListingForm(e) {
-				R(_, e);
+				R(v, e);
 			},
 			$$legacy: !0
 		});
-	}, nt = (e) => {
-		Es(e, {
+	}, ot = (e) => {
+		Ds(e, {
 			get product() {
 				return U(l);
 			},
-			addToCart: A,
-			addToComparison: M,
+			addToCart: Ve,
+			addToComparison: Ue,
 			get formatCurrency() {
-				return po;
+				return mo;
 			}
 		});
-	}, rt = (e) => {
-		$o(e, {
+	}, st = (e) => {
+		es(e, {
 			get cart() {
 				return U(d);
 			},
-			removeFromCart: Be,
+			removeFromCart: We,
 			get formatCurrency() {
-				return po;
+				return mo;
 			}
 		});
-	}, it = (e) => {
-		as(e, {
+	}, ct = (e) => {
+		os(e, {
 			get cart() {
 				return U(d);
 			},
-			placeOrder: He,
+			placeOrder: Ke,
 			get formatCurrency() {
-				return po;
+				return mo;
 			},
 			get shippingAddress() {
-				return U(ee);
+				return U(te);
 			},
-			onShippingInput: Ce
+			onShippingInput: Ee
 		});
-	}, at = (e) => {
-		gs(e, {
+	}, F = (e) => {
+		_s(e, {
 			get order() {
 				return U(f);
 			},
 			get formatCurrency() {
-				return po;
-			},
-			get formatDate() {
 				return mo;
 			},
-			get formatPaymentMethod() {
+			get formatDate() {
 				return ho;
+			},
+			get formatPaymentMethod() {
+				return go;
 			}
 		});
-	}, ot = (e) => {
-		xs(e, {
+	}, lt = (e) => {
+		Ss(e, {
 			get orders() {
 				return U(p);
 			},
 			get pageInfo() {
 				return U(m);
 			},
-			goToOrderHistoryPage: Re,
+			goToOrderHistoryPage: M,
 			get formatCurrency() {
-				return po;
-			},
-			get formatDate() {
 				return mo;
 			},
-			get formatPaymentMethod() {
+			get formatDate() {
 				return ho;
-			}
-		});
-	}, st = (e) => {
-		ds(e, {
-			get compareItems() {
-				return U(u);
 			},
-			addToCart: A,
-			removeFromCompare: Ve,
-			get formatCurrency() {
-				return po;
-			},
-			get truncate() {
+			get formatPaymentMethod() {
 				return go;
 			}
 		});
-	}, ct = (e) => {
-		zs(e, {
+	}, ut = (e) => {
+		fs(e, {
+			get compareItems() {
+				return U(u);
+			},
+			addToCart: Ve,
+			removeFromCompare: Ge,
+			get formatCurrency() {
+				return mo;
+			},
+			get truncate() {
+				return _o;
+			}
+		});
+	}, dt = (e) => {
+		Vs(e, {
 			get products() {
 				return U(s);
 			},
 			get productSearch() {
 				return U(c);
 			},
-			addToCart: A,
-			addToComparison: M,
-			openRandomProduct: j,
-			onProductSearchInput: Fe,
-			searchProducts: Ie,
-			clearProductSearch: Le,
+			addToCart: Ve,
+			addToComparison: Ue,
+			openRandomProduct: He,
+			onProductSearchInput: ze,
+			searchProducts: A,
+			clearProductSearch: j,
 			get formatCurrency() {
-				return po;
+				return mo;
 			}
 		});
 	};
-	Mi(Je, (e) => {
-		U(w) ? e(Ye) : U(T) ? e(Xe, 1) : U(o) === "admin-home" ? e(Ze, 2) : U(o) === "admin-moderation" ? e(et, 3) : U(o) === "admin-audit" ? e(N, 4) : U(o) === "seller-home" ? e(P, 5) : U(o) === "seller-inventory" ? e(tt, 6) : U(o) === "product" && U(l) ? e(nt, 7) : U(o) === "cart" ? e(rt, 8) : U(o) === "checkout" ? e(it, 9) : U(o) === "confirmation" && U(f) ? e(at, 10) : U(o) === "orders" ? e(ot, 11) : U(o) === "compare" ? e(st, 12) : e(ct, -1);
+	Mi(et, (e) => {
+		U(w) ? e(N) : U(T) ? e(P, 1) : U(o) === "admin-home" ? e(tt, 2) : U(o) === "admin-moderation" ? e(nt, 3) : U(o) === "admin-audit" ? e(rt, 4) : U(o) === "seller-home" ? e(it, 5) : U(o) === "seller-inventory" ? e(at, 6) : U(o) === "product" && U(l) ? e(ot, 7) : U(o) === "cart" ? e(st, 8) : U(o) === "checkout" ? e(ct, 9) : U(o) === "confirmation" && U(f) ? e(F, 10) : U(o) === "orders" ? e(lt, 11) : U(o) === "compare" ? e(ut, 12) : e(dt, -1);
 	});
-	var F = B(Je, 2), lt = (e) => {
-		var t = Ys(), n = z(t, !0);
+	var ft = B(et, 2), pt = (e) => {
+		var t = Zs(), n = z(t, !0);
 		k(t), V(() => Q(n, U(E))), Z(e, t);
 	};
-	Mi(F, (e) => {
-		U(E) && e(lt);
-	}), k(Ke);
-	var ut = B(Ke, 2), dt = (e) => {
-		var t = Zs();
-		zi(t, 5, () => U(re), (e) => e.id, (e, t) => {
-			var n = Xs();
+	Mi(ft, (e) => {
+		U(E) && e(pt);
+	}), k(Xe);
+	var mt = B(Xe, 2), ht = (e) => {
+		var t = $s();
+		zi(t, 5, () => U(ie), (e) => e.id, (e, t) => {
+			var n = Qs();
 			let r;
 			var i = z(n, !0);
 			k(n), V(() => {
@@ -3884,38 +3964,38 @@ function Ks(e, t) {
 			}), Z(e, n);
 		}), k(t), Z(e, t);
 	};
-	Mi(ut, (e) => {
-		U(re), W(() => U(re).length > 0) && e(dt);
+	Mi(mt, (e) => {
+		U(ie), W(() => U(ie).length > 0) && e(ht);
 	});
-	var ft = B(ut, 2), pt = z(ft), mt = (e) => {
-		var t = ec();
+	var gt = B(mt, 2), _t = z(gt), vt = (e) => {
+		var t = nc();
 		zi(t, 5, () => r, Ii, (e, t) => {
-			var n = $s();
+			var n = tc();
 			let r;
 			var i = z(n), a = z(i, !0);
 			k(i);
 			var o = B(i, 2), s = (e) => {
-				Z(e, Qs());
+				Z(e, ec());
 			};
 			Mi(o, (e) => {
-				U(te), U(t), W(() => U(te) === U(t).value) && e(s);
+				U(ne), U(t), W(() => U(ne) === U(t).value) && e(s);
 			}), k(n), V(() => {
-				r = ua(n, 1, "theme-dock-option", null, r, { "active-theme": U(te) === U(t).value }), ga(n, "aria-checked", (U(te), U(t), W(() => U(te) === U(t).value))), Q(a, (U(t), W(() => U(t).label)));
-			}), Y("click", n, () => se(U(t).value)), Z(e, n);
+				r = ua(n, 1, "theme-dock-option", null, r, { "active-theme": U(ne) === U(t).value }), _a(n, "aria-checked", (U(ne), U(t), W(() => U(ne) === U(t).value))), Q(a, (U(t), W(() => U(t).label)));
+			}), Y("click", n, () => ce(U(t).value)), Z(e, n);
 		}), k(t), Z(e, t);
 	};
-	Mi(pt, (e) => {
-		U(ne) && e(mt);
+	Mi(_t, (e) => {
+		U(re) && e(vt);
 	});
-	var ht = B(pt, 2);
-	k(ft), k(We), V(() => {
-		ga(We, "data-page", U(o)), ga(ht, "aria-expanded", U(ne));
-	}), Y("click", ht, oe), Z(e, We), $e();
+	var yt = B(_t, 2);
+	k(gt), k(Je), V(() => {
+		_a(Je, "data-page", U(o)), _a(yt, "aria-expanded", U(re));
+	}), Y("click", yt, se), Z(e, Je), $e();
 }
-var qs, Js, Ys, Xs, Zs, Qs, $s, ec, tc, nc = e((() => {
-	to(), no(), Ja(), $a(), Eo(), ko(), Po(), Lo(), Qo(), is(), us(), hs(), bs(), Ts(), Os(), js(), Rs(), Gs(), So(), qs = /* @__PURE__ */ X("<div class=\"state-card\">Loading...</div>"), Js = /* @__PURE__ */ X("<div class=\"state-card error\"> </div>"), Ys = /* @__PURE__ */ X("<p class=\"status-banner\"> </p>"), Xs = /* @__PURE__ */ X("<div role=\"status\"> </div>"), Zs = /* @__PURE__ */ X("<div class=\"cart-toast-stack\" aria-live=\"polite\" aria-label=\"Cart notifications\"></div>"), Qs = /* @__PURE__ */ X("<span class=\"theme-dock-check\">Current</span>"), $s = /* @__PURE__ */ X("<button type=\"button\" role=\"menuitemradio\"><span> </span> <!></button>"), ec = /* @__PURE__ */ X("<div class=\"theme-dock-menu\" role=\"menu\" aria-label=\"Theme picker\"></div>"), tc = /* @__PURE__ */ X("<div class=\"page-shell\"><!> <section class=\"catalog\"><!> <!> <!></section> <!> <div class=\"theme-dock\"><!> <button class=\"theme-dock-toggle\" type=\"button\" aria-haspopup=\"menu\">Theme</button></div></div>");
-})), rc = e((() => {})), ic = /* @__PURE__ */ t((() => {
-	$a(), nc(), rc(), _i(Ks, { target: document.getElementById("buyer-app") });
+var Ys, Xs, Zs, Qs, $s, ec, tc, nc, rc, ic = e((() => {
+	no(), ro(), Ya(), eo(), Do(), Ao(), Fo(), Ro(), $o(), as(), ds(), gs(), xs(), Es(), ks(), Ns(), Bs(), qs(), Co(), Ys = /* @__PURE__ */ X("<div class=\"state-card\">Loading...</div>"), Xs = /* @__PURE__ */ X("<div class=\"state-card error\"> </div>"), Zs = /* @__PURE__ */ X("<p class=\"status-banner\"> </p>"), Qs = /* @__PURE__ */ X("<div role=\"status\"> </div>"), $s = /* @__PURE__ */ X("<div class=\"cart-toast-stack\" aria-live=\"polite\" aria-label=\"Cart notifications\"></div>"), ec = /* @__PURE__ */ X("<span class=\"theme-dock-check\">Current</span>"), tc = /* @__PURE__ */ X("<button type=\"button\" role=\"menuitemradio\"><span> </span> <!></button>"), nc = /* @__PURE__ */ X("<div class=\"theme-dock-menu\" role=\"menu\" aria-label=\"Theme picker\"></div>"), rc = /* @__PURE__ */ X("<div class=\"page-shell\"><!> <section class=\"catalog\"><!> <!> <!></section> <!> <div class=\"theme-dock\"><!> <button class=\"theme-dock-toggle\" type=\"button\" aria-haspopup=\"menu\">Theme</button></div></div>");
+})), ac = e((() => {})), oc = /* @__PURE__ */ t((() => {
+	eo(), ic(), ac(), _i(Js, { target: document.getElementById("buyer-app") });
 }));
 //#endregion
-export default ic();
+export default oc();

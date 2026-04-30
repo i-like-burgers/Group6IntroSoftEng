@@ -65,6 +65,11 @@
         hasNextPage: false
     };
     let sellerProducts = [];
+    let sellerWebhook = {
+        endpointUrl: '',
+        signingSecret: '',
+        isActive: false
+    };
     let sellerForm = {
         name: '',
         description: '',
@@ -231,6 +236,24 @@
         }
     }
 
+    async function loadSellerWebhook() {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            const config = await fetchJson('/api/seller/webhook');
+            sellerWebhook = {
+                endpointUrl: config.endpointUrl || '',
+                signingSecret: config.signingSecret || '',
+                isActive: Boolean(config.isActive)
+            };
+        } catch (error) {
+            errorMessage = error.message || 'Could not load webhook setup.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadAdminAuditLogs() {
         loading = true;
         errorMessage = '';
@@ -314,9 +337,14 @@
         appMode = getAppMode();
         currentPage = detectPage();
 
-        if (currentPage === 'admin-home' || currentPage === 'seller-home') {
+        if (currentPage === 'admin-home') {
             loading = false;
             errorMessage = '';
+            return;
+        }
+
+        if (currentPage === 'seller-home') {
+            await loadSellerWebhook();
             return;
         }
 
@@ -377,6 +405,13 @@
         sellerForm = {
             ...sellerForm,
             [field]: event.currentTarget.value
+        };
+    }
+
+    function updateSellerWebhook(field, event) {
+        sellerWebhook = {
+            ...sellerWebhook,
+            [field]: field === 'isActive' ? event.currentTarget.checked : event.currentTarget.value
         };
     }
 
@@ -479,6 +514,32 @@
             await loadSellerProducts();
         } catch (error) {
             statusMessage = error.message || 'Could not create listing.';
+        }
+    }
+
+    async function saveSellerWebhook() {
+        statusMessage = '';
+
+        try {
+            const config = await fetchJson('/api/seller/webhook', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    endpointUrl: sellerWebhook.endpointUrl,
+                    isActive: sellerWebhook.isActive
+                })
+            });
+
+            sellerWebhook = {
+                endpointUrl: config.endpointUrl || '',
+                signingSecret: config.signingSecret || '',
+                isActive: Boolean(config.isActive)
+            };
+            statusMessage = 'Webhook setup saved.';
+        } catch (error) {
+            statusMessage = error.message || 'Could not save webhook setup.';
         }
     }
 
@@ -796,7 +857,11 @@
                 {formatDate}
             />
         {:else if currentPage === 'seller-home'}
-            <SellerHomeView />
+            <SellerHomeView
+                {sellerWebhook}
+                onSellerWebhookInput={updateSellerWebhook}
+                {saveSellerWebhook}
+            />
         {:else if currentPage === 'seller-inventory'}
             <SellerInventoryView
                 {sellerForm}
