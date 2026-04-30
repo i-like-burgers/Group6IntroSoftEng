@@ -69,29 +69,42 @@ async function removeCompareItem({ buyerID, productID }) {
     });
 }
 
-async function randomAccess()
-{
+const VISIBLE_PRODUCT_FILTER = {
+    isListed: true,
+    listingStatus: 'approved',
+    seller: {
+        banned: false
+    }
+};
+
+async function randomAccess() {
     const count = await prisma.product.count({
-        where: {isListed:true, listingStatus:"approved"}
+        where: VISIBLE_PRODUCT_FILTER
     });
 
-    if(count === 0) return null
+    if (count === 0) return null;
 
-    for(let i=0; i<3; i++)
-    {
-        const rand = Math.floor(Math.random() * count)
+    for (let i = 0; i < 3; i++) {
+        const rand = Math.floor(Math.random() * count);
 
         const product = await prisma.product.findFirst({
-            where: {isListed:true},
+            where: VISIBLE_PRODUCT_FILTER,
+            include: {
+                seller: {
+                    select: {
+                        username: true
+                    }
+                }
+            },
             skip: rand,
             take: 1,
-            orderBy: {id: 'asc'}
+            orderBy: { id: 'asc' }
         });
 
-        if(product) return product;
+        if (product) return product;
     }
 
-    return null
+    return null;
 }
 
 module.exports = {

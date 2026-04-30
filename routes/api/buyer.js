@@ -4,9 +4,13 @@ const prisma = require('../../lib/prisma');
 const auth = require('../../authenticate');
 const { requireRole } = require('../../authorize');
 const { logAuditAction } = require('../../services/audit');
-const { addCompareItem, getCompareItems, removeCompareItem } = require('../../buyer/product_handling');
+const {
+    addCompareItem,
+    getCompareItems,
+    randomAccess,
+    removeCompareItem
+} = require('../../buyer/product_handling');
 const { deliverSellerOrderPlacedWebhooks } = require('../../services/seller-webhooks');
-const {randomAccess} = require('../../buyer/product_handling')
 
 const router = express.Router();
 const PAYMENT_METHODS = new Set([
@@ -189,25 +193,20 @@ router.get('/orders/:id', async (req, res) => {
     }
 });
 
-/*
 router.get('/random_access', async (req, res) => {
-    try{
+    try {
         const product = await randomAccess();
 
-        if(!product)
-        {
-            return res.status(404).send("No Products Available");
+        if (!product) {
+            return res.status(404).json({ error: 'No products available' });
         }
 
-        res.redirect(`/products/${product.id}`);
-    }
-    catch(err)
-    {
-        console.error(err);
-        res.status(500).send("Server Error");
+        res.json(product);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load random product' });
     }
 });
-*/
 
 router.post('/cart', async (req, res) => {
     try {

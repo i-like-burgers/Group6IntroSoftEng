@@ -497,6 +497,20 @@
         }
     }
 
+    async function openRandomProduct() {
+        statusMessage = '';
+
+        try {
+            const randomProduct = await fetchJson('/api/buyer/random_access');
+
+            if (typeof window !== 'undefined') {
+                window.location.href = `/buyer/products/${randomProduct.id}`;
+            }
+        } catch (error) {
+            statusMessage = error.message || 'Could not load a random product.';
+        }
+    }
+
     async function addToComparison(productId) {
         statusMessage = '';
 
@@ -694,6 +708,7 @@
                 {products}
                 {addToCart}
                 {addToComparison}
+                {openRandomProduct}
                 {formatCurrency}
             />
         {/if}

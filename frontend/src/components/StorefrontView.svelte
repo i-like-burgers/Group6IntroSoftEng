@@ -2,8 +2,15 @@
     export let products = [];
     export let addToCart;
     export let addToComparison;
+    export let openRandomProduct;
     export let formatCurrency;
 </script>
+
+<div class="storefront-actions">
+    <button class="checkout-link random-product-button" type="button" on:click={openRandomProduct}>
+        Random product
+    </button>
+</div>
 
 {#if products.length === 0}
     <div class="state-card">No listed products are available right now.</div>

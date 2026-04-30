@@ -6,6 +6,7 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
     const compareHandlers = {
         addCompareItem: jest.fn(),
         getCompareItems: jest.fn().mockResolvedValue([]),
+        randomAccess: jest.fn(),
         removeCompareItem: jest.fn()
     };
 
@@ -140,6 +141,34 @@ describe('buyer api routes', () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual(product);
         expect(prismaMock.product.findFirst).toHaveBeenCalled();
+    });
+
+    test('GET /api/buyer/random_access returns one random visible product', async () => {
+        const product = {
+            id: 103,
+            name: 'Random GPU',
+            price: 299.99,
+            stock: 4,
+            seller: { username: 'seller-user' }
+        };
+        const { app, compareHandlers } = loadBuyerApiApp();
+        compareHandlers.randomAccess.mockResolvedValue(product);
+
+        const response = await request(app).get('/api/buyer/random_access');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(product);
+        expect(compareHandlers.randomAccess).toHaveBeenCalledTimes(1);
+    });
+
+    test('GET /api/buyer/random_access returns 404 when no products are visible', async () => {
+        const { app, compareHandlers } = loadBuyerApiApp();
+        compareHandlers.randomAccess.mockResolvedValue(null);
+
+        const response = await request(app).get('/api/buyer/random_access');
+
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({ error: 'No products available' });
     });
 
     test('GET /api/buyer/products rejects unauthenticated requests', async () => {

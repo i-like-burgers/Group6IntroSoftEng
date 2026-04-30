@@ -4,6 +4,7 @@ const path = require("path");
 
 const auth = require("../authenticate");
 const { requireRole } = require("../authorize");
+const { randomAccess } = require("../buyer/product_handling");
 
 router.get("/home",
     auth.authenticateToken,
@@ -97,15 +98,20 @@ router.get("/classic/orders/:id/confirmation",
     }
 );
 
-router.get("/buyer/random_access",
+router.get("/random_access",
     auth.authenticateToken,
     requireRole("buyer"),
     async (req, res) => {
-        const product = await randomAccess();
+        try {
+            const product = await randomAccess();
 
-        if(!product) return res.status(404).send("No products found");
+            if (!product) return res.status(404).send("No products found");
 
-        return res.redirect(302, `/products/${product.id}`);
+            return res.redirect(302, `/buyer/products/${product.id}`);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send("Server error");
+        }
     }
 );
 
