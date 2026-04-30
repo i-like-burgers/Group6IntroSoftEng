@@ -58,6 +58,8 @@
     let sellerForm = {
         name: '',
         description: '',
+        imageDataUrl: '',
+        imagePreviewUrl: '',
         price: '',
         stock: ''
     };
@@ -342,6 +344,45 @@
         };
     }
 
+    function updateSellerImage(event) {
+        const [file] = event.currentTarget.files || [];
+
+        if (!file) {
+            sellerForm = {
+                ...sellerForm,
+                imageDataUrl: '',
+                imagePreviewUrl: ''
+            };
+            return;
+        }
+
+        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+            statusMessage = 'Select a JPEG or PNG file for the product photo.';
+            event.currentTarget.value = '';
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            statusMessage = 'Product image must be 2 MB or smaller.';
+            event.currentTarget.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            sellerForm = {
+                ...sellerForm,
+                imageDataUrl: String(reader.result || ''),
+                imagePreviewUrl: String(reader.result || '')
+            };
+            statusMessage = '';
+        };
+        reader.onerror = () => {
+            statusMessage = 'Could not read selected image.';
+        };
+        reader.readAsDataURL(file);
+    }
+
     function updateShippingAddress(field, event) {
         shippingAddress = {
             ...shippingAddress,
@@ -383,6 +424,7 @@
                 body: JSON.stringify({
                     name: sellerForm.name,
                     description: sellerForm.description,
+                    imageDataUrl: sellerForm.imageDataUrl,
                     price: parsedPrice,
                     stock: parsedStock
                 })
@@ -391,9 +433,12 @@
             sellerForm = {
                 name: '',
                 description: '',
+                imageDataUrl: '',
+                imagePreviewUrl: '',
                 price: '',
                 stock: ''
             };
+            sellerListingForm?.reset();
             statusMessage = 'Listing submitted for admin approval.';
             await loadSellerProducts();
         } catch (error) {
@@ -715,6 +760,7 @@
                 bind:sellerListingForm
                 {createSellerListing}
                 onSellerFormInput={updateSellerForm}
+                onSellerImageInput={updateSellerImage}
                 {formatCurrency}
             />
         {:else if currentPage === 'product' && product}

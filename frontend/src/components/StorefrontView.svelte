@@ -45,6 +45,7 @@
     <div class="product-grid">
         {#each products as product}
             <article class="product-card">
+                <img class="product-card-image" src={product.imageUrl || '/images/product-placeholder.png'} alt={product.name} loading="lazy" />
                 <div class="card-topline">
                     <span class="seller">{product.seller.username}</span>
                     <span class="stock">{product.stock} in stock</span>

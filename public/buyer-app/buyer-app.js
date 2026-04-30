@@ -2943,23 +2943,23 @@ function xs(e, t) {
 	Qe(t, !1);
 	let n = $(t, "product", 8), r = $(t, "addToCart", 8), i = $(t, "addToComparison", 8), a = $(t, "formatCurrency", 8);
 	za();
-	var o = Ss(), s = z(o), c = z(s), l = z(c, !0);
-	k(c);
-	var u = B(c, 2), d = z(u);
-	k(u), k(s);
-	var f = B(s, 2), p = z(f), m = z(p), h = z(m, !0);
-	k(m);
-	var g = B(m, 2), _ = z(g, !0);
-	k(g), k(p);
-	var v = B(p, 2), y = z(v), b = B(y, 2);
-	k(v), k(f);
-	var x = B(f, 2), S = z(x, !0);
-	k(x), Le(2), k(o), V((e) => {
-		Q(l, (G(n()), W(() => n().seller.username))), Q(d, `${(G(n()), W(() => n().stock)) ?? ""} in stock`), Q(h, (G(n()), W(() => n().name))), Q(_, e), Q(S, (G(n()), W(() => n().description || "No description provided.")));
-	}, [() => (G(a()), G(n()), W(() => a()(n().price)))]), Y("click", y, () => r()(n().id)), Y("click", b, () => i()(n().id)), Z(e, o), $e();
+	var o = Ss(), s = z(o), c = B(s, 2), l = z(c), u = z(l, !0);
+	k(l);
+	var d = B(l, 2), f = z(d);
+	k(d), k(c);
+	var p = B(c, 2), m = z(p), h = z(m), g = z(h, !0);
+	k(h);
+	var _ = B(h, 2), v = z(_, !0);
+	k(_), k(m);
+	var y = B(m, 2), b = z(y), x = B(b, 2);
+	k(y), k(p);
+	var S = B(p, 2), C = z(S, !0);
+	k(S), Le(2), k(o), V((e) => {
+		ga(s, "src", (G(n()), W(() => n().imageUrl || "/images/product-placeholder.png"))), ga(s, "alt", (G(n()), W(() => n().name))), Q(u, (G(n()), W(() => n().seller.username))), Q(f, `${(G(n()), W(() => n().stock)) ?? ""} in stock`), Q(g, (G(n()), W(() => n().name))), Q(v, e), Q(C, (G(n()), W(() => n().description || "No description provided.")));
+	}, [() => (G(a()), G(n()), W(() => a()(n().price)))]), Y("click", b, () => r()(n().id)), Y("click", x, () => i()(n().id)), Z(e, o), $e();
 }
 var Ss, Cs = e((() => {
-	to(), no(), Ja(), Ss = /* @__PURE__ */ X("<article class=\"detail-card\"><div class=\"detail-meta\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <div class=\"detail-layout\"><div><h3> </h3> <p class=\"detail-price\"> </p></div> <div class=\"detail-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div> <p class=\"detail-description\"> </p> <a class=\"detail-link\" href=\"/buyer/home\">Back to storefront</a></article>");
+	to(), no(), Ja(), Ss = /* @__PURE__ */ X("<article class=\"detail-card\"><img class=\"product-detail-image\"/> <div class=\"detail-meta\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <div class=\"detail-layout\"><div><h3> </h3> <p class=\"detail-price\"> </p></div> <div class=\"detail-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div> <p class=\"detail-description\"> </p> <a class=\"detail-link\" href=\"/buyer/home\">Back to storefront</a></article>");
 }));
 //#endregion
 //#region frontend/src/components/SellerHomeView.svelte
@@ -2973,70 +2973,79 @@ var Ts, Es = e((() => {
 //#region frontend/src/components/SellerInventoryView.svelte
 function Ds(e, t) {
 	Qe(t, !1);
-	let n = $(t, "sellerForm", 8), r = $(t, "sellerProducts", 24, () => []), i = $(t, "sellerListingForm", 12), a = $(t, "createSellerListing", 8), o = $(t, "onSellerFormInput", 8), s = $(t, "formatCurrency", 8);
+	let n = $(t, "sellerForm", 8), r = $(t, "sellerProducts", 24, () => []), i = $(t, "sellerListingForm", 12), a = $(t, "createSellerListing", 8), o = $(t, "onSellerFormInput", 8), s = $(t, "onSellerImageInput", 8), c = $(t, "formatCurrency", 8);
 	za();
-	var c = js(), l = On(c), u = z(l), d = z(u), f = B(z(d), 2);
-	ma(f);
-	var p = B(f, 4);
-	zn(p);
+	var l = Ms(), u = On(l), d = z(u), f = z(d), p = B(z(f), 2);
+	ma(p);
 	var m = B(p, 4);
-	ma(m);
-	var h = B(m, 4);
-	ma(h), Le(2), k(d), Na(d, (e) => i(e), () => i()), k(u);
-	var g = B(u, 2), _ = B(z(g), 2), v = z(_, !0);
-	k(_), k(g), k(l);
-	var y = B(l, 2), b = (e) => {
-		Z(e, Os());
-	}, x = (e) => {
-		var t = As();
+	zn(m);
+	var h = B(m, 4), g = B(h, 4), _ = (e) => {
+		var t = Os();
+		V(() => ga(t, "src", (G(n()), W(() => n().imagePreviewUrl)))), Z(e, t);
+	};
+	Mi(g, (e) => {
+		G(n()), W(() => n().imagePreviewUrl) && e(_);
+	});
+	var v = B(g, 4);
+	ma(v);
+	var y = B(v, 4);
+	ma(y), Le(2), k(f), Na(f, (e) => i(e), () => i()), k(d);
+	var b = B(d, 2), x = B(z(b), 2), S = z(x, !0);
+	k(x), k(b), k(u);
+	var C = B(u, 2), ee = (e) => {
+		Z(e, ks());
+	}, w = (e) => {
+		var t = js();
 		zi(t, 5, r, Ii, (e, t) => {
-			var n = ks(), r = z(n), i = z(r), a = z(i), o = (e) => {
+			var n = As(), r = z(n), i = B(r, 2), a = z(i), o = z(a), s = (e) => {
 				Z(e, mi("Pending approval"));
-			}, c = (e) => {
-				Z(e, mi("Rejected"));
 			}, l = (e) => {
-				Z(e, mi("Listed"));
+				Z(e, mi("Rejected"));
 			}, u = (e) => {
+				Z(e, mi("Listed"));
+			}, d = (e) => {
 				Z(e, mi("Delisted"));
 			};
-			Mi(a, (e) => {
-				U(t), W(() => U(t).listingStatus === "pending") ? e(o) : (U(t), W(() => U(t).listingStatus === "rejected") ? e(c, 1) : (U(t), W(() => U(t).isListed) ? e(l, 2) : e(u, -1)));
-			}), k(i);
-			var d = B(i, 2), f = z(d);
-			k(d), k(r);
-			var p = B(r, 2), m = z(p, !0);
-			k(p);
-			var h = B(p, 2), g = z(h, !0);
-			k(h);
-			var _ = B(h, 2), v = z(_), y = z(v), b = z(y, !0);
-			k(y);
-			var x = B(y, 2), S = z(x);
-			k(x), k(v), k(_), k(n), V((e, n) => {
-				Q(f, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(m, (U(t), W(() => U(t).name))), Q(g, (U(t), W(() => U(t).description || "No description provided."))), Q(b, e), Q(S, `Created ${n ?? ""}`);
-			}, [() => (G(s()), U(t), W(() => s()(U(t).price))), () => (U(t), W(() => new Date(U(t).createdAt).toLocaleDateString()))]), Z(e, n);
+			Mi(o, (e) => {
+				U(t), W(() => U(t).listingStatus === "pending") ? e(s) : (U(t), W(() => U(t).listingStatus === "rejected") ? e(l, 1) : (U(t), W(() => U(t).isListed) ? e(u, 2) : e(d, -1)));
+			}), k(a);
+			var f = B(a, 2), p = z(f);
+			k(f), k(i);
+			var m = B(i, 2), h = z(m, !0);
+			k(m);
+			var g = B(m, 2), _ = z(g, !0);
+			k(g);
+			var v = B(g, 2), y = z(v), b = z(y), x = z(b, !0);
+			k(b);
+			var S = B(b, 2), C = z(S);
+			k(S), k(y), k(v), k(n), V((e, n) => {
+				ga(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), ga(r, "alt", (U(t), W(() => U(t).name))), Q(p, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(h, (U(t), W(() => U(t).name))), Q(_, (U(t), W(() => U(t).description || "No description provided."))), Q(x, e), Q(C, `Created ${n ?? ""}`);
+			}, [() => (G(c()), U(t), W(() => c()(U(t).price))), () => (U(t), W(() => new Date(U(t).createdAt).toLocaleDateString()))]), Z(e, n);
 		}), k(t), Z(e, t);
 	};
-	Mi(y, (e) => {
-		G(r()), W(() => r().length === 0) ? e(b) : e(x, -1);
+	Mi(C, (e) => {
+		G(r()), W(() => r().length === 0) ? e(ee) : e(w, -1);
 	}), V(() => {
-		ha(f, (G(n()), W(() => n().name))), ha(p, (G(n()), W(() => n().description))), ha(m, (G(n()), W(() => n().price))), ha(h, (G(n()), W(() => n().stock))), Q(v, (G(r()), W(() => r().length)));
-	}), Y("input", f, (e) => o()("name", e)), Y("input", p, (e) => o()("description", e)), Y("input", m, (e) => o()("price", e)), Y("input", h, (e) => o()("stock", e)), Y("submit", d, La(function(...e) {
+		ha(p, (G(n()), W(() => n().name))), ha(m, (G(n()), W(() => n().description))), ha(v, (G(n()), W(() => n().price))), ha(y, (G(n()), W(() => n().stock))), Q(S, (G(r()), W(() => r().length)));
+	}), Y("input", p, (e) => o()("name", e)), Y("input", m, (e) => o()("description", e)), Y("change", h, function(...e) {
+		s()?.apply(this, e);
+	}), Y("input", v, (e) => o()("price", e)), Y("input", y, (e) => o()("stock", e)), Y("submit", f, La(function(...e) {
 		a()?.apply(this, e);
-	})), Z(e, c), $e();
+	})), Z(e, l), $e();
 }
-var Os, ks, As, js, Ms = e((() => {
-	to(), no(), Ja(), Os = /* @__PURE__ */ X("<div class=\"state-card\">No listings yet.</div>"), ks = /* @__PURE__ */ X("<article class=\"product-card\"><div class=\"card-topline\"><span class=\"seller\"><!></span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <p class=\"seller\"> </p></div></div></article>"), As = /* @__PURE__ */ X("<div class=\"product-grid inventory-grid\"></div>"), js = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><form class=\"stack-form\"><label for=\"seller-name\">Product name</label> <input id=\"seller-name\" type=\"text\" required=\"\"/> <label for=\"seller-description\">Description</label> <textarea id=\"seller-description\" rows=\"4\"></textarea> <label for=\"seller-price\">Price</label> <input id=\"seller-price\" type=\"number\" min=\"0\" step=\"0.01\" required=\"\"/> <label for=\"seller-stock\">Stock</label> <input id=\"seller-stock\" type=\"number\" min=\"0\" step=\"1\" required=\"\"/> <button class=\"checkout-link place-order-button\" type=\"submit\">Create listing</button></form></div> <aside class=\"summary-panel inventory-panel\"><p>Active records</p> <strong> </strong></aside></div> <!>", 1);
+var Os, ks, As, js, Ms, Ns = e((() => {
+	to(), no(), Ja(), Os = /* @__PURE__ */ X("<img class=\"product-image-preview\" alt=\"Selected product preview\"/>"), ks = /* @__PURE__ */ X("<div class=\"state-card\">No listings yet.</div>"), As = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"><!></span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <p class=\"seller\"> </p></div></div></article>"), js = /* @__PURE__ */ X("<div class=\"product-grid inventory-grid\"></div>"), Ms = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><form class=\"stack-form\"><label for=\"seller-name\">Product name</label> <input id=\"seller-name\" type=\"text\" required=\"\"/> <label for=\"seller-description\">Description</label> <textarea id=\"seller-description\" rows=\"4\"></textarea> <label for=\"seller-image\">Product image</label> <input id=\"seller-image\" type=\"file\" accept=\"image/jpeg,image/png\"/> <p class=\"field-hint\">Optional. JPEG or PNG up to 2 MB.</p> <!> <label for=\"seller-price\">Price</label> <input id=\"seller-price\" type=\"number\" min=\"0\" step=\"0.01\" required=\"\"/> <label for=\"seller-stock\">Stock</label> <input id=\"seller-stock\" type=\"number\" min=\"0\" step=\"1\" required=\"\"/> <button class=\"checkout-link place-order-button\" type=\"submit\">Create listing</button></form></div> <aside class=\"summary-panel inventory-panel\"><p>Active records</p> <strong> </strong></aside></div> <!>", 1);
 }));
 //#endregion
 //#region frontend/src/components/StorefrontView.svelte
-function Ns(e, t) {
+function Ps(e, t) {
 	Qe(t, !1);
 	let n = $(t, "products", 24, () => []), r = $(t, "productSearch", 8, ""), i = $(t, "addToCart", 8), a = $(t, "addToComparison", 8), o = $(t, "openRandomProduct", 8), s = $(t, "onProductSearchInput", 8), c = $(t, "searchProducts", 8), l = $(t, "clearProductSearch", 8), u = $(t, "formatCurrency", 8);
 	za();
-	var d = Rs(), f = On(d), p = z(f), m = B(z(p), 2), h = z(m);
+	var d = zs(), f = On(d), p = z(f), m = B(z(p), 2), h = z(m);
 	ma(h);
 	var g = B(h, 4), _ = (e) => {
-		var t = Ps();
+		var t = Fs();
 		Y("click", t, function(...e) {
 			l()?.apply(this, e);
 		}), Z(e, t);
@@ -3047,27 +3056,27 @@ function Ns(e, t) {
 	var y = B(p, 2), b = z(y);
 	k(y), k(f);
 	var x = B(f, 2), S = (e) => {
-		var t = Fs(), n = z(t, !0);
+		var t = Is(), n = z(t, !0);
 		k(t), V((e) => Q(n, e), [() => (G(r()), W(() => r().trim() ? "No products match your search." : "No listed products are available right now."))]), Z(e, t);
 	}, C = (e) => {
-		var t = Ls();
+		var t = Rs();
 		zi(t, 5, n, Ii, (e, t) => {
-			var n = Is(), r = z(n), o = z(r), s = z(o, !0);
-			k(o);
-			var c = B(o, 2), l = z(c);
-			k(c), k(r);
-			var d = B(r, 2), f = z(d, !0);
-			k(d);
-			var p = B(d, 2), m = z(p, !0);
-			k(p);
-			var h = B(p, 2), g = z(h), _ = z(g), v = z(_, !0);
+			var n = Ls(), r = z(n), o = B(r, 2), s = z(o), c = z(s, !0);
+			k(s);
+			var l = B(s, 2), d = z(l);
+			k(l), k(o);
+			var f = B(o, 2), p = z(f, !0);
+			k(f);
+			var m = B(f, 2), h = z(m, !0);
+			k(m);
+			var g = B(m, 2), _ = z(g), v = z(_), y = z(v, !0);
+			k(v);
+			var b = B(v, 2);
 			k(_);
-			var y = B(_, 2);
-			k(g);
-			var b = B(g, 2), x = z(b), S = B(x, 2);
-			k(b), k(h), k(n), V((e) => {
-				Q(s, (U(t), W(() => U(t).seller.username))), Q(l, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(f, (U(t), W(() => U(t).name))), Q(m, (U(t), W(() => U(t).description || "No description provided."))), Q(v, e), ga(y, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
-			}, [() => (G(u()), U(t), W(() => u()(U(t).price)))]), Y("click", x, () => i()(U(t).id)), Y("click", S, () => a()(U(t).id)), Z(e, n);
+			var x = B(_, 2), S = z(x), C = B(S, 2);
+			k(x), k(g), k(n), V((e) => {
+				ga(r, "src", (U(t), W(() => U(t).imageUrl || "/images/product-placeholder.png"))), ga(r, "alt", (U(t), W(() => U(t).name))), Q(c, (U(t), W(() => U(t).seller.username))), Q(d, `${(U(t), W(() => U(t).stock)) ?? ""} in stock`), Q(p, (U(t), W(() => U(t).name))), Q(h, (U(t), W(() => U(t).description || "No description provided."))), Q(y, e), ga(b, "href", (U(t), W(() => `/buyer/products/${U(t).id}`)));
+			}, [() => (G(u()), U(t), W(() => u()(U(t).price)))]), Y("click", S, () => i()(U(t).id)), Y("click", C, () => a()(U(t).id)), Z(e, n);
 		}), k(t), Z(e, t);
 	};
 	Mi(x, (e) => {
@@ -3080,12 +3089,12 @@ function Ns(e, t) {
 		o()?.apply(this, e);
 	}), Z(e, d), $e();
 }
-var Ps, Fs, Is, Ls, Rs, zs = e((() => {
-	to(), no(), Ja(), Ps = /* @__PURE__ */ X("<button class=\"secondary\" type=\"button\">Clear</button>"), Fs = /* @__PURE__ */ X("<div class=\"state-card\"> </div>"), Is = /* @__PURE__ */ X("<article class=\"product-card\"><div class=\"card-topline\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div></article>"), Ls = /* @__PURE__ */ X("<div class=\"product-grid\"></div>"), Rs = /* @__PURE__ */ X("<div class=\"storefront-tools\"><form class=\"storefront-search\"><label for=\"product-search\">Search products</label> <div class=\"storefront-search-row\"><input id=\"product-search\" type=\"search\" placeholder=\"Search by product name or description\"/> <button type=\"submit\">Search</button> <!></div></form> <div class=\"storefront-actions\"><button class=\"checkout-link random-product-button\" type=\"button\">Random product</button></div></div> <!>", 1);
+var Fs, Is, Ls, Rs, zs, Bs = e((() => {
+	to(), no(), Ja(), Fs = /* @__PURE__ */ X("<button class=\"secondary\" type=\"button\">Clear</button>"), Is = /* @__PURE__ */ X("<div class=\"state-card\"> </div>"), Ls = /* @__PURE__ */ X("<article class=\"product-card\"><img class=\"product-card-image\" loading=\"lazy\"/> <div class=\"card-topline\"><span class=\"seller\"> </span> <span class=\"stock\"> </span></div> <h3> </h3> <p class=\"description\"> </p> <div class=\"card-footer\"><div><p class=\"price\"> </p> <a class=\"detail-link\">View details</a></div> <div class=\"card-actions\"><button>Add to cart</button> <button class=\"secondary\">Compare</button></div></div></article>"), Rs = /* @__PURE__ */ X("<div class=\"product-grid\"></div>"), zs = /* @__PURE__ */ X("<div class=\"storefront-tools\"><form class=\"storefront-search\"><label for=\"product-search\">Search products</label> <div class=\"storefront-search-row\"><input id=\"product-search\" type=\"search\" placeholder=\"Search by product name or description\"/> <button type=\"submit\">Search</button> <!></div></form> <div class=\"storefront-actions\"><button class=\"checkout-link random-product-button\" type=\"button\">Random product</button></div></div> <!>", 1);
 }));
 //#endregion
 //#region frontend/src/App.svelte
-function Bs(e, t) {
+function Vs(e, t) {
 	Qe(t, !1);
 	let n = /* @__PURE__ */ L(), r = [
 		{
@@ -3124,6 +3133,8 @@ function Bs(e, t) {
 	}), f = /* @__PURE__ */ L(null), p = /* @__PURE__ */ L([]), m = /* @__PURE__ */ L({
 		name: "",
 		description: "",
+		imageDataUrl: "",
+		imagePreviewUrl: "",
 		price: "",
 		stock: ""
 	}), h = /* @__PURE__ */ L(), g = /* @__PURE__ */ L([]), _ = /* @__PURE__ */ L([]), v = /* @__PURE__ */ L([]), y = /* @__PURE__ */ L([]), b = /* @__PURE__ */ L({
@@ -3307,16 +3318,45 @@ function Bs(e, t) {
 			[e]: t.currentTarget.value
 		});
 	}
-	function ye(e, t) {
+	function ye(e) {
+		let [t] = e.currentTarget.files || [];
+		if (!t) {
+			R(m, {
+				...U(m),
+				imageDataUrl: "",
+				imagePreviewUrl: ""
+			});
+			return;
+		}
+		if (!["image/jpeg", "image/png"].includes(t.type)) {
+			R(E, "Select a JPEG or PNG file for the product photo."), e.currentTarget.value = "";
+			return;
+		}
+		if (t.size > 2 * 1024 * 1024) {
+			R(E, "Product image must be 2 MB or smaller."), e.currentTarget.value = "";
+			return;
+		}
+		let n = new FileReader();
+		n.onload = () => {
+			R(m, {
+				...U(m),
+				imageDataUrl: String(n.result || ""),
+				imagePreviewUrl: String(n.result || "")
+			}), R(E, "");
+		}, n.onerror = () => {
+			R(E, "Could not read selected image.");
+		}, n.readAsDataURL(t);
+	}
+	function be(e, t) {
 		R(S, {
 			...U(S),
 			[e]: t.currentTarget.value
 		});
 	}
-	function be(e) {
+	function xe(e) {
 		R(x, e.currentTarget.value);
 	}
-	async function xe() {
+	async function Se() {
 		R(E, "");
 		let e = String(U(m).price).trim(), t = String(U(m).stock).trim(), n = Number(e), r = Number(t);
 		if (U(h)?.reportValidity()) {
@@ -3335,21 +3375,24 @@ function Bs(e, t) {
 					body: JSON.stringify({
 						name: U(m).name,
 						description: U(m).description,
+						imageDataUrl: U(m).imageDataUrl,
 						price: n,
 						stock: r
 					})
 				}), R(m, {
 					name: "",
 					description: "",
+					imageDataUrl: "",
+					imagePreviewUrl: "",
 					price: "",
 					stock: ""
-				}), R(E, "Listing submitted for admin approval."), await O();
+				}), U(h)?.reset(), R(E, "Listing submitted for admin approval."), await O();
 			} catch (e) {
 				R(E, e.message || "Could not create listing.");
 			}
 		}
 	}
-	async function Se(e) {
+	async function Ce(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/approve-user/${e}`, { method: "POST" });
@@ -3358,7 +3401,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not approve user.");
 		}
 	}
-	async function Ce(e) {
+	async function we(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/block-user/${e}`, { method: "POST" });
@@ -3367,7 +3410,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not block user.");
 		}
 	}
-	async function we(e) {
+	async function Te(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/ban-user/${e}`, { method: "POST" });
@@ -3376,7 +3419,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not ban user.");
 		}
 	}
-	async function Te(e) {
+	async function Ee(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/products/${e}/approve`, { method: "POST" });
@@ -3385,7 +3428,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not approve product.");
 		}
 	}
-	async function Ee(e) {
+	async function De(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/products/${e}/reject`, { method: "POST" });
@@ -3394,7 +3437,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not reject product.");
 		}
 	}
-	async function De(e) {
+	async function Oe(e) {
 		R(E, "");
 		try {
 			let t = await D(`/api/admin/products/${e}/delist`, { method: "POST" });
@@ -3403,25 +3446,25 @@ function Bs(e, t) {
 			R(E, e.message || "Could not delist product.");
 		}
 	}
-	async function Oe() {
+	async function ke() {
 		await _e(() => me(1, U(x)));
 	}
-	async function ke() {
+	async function Ae() {
 		R(x, ""), await _e(() => me(1, ""));
 	}
-	async function Ae(e) {
+	async function je(e) {
 		e < 1 || e > U(b).totalPages || await _e(() => me(e, U(b).search));
 	}
-	function je(e) {
+	function Me(e) {
 		R(c, e.target.value);
 	}
-	async function Me() {
+	async function Ne() {
 		await _e(() => le(!0));
 	}
-	async function Ne() {
+	async function Pe() {
 		R(c, ""), await _e(() => le(!0));
 	}
-	function Pe(e, t = "success") {
+	function Fe(e, t = "success") {
 		let n = typeof crypto < "u" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
 		R(te, [...U(te), {
 			id: n,
@@ -3433,7 +3476,7 @@ function Bs(e, t) {
 		}, 3200);
 		ne.set(n, r);
 	}
-	async function Fe(e) {
+	async function Ie(e) {
 		R(E, "");
 		try {
 			await D("/api/buyer/cart", {
@@ -3443,12 +3486,12 @@ function Bs(e, t) {
 					productId: e,
 					quantity: 1
 				})
-			}), R(E, "Item added to cart."), Pe("Item added to cart.");
+			}), R(E, "Item added to cart."), Fe("Item added to cart.");
 		} catch (e) {
-			R(E, e.message || "Could not add item to cart."), Pe(U(E), "error");
+			R(E, e.message || "Could not add item to cart."), Fe(U(E), "error");
 		}
 	}
-	async function Ie() {
+	async function Le() {
 		R(E, "");
 		try {
 			let e = await D("/api/buyer/random_access");
@@ -3457,7 +3500,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not load a random product.");
 		}
 	}
-	async function Le(e) {
+	async function Re(e) {
 		R(E, "");
 		try {
 			await D("/api/buyer/compare", {
@@ -3469,7 +3512,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not add item to list.");
 		}
 	}
-	async function Re(e) {
+	async function ze(e) {
 		R(E, "");
 		try {
 			await D(`/api/buyer/cart/${e}/remove`, { method: "POST" }), R(E, "Item removed from cart."), await de();
@@ -3477,7 +3520,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not remove item.");
 		}
 	}
-	async function ze(e) {
+	async function A(e) {
 		R(E, "");
 		try {
 			await D(`/api/buyer/compare/${e}/remove`, { method: "POST" }), R(E, "Item removed from comparison list."), await fe();
@@ -3485,7 +3528,7 @@ function Bs(e, t) {
 			R(E, e.message || "Could not remove item.");
 		}
 	}
-	async function A() {
+	async function j() {
 		R(E, "");
 		try {
 			let e = await D("/api/buyer/checkout", {
@@ -3501,7 +3544,7 @@ function Bs(e, t) {
 			R(E, e.message || "Checkout failed."), await de();
 		}
 	}
-	async function j() {
+	async function M() {
 		R(E, "");
 		try {
 			await D("/api/logout", { method: "POST" }), window.location.href = "/login";
@@ -3516,24 +3559,24 @@ function Bs(e, t) {
 	}), tr(() => U(o), () => {
 		R(n, co(U(o)));
 	}), nr(), za();
-	var M = Ys();
+	var Be = Xs();
 	na("13zv0lp", (e) => {
 		ar((e) => {
 			Pn.title = e ?? "";
 		}, [() => (G(lo), U(o), W(() => lo(U(o))))]);
 	});
-	var Be = z(M);
-	Co(Be, {
+	var Ve = z(Be);
+	Co(Ve, {
 		get appMode() {
 			return U(a);
 		},
 		get currentPage() {
 			return U(o);
 		},
-		onLogout: j
+		onLogout: M
 	});
-	var Ve = B(Be, 2), He = z(Ve);
-	Do(He, {
+	var He = B(Ve, 2), Ue = z(He);
+	Do(Ue, {
 		get kicker() {
 			return U(n), W(() => U(n).kicker);
 		},
@@ -3542,14 +3585,14 @@ function Bs(e, t) {
 		},
 		onRefresh: ge
 	});
-	var Ue = B(He, 2), We = (e) => {
-		Z(e, Vs());
-	}, Ge = (e) => {
-		var t = Hs(), n = z(t, !0);
-		k(t), V(() => Q(n, U(T))), Z(e, t);
+	var We = B(Ue, 2), Ge = (e) => {
+		Z(e, Hs());
 	}, Ke = (e) => {
-		Fo(e, {});
+		var t = Us(), n = z(t, !0);
+		k(t), V(() => Q(n, U(T))), Z(e, t);
 	}, qe = (e) => {
+		Fo(e, {});
+	}, Je = (e) => {
 		Ro(e, {
 			get adminPendingUsers() {
 				return U(g);
@@ -3566,16 +3609,16 @@ function Bs(e, t) {
 			get adminUserSearch() {
 				return U(x);
 			},
-			onAdminUserSearchInput: be,
-			approveUser: Se,
-			blockUser: Ce,
-			banUser: we,
-			approveProduct: Te,
-			rejectProduct: Ee,
-			delistProduct: De,
-			searchAdminUsers: Oe,
-			clearAdminUserSearch: ke,
-			goToAdminUsersPage: Ae,
+			onAdminUserSearchInput: xe,
+			approveUser: Ce,
+			blockUser: we,
+			banUser: Te,
+			approveProduct: Ee,
+			rejectProduct: De,
+			delistProduct: Oe,
+			searchAdminUsers: ke,
+			clearAdminUserSearch: Ae,
+			goToAdminUsersPage: je,
 			get capitalizeRole() {
 				return _o;
 			},
@@ -3589,7 +3632,7 @@ function Bs(e, t) {
 				return vo;
 			}
 		});
-	}, Je = (e) => {
+	}, Ye = (e) => {
 		Ao(e, {
 			get adminAuditLogs() {
 				return U(y);
@@ -3601,9 +3644,9 @@ function Bs(e, t) {
 				return mo;
 			}
 		});
-	}, Ye = (e) => {
-		ws(e, {});
 	}, Xe = (e) => {
+		ws(e, {});
+	}, Ze = (e) => {
 		Ds(e, {
 			get sellerForm() {
 				return U(m);
@@ -3611,8 +3654,9 @@ function Bs(e, t) {
 			get sellerProducts() {
 				return U(p);
 			},
-			createSellerListing: xe,
+			createSellerListing: Se,
 			onSellerFormInput: ve,
+			onSellerImageInput: ye,
 			get formatCurrency() {
 				return po;
 			},
@@ -3624,42 +3668,42 @@ function Bs(e, t) {
 			},
 			$$legacy: !0
 		});
-	}, Ze = (e) => {
+	}, et = (e) => {
 		xs(e, {
 			get product() {
 				return U(l);
 			},
-			addToCart: Fe,
-			addToComparison: Le,
-			get formatCurrency() {
-				return po;
-			}
-		});
-	}, et = (e) => {
-		$o(e, {
-			get cart() {
-				return U(d);
-			},
-			removeFromCart: Re,
+			addToCart: Ie,
+			addToComparison: Re,
 			get formatCurrency() {
 				return po;
 			}
 		});
 	}, N = (e) => {
+		$o(e, {
+			get cart() {
+				return U(d);
+			},
+			removeFromCart: ze,
+			get formatCurrency() {
+				return po;
+			}
+		});
+	}, P = (e) => {
 		as(e, {
 			get cart() {
 				return U(d);
 			},
-			placeOrder: A,
+			placeOrder: j,
 			get formatCurrency() {
 				return po;
 			},
 			get shippingAddress() {
 				return U(S);
 			},
-			onShippingInput: ye
+			onShippingInput: be
 		});
-	}, P = (e) => {
+	}, tt = (e) => {
 		gs(e, {
 			get order() {
 				return U(f);
@@ -3674,13 +3718,13 @@ function Bs(e, t) {
 				return ho;
 			}
 		});
-	}, tt = (e) => {
+	}, nt = (e) => {
 		ds(e, {
 			get compareItems() {
 				return U(u);
 			},
-			addToCart: Fe,
-			removeFromCompare: ze,
+			addToCart: Ie,
+			removeFromCompare: A,
 			get formatCurrency() {
 				return po;
 			},
@@ -3688,39 +3732,39 @@ function Bs(e, t) {
 				return go;
 			}
 		});
-	}, nt = (e) => {
-		Ns(e, {
+	}, rt = (e) => {
+		Ps(e, {
 			get products() {
 				return U(s);
 			},
 			get productSearch() {
 				return U(c);
 			},
-			addToCart: Fe,
-			addToComparison: Le,
-			openRandomProduct: Ie,
-			onProductSearchInput: je,
-			searchProducts: Me,
-			clearProductSearch: Ne,
+			addToCart: Ie,
+			addToComparison: Re,
+			openRandomProduct: Le,
+			onProductSearchInput: Me,
+			searchProducts: Ne,
+			clearProductSearch: Pe,
 			get formatCurrency() {
 				return po;
 			}
 		});
 	};
-	Mi(Ue, (e) => {
-		U(w) ? e(We) : U(T) ? e(Ge, 1) : U(o) === "admin-home" ? e(Ke, 2) : U(o) === "admin-moderation" ? e(qe, 3) : U(o) === "admin-audit" ? e(Je, 4) : U(o) === "seller-home" ? e(Ye, 5) : U(o) === "seller-inventory" ? e(Xe, 6) : U(o) === "product" && U(l) ? e(Ze, 7) : U(o) === "cart" ? e(et, 8) : U(o) === "checkout" ? e(N, 9) : U(o) === "confirmation" && U(f) ? e(P, 10) : U(o) === "compare" ? e(tt, 11) : e(nt, -1);
+	Mi(We, (e) => {
+		U(w) ? e(Ge) : U(T) ? e(Ke, 1) : U(o) === "admin-home" ? e(qe, 2) : U(o) === "admin-moderation" ? e(Je, 3) : U(o) === "admin-audit" ? e(Ye, 4) : U(o) === "seller-home" ? e(Xe, 5) : U(o) === "seller-inventory" ? e(Ze, 6) : U(o) === "product" && U(l) ? e(et, 7) : U(o) === "cart" ? e(N, 8) : U(o) === "checkout" ? e(P, 9) : U(o) === "confirmation" && U(f) ? e(tt, 10) : U(o) === "compare" ? e(nt, 11) : e(rt, -1);
 	});
-	var rt = B(Ue, 2), it = (e) => {
-		var t = Us(), n = z(t, !0);
+	var it = B(We, 2), at = (e) => {
+		var t = Ws(), n = z(t, !0);
 		k(t), V(() => Q(n, U(E))), Z(e, t);
 	};
-	Mi(rt, (e) => {
-		U(E) && e(it);
-	}), k(Ve);
-	var at = B(Ve, 2), ot = (e) => {
-		var t = Gs();
+	Mi(it, (e) => {
+		U(E) && e(at);
+	}), k(He);
+	var ot = B(He, 2), st = (e) => {
+		var t = Ks();
 		zi(t, 5, () => U(te), (e) => e.id, (e, t) => {
-			var n = Ws();
+			var n = Gs();
 			let r;
 			var i = z(n, !0);
 			k(n), V(() => {
@@ -3728,18 +3772,18 @@ function Bs(e, t) {
 			}), Z(e, n);
 		}), k(t), Z(e, t);
 	};
-	Mi(at, (e) => {
-		U(te), W(() => U(te).length > 0) && e(ot);
+	Mi(ot, (e) => {
+		U(te), W(() => U(te).length > 0) && e(st);
 	});
-	var st = B(at, 2), ct = z(st), F = (e) => {
-		var t = Js();
+	var ct = B(ot, 2), F = z(ct), lt = (e) => {
+		var t = Ys();
 		zi(t, 5, () => r, Ii, (e, t) => {
-			var n = qs();
+			var n = Js();
 			let r;
 			var i = z(n), a = z(i, !0);
 			k(i);
 			var o = B(i, 2), s = (e) => {
-				Z(e, Ks());
+				Z(e, qs());
 			};
 			Mi(o, (e) => {
 				U(C), U(t), W(() => U(C) === U(t).value) && e(s);
@@ -3748,18 +3792,18 @@ function Bs(e, t) {
 			}), Y("click", n, () => ae(U(t).value)), Z(e, n);
 		}), k(t), Z(e, t);
 	};
-	Mi(ct, (e) => {
-		U(ee) && e(F);
+	Mi(F, (e) => {
+		U(ee) && e(lt);
 	});
-	var lt = B(ct, 2);
-	k(st), k(M), V(() => {
-		ga(M, "data-page", U(o)), ga(lt, "aria-expanded", U(ee));
-	}), Y("click", lt, ie), Z(e, M), $e();
+	var ut = B(F, 2);
+	k(ct), k(Be), V(() => {
+		ga(Be, "data-page", U(o)), ga(ut, "aria-expanded", U(ee));
+	}), Y("click", ut, ie), Z(e, Be), $e();
 }
-var Vs, Hs, Us, Ws, Gs, Ks, qs, Js, Ys, Xs = e((() => {
-	to(), no(), Ja(), $a(), Eo(), ko(), Po(), Lo(), Qo(), is(), us(), hs(), bs(), Cs(), Es(), Ms(), zs(), So(), Vs = /* @__PURE__ */ X("<div class=\"state-card\">Loading...</div>"), Hs = /* @__PURE__ */ X("<div class=\"state-card error\"> </div>"), Us = /* @__PURE__ */ X("<p class=\"status-banner\"> </p>"), Ws = /* @__PURE__ */ X("<div role=\"status\"> </div>"), Gs = /* @__PURE__ */ X("<div class=\"cart-toast-stack\" aria-live=\"polite\" aria-label=\"Cart notifications\"></div>"), Ks = /* @__PURE__ */ X("<span class=\"theme-dock-check\">Current</span>"), qs = /* @__PURE__ */ X("<button type=\"button\" role=\"menuitemradio\"><span> </span> <!></button>"), Js = /* @__PURE__ */ X("<div class=\"theme-dock-menu\" role=\"menu\" aria-label=\"Theme picker\"></div>"), Ys = /* @__PURE__ */ X("<div class=\"page-shell\"><!> <section class=\"catalog\"><!> <!> <!></section> <!> <div class=\"theme-dock\"><!> <button class=\"theme-dock-toggle\" type=\"button\" aria-haspopup=\"menu\">Theme</button></div></div>");
-})), Zs = e((() => {})), Qs = /* @__PURE__ */ t((() => {
-	$a(), Xs(), Zs(), _i(Bs, { target: document.getElementById("buyer-app") });
+var Hs, Us, Ws, Gs, Ks, qs, Js, Ys, Xs, Zs = e((() => {
+	to(), no(), Ja(), $a(), Eo(), ko(), Po(), Lo(), Qo(), is(), us(), hs(), bs(), Cs(), Es(), Ns(), Bs(), So(), Hs = /* @__PURE__ */ X("<div class=\"state-card\">Loading...</div>"), Us = /* @__PURE__ */ X("<div class=\"state-card error\"> </div>"), Ws = /* @__PURE__ */ X("<p class=\"status-banner\"> </p>"), Gs = /* @__PURE__ */ X("<div role=\"status\"> </div>"), Ks = /* @__PURE__ */ X("<div class=\"cart-toast-stack\" aria-live=\"polite\" aria-label=\"Cart notifications\"></div>"), qs = /* @__PURE__ */ X("<span class=\"theme-dock-check\">Current</span>"), Js = /* @__PURE__ */ X("<button type=\"button\" role=\"menuitemradio\"><span> </span> <!></button>"), Ys = /* @__PURE__ */ X("<div class=\"theme-dock-menu\" role=\"menu\" aria-label=\"Theme picker\"></div>"), Xs = /* @__PURE__ */ X("<div class=\"page-shell\"><!> <section class=\"catalog\"><!> <!> <!></section> <!> <div class=\"theme-dock\"><!> <button class=\"theme-dock-toggle\" type=\"button\" aria-haspopup=\"menu\">Theme</button></div></div>");
+})), Qs = e((() => {})), $s = /* @__PURE__ */ t((() => {
+	$a(), Zs(), Qs(), _i(Vs, { target: document.getElementById("buyer-app") });
 }));
 //#endregion
-export default Qs();
+export default $s();

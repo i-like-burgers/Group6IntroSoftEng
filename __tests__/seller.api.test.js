@@ -133,6 +133,7 @@ describe('seller api routes', () => {
             id: 202,
             name: 'ASUS TUF B650-Plus WiFi',
             description: 'AM5 ATX motherboard',
+            imageUrl: '/images/product-placeholder.png',
             price: 219.99,
             stock: 6,
             sellerId: 9,
@@ -154,6 +155,7 @@ describe('seller api routes', () => {
             id: 202,
             name: 'ASUS TUF B650-Plus WiFi',
             description: 'AM5 ATX motherboard',
+            imageUrl: '/images/product-placeholder.png',
             price: 219.99,
             stock: 6,
             sellerId: 9,
@@ -164,12 +166,32 @@ describe('seller api routes', () => {
             data: {
                 name: 'ASUS TUF B650-Plus WiFi',
                 description: 'AM5 ATX motherboard',
+                imageUrl: '/images/product-placeholder.png',
                 price: 219.99,
                 stock: 6,
                 sellerId: 9,
                 isListed: false,
                 listingStatus: 'pending'
             }
+        });
+    });
+
+    test('POST /api/seller/products rejects unsupported product image data', async () => {
+        const { app } = loadSellerApiApp();
+
+        const response = await request(app)
+            .post('/api/seller/products')
+            .send({
+                name: 'ASUS TUF B650-Plus WiFi',
+                description: 'AM5 ATX motherboard',
+                imageDataUrl: 'data:text/plain;base64,SGVsbG8=',
+                price: 219.99,
+                stock: 6
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'Product image must be a JPEG or PNG file'
         });
     });
 

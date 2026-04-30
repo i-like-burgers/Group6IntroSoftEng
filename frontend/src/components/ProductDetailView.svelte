@@ -6,6 +6,8 @@
 </script>
 
 <article class="detail-card">
+    <img class="product-detail-image" src={product.imageUrl || '/images/product-placeholder.png'} alt={product.name} />
+
     <div class="detail-meta">
         <span class="seller">{product.seller.username}</span>
         <span class="stock">{product.stock} in stock</span>

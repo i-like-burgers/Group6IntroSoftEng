@@ -15,9 +15,9 @@ const sellerApiRouter = require('./routes/api/seller');
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 app.get('/test', async (req, res) => {
     const users = await prisma.user.findMany();

@@ -4,6 +4,7 @@
     export let sellerListingForm;
     export let createSellerListing;
     export let onSellerFormInput;
+    export let onSellerImageInput;
     export let formatCurrency;
 </script>
 
@@ -19,6 +20,13 @@
                 on:input={(event) => onSellerFormInput('description', event)}
                 rows="4"
             >{sellerForm.description}</textarea>
+
+            <label for="seller-image">Product image</label>
+            <input id="seller-image" on:change={onSellerImageInput} type="file" accept="image/jpeg,image/png" />
+            <p class="field-hint">Optional. JPEG or PNG up to 2 MB.</p>
+            {#if sellerForm.imagePreviewUrl}
+                <img class="product-image-preview" src={sellerForm.imagePreviewUrl} alt="Selected product preview" />
+            {/if}
 
             <label for="seller-price">Price</label>
             <input
@@ -60,6 +68,7 @@
     <div class="product-grid inventory-grid">
         {#each sellerProducts as item}
             <article class="product-card">
+                <img class="product-card-image" src={item.imageUrl || '/images/product-placeholder.png'} alt={item.name} loading="lazy" />
                 <div class="card-topline">
                     <span class="seller">
                         {#if item.listingStatus === 'pending'}
