@@ -32,6 +32,7 @@
 
     const THEME_OPTIONS = [
         { value: 'accessible', label: 'Winter Ice' },
+        { value: 'dark', label: 'Dark Mode' },
         { value: 'warm', label: 'Warm' },
         { value: 'terminal', label: 'Terminal' },
         { value: 'cool-grey', label: 'Cool Grey' },
@@ -95,7 +96,7 @@
         postalCode: '',
         country: 'US'
     };
-    let currentTheme = 'accessible';
+    let currentTheme = 'accessible-blue-gold';
     let themeMenuOpen = false;
     let loading = true;
     let errorMessage = '';
@@ -118,7 +119,7 @@
     }
 
     function applyTheme(theme) {
-        currentTheme = VALID_THEMES.has(theme) ? theme : 'accessible';
+        currentTheme = VALID_THEMES.has(theme) ? theme : 'accessible-blue-gold';
 
         if (typeof document !== 'undefined') {
             document.documentElement.dataset.theme = currentTheme;
@@ -732,7 +733,7 @@
 
     onMount(async () => {
         const storedTheme = typeof localStorage === 'undefined' ? null : localStorage.getItem('ram-theme');
-        applyTheme(storedTheme || 'accessible');
+        applyTheme(storedTheme || 'accessible-blue-gold');
         await loadCurrentPage();
     });
 

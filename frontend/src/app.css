@@ -92,6 +92,53 @@
     --danger-text: #fffaf2;
 }
 
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0e1116;
+    --surface: #171c24;
+    --surface-strong: #202733;
+    --text: #eef3f8;
+    --muted: #b4c0cc;
+    --accent: #f4f7fb;
+    --accent-strong: #ffffff;
+    --border: #516173;
+    --bg-top: #161b23;
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    --hero-bg: linear-gradient(135deg, rgba(31, 39, 51, 0.98), rgba(13, 17, 23, 0.98));
+    --catalog-bg: rgba(18, 23, 31, 0.96);
+    --admin-region-border: #6a7d92;
+    --admin-region-bg: #171d26;
+    --admin-table-bg: #1b222d;
+    --admin-table-head-bg: #263140;
+    --admin-table-text: #eef3f8;
+    --admin-button-bg: #f4f7fb;
+    --admin-button-hover-bg: #ffffff;
+    --admin-button-text: #111820;
+    --button-text: #08111d;
+    --payment-bg: #242c38;
+    --payment-selected-bg: #2d3b4d;
+    --payment-placeholder-bg: #1b222c;
+    --field-bg: #121820;
+    --status-bg: rgba(244, 247, 251, 0.14);
+    --status-text: #f4f7fb;
+    --error-text: #ffd3d3;
+    --error-border: #a86464;
+    --error-bg: #40262b;
+    --danger-bg: #f2c66d;
+    --danger-hover-bg: #ffd987;
+    --danger-text: #121820;
+    --audit-row-bg: rgba(28, 36, 48, 0.98);
+    --audit-user-text: #ffffff;
+    --audit-action-text: #ffffff;
+    --audit-details-text: #d1dbe5;
+    --checkout-catalog-bg: linear-gradient(180deg, rgba(20, 26, 35, 0.98), rgba(12, 16, 22, 0.98));
+    --admin-audit-catalog-bg: linear-gradient(180deg, rgba(25, 33, 44, 0.98), rgba(12, 16, 22, 0.98));
+    --surface-highlight: rgba(255, 255, 255, 0.07);
+    --icon-chip-bg: rgba(255, 255, 255, 0.08);
+    --focus-ring: #ffd166;
+    --focus-shadow: rgba(255, 209, 102, 0.28);
+}
+
 :root[data-theme="terminal"] {
     color-scheme: dark;
     --bg: #050805;

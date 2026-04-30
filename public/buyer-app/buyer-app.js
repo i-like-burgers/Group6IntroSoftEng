@@ -3162,6 +3162,10 @@ function Ks(e, t) {
 			label: "Winter Ice"
 		},
 		{
+			value: "dark",
+			label: "Dark Mode"
+		},
+		{
 			value: "warm",
 			label: "Warm"
 		},
@@ -3217,14 +3221,14 @@ function Ks(e, t) {
 		state: "",
 		postalCode: "",
 		country: "US"
-	}), te = /* @__PURE__ */ L("accessible"), ne = /* @__PURE__ */ L(!1), w = /* @__PURE__ */ L(!0), T = /* @__PURE__ */ L(""), E = /* @__PURE__ */ L(""), re = /* @__PURE__ */ L([]), ie = /* @__PURE__ */ new Map();
+	}), te = /* @__PURE__ */ L("accessible-blue-gold"), ne = /* @__PURE__ */ L(!1), w = /* @__PURE__ */ L(!0), T = /* @__PURE__ */ L(""), E = /* @__PURE__ */ L(""), re = /* @__PURE__ */ L([]), ie = /* @__PURE__ */ new Map();
 	async function D(e, t = {}) {
 		let n = await fetch(e, t), r = (n.headers.get("content-type") || "").includes("application/json") ? await n.json() : null;
 		if (!n.ok) throw Error(r?.error || "Request failed");
 		return r;
 	}
 	function ae(e) {
-		R(te, i.has(e) ? e : "accessible"), typeof document < "u" && (document.documentElement.dataset.theme = U(te)), typeof localStorage < "u" && localStorage.setItem("ram-theme", U(te));
+		R(te, i.has(e) ? e : "accessible-blue-gold"), typeof document < "u" && (document.documentElement.dataset.theme = U(te)), typeof localStorage < "u" && localStorage.setItem("ram-theme", U(te));
 	}
 	function oe() {
 		R(ne, !U(ne));
@@ -3642,7 +3646,7 @@ function Ks(e, t) {
 		}
 	}
 	Xa(async () => {
-		ae((typeof localStorage > "u" ? null : localStorage.getItem("ram-theme")) || "accessible"), await ye();
+		ae((typeof localStorage > "u" ? null : localStorage.getItem("ram-theme")) || "accessible-blue-gold"), await ye();
 	}), Za(() => {
 		ie.forEach((e) => clearTimeout(e)), ie.clear();
 	}), tr(() => U(o), () => {
