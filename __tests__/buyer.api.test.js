@@ -124,6 +124,36 @@ describe('buyer api routes', () => {
         expect(prismaMock.product.findMany).toHaveBeenCalled();
     });
 
+    test('GET /api/buyer/products applies product search while preserving visibility filters', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.product.findMany.mockResolvedValue([]);
+
+        const response = await request(app).get('/api/buyer/products?search=keyboard');
+
+        expect(response.status).toBe(200);
+        expect(prismaMock.product.findMany).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                isListed: true,
+                listingStatus: 'approved',
+                seller: {
+                    banned: false
+                },
+                OR: [
+                    {
+                        name: {
+                            contains: 'keyboard'
+                        }
+                    },
+                    {
+                        description: {
+                            contains: 'keyboard'
+                        }
+                    }
+                ]
+            }
+        }));
+    });
+
     test('GET /api/buyer/products/:id returns a specific listed product', async () => {
         const product = {
             id: 102,

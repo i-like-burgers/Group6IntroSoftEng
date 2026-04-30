@@ -511,10 +511,56 @@ textarea:focus-visible {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.storefront-tools {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.storefront-search {
+    display: grid;
+    gap: 8px;
+}
+
+.storefront-search label {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.storefront-search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.storefront-search-row input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--field-bg);
+    color: var(--text);
+    padding: 12px 14px;
+}
+
+.storefront-search-row button {
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--button-text);
+    cursor: pointer;
+    min-height: 42px;
+    padding: 10px 14px;
+}
+
+.storefront-search-row button.secondary {
+    background: transparent;
+    color: var(--accent-strong);
+}
+
 .storefront-actions {
     display: flex;
     justify-content: center;
-    margin-bottom: 18px;
 }
 
 .random-product-button {

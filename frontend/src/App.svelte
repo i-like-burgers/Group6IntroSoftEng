@@ -44,6 +44,7 @@
     let appMode = 'buyer';
     let currentPage = 'storefront';
     let products = [];
+    let productSearch = '';
     let product = null;
     let compareItems = [];
     let cart = {
@@ -148,7 +149,12 @@
         if (resetStatus) statusMessage = '';
 
         try {
-            products = await fetchJson('/api/buyer/products');
+            const search = productSearch.trim();
+            const endpoint = search
+                ? `/api/buyer/products?search=${encodeURIComponent(search)}`
+                : '/api/buyer/products';
+
+            products = await fetchJson(endpoint);
         } catch (error) {
             errorMessage = error.message || 'Could not load products.';
         } finally {
@@ -478,6 +484,19 @@
         await preserveScrollDuring(() => loadAdminModeration(nextPage, adminUsersPageInfo.search));
     }
 
+    function updateProductSearch(event) {
+        productSearch = event.target.value;
+    }
+
+    async function searchProducts() {
+        await preserveScrollDuring(() => loadProducts(true));
+    }
+
+    async function clearProductSearch() {
+        productSearch = '';
+        await preserveScrollDuring(() => loadProducts(true));
+    }
+
     function showCartNotification(message, type = 'success') {
         const id = typeof crypto !== 'undefined' && crypto.randomUUID
             ? crypto.randomUUID()
@@ -737,9 +756,13 @@
         {:else}
             <StorefrontView
                 {products}
+                {productSearch}
                 {addToCart}
                 {addToComparison}
                 {openRandomProduct}
+                onProductSearchInput={updateProductSearch}
+                {searchProducts}
+                {clearProductSearch}
                 {formatCurrency}
             />
         {/if}

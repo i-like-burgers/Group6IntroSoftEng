@@ -46,14 +46,32 @@ router.use(auth.authenticateToken, requireRole('buyer'));
 
 router.get('/products', async (req, res) => {
     try {
-        const products = await prisma.product.findMany({
-            where: {
-                isListed: true,
-                listingStatus: 'approved',
-                seller: {
-                    banned: false
+        const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+        const where = {
+            isListed: true,
+            listingStatus: 'approved',
+            seller: {
+                banned: false
+            }
+        };
+
+        if (search) {
+            where.OR = [
+                {
+                    name: {
+                        contains: search
+                    }
+                },
+                {
+                    description: {
+                        contains: search
+                    }
                 }
-            },
+            ];
+        }
+
+        const products = await prisma.product.findMany({
+            where,
             include: {
                 seller: {
                     select: {

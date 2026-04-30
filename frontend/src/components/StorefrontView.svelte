@@ -1,19 +1,46 @@
 <script>
     export let products = [];
+    export let productSearch = '';
     export let addToCart;
     export let addToComparison;
     export let openRandomProduct;
+    export let onProductSearchInput;
+    export let searchProducts;
+    export let clearProductSearch;
     export let formatCurrency;
 </script>
 
-<div class="storefront-actions">
-    <button class="checkout-link random-product-button" type="button" on:click={openRandomProduct}>
-        Random product
-    </button>
+<div class="storefront-tools">
+    <form class="storefront-search" on:submit|preventDefault={searchProducts}>
+        <label for="product-search">Search products</label>
+        <div class="storefront-search-row">
+            <input
+                id="product-search"
+                type="search"
+                placeholder="Search by product name or description"
+                value={productSearch}
+                on:input={onProductSearchInput}
+            />
+            <button type="submit">Search</button>
+            {#if productSearch.trim()}
+                <button class="secondary" type="button" on:click={clearProductSearch}>Clear</button>
+            {/if}
+        </div>
+    </form>
+
+    <div class="storefront-actions">
+        <button class="checkout-link random-product-button" type="button" on:click={openRandomProduct}>
+            Random product
+        </button>
+    </div>
 </div>
 
 {#if products.length === 0}
-    <div class="state-card">No listed products are available right now.</div>
+    <div class="state-card">
+        {productSearch.trim()
+            ? 'No products match your search.'
+            : 'No listed products are available right now.'}
+    </div>
 {:else}
     <div class="product-grid">
         {#each products as product}
