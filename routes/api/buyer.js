@@ -18,6 +18,8 @@ const PAYMENT_METHODS = new Set([
     'demo_paypal',
     'cash_on_delivery'
 ]);
+const TAX_RATE = 0.07;
+const SERVICE_FEE_RATE = 0.05;
 
 function normalizeShippingAddress(input) {
     const shippingAddress = input && typeof input === 'object' ? input : {};
@@ -153,14 +155,16 @@ router.get('/cart', async (req, res) => {
             return sum + (item.product.price * item.quantity);
         }, 0);
 
-        const taxRate = 0.07;
-        const tax = Number((subtotal * taxRate).toFixed(2));
-        const total = Number((subtotal + tax).toFixed(2));
+        const serviceFee = Number((subtotal * SERVICE_FEE_RATE).toFixed(2));
+        const tax = Number((subtotal * TAX_RATE).toFixed(2));
+        const total = Number((subtotal + serviceFee + tax).toFixed(2));
 
         res.json({
             items: cartItems,
             subtotal: Number(subtotal.toFixed(2)),
-            taxRate,
+            serviceFeeRate: SERVICE_FEE_RATE,
+            serviceFee,
+            taxRate: TAX_RATE,
             tax,
             total
         });
@@ -410,7 +414,6 @@ router.post('/cart/:id/remove', async (req, res) => {
 
 router.post('/checkout', async (req, res) => {
     try {
-        const taxRate = 0.07;
         const paymentMethod = String(req.body.paymentMethod || '');
         const shippingAddress = normalizeShippingAddress(req.body.shippingAddress);
 
@@ -467,8 +470,9 @@ router.post('/checkout', async (req, res) => {
             const subtotal = Number(cartItems.reduce((sum, item) => {
                 return sum + (item.product.price * item.quantity);
             }, 0).toFixed(2));
-            const taxAmount = Number((subtotal * taxRate).toFixed(2));
-            const total = Number((subtotal + taxAmount).toFixed(2));
+            const serviceFeeAmount = Number((subtotal * SERVICE_FEE_RATE).toFixed(2));
+            const taxAmount = Number((subtotal * TAX_RATE).toFixed(2));
+            const total = Number((subtotal + serviceFeeAmount + taxAmount).toFixed(2));
 
             const order = await tx.order.create({
                 data: {
@@ -482,7 +486,9 @@ router.post('/checkout', async (req, res) => {
                     shipToPostalCode: shippingAddress.postalCode,
                     shipToCountry: shippingAddress.country,
                     subtotal,
-                    taxRate,
+                    serviceFeeRate: SERVICE_FEE_RATE,
+                    serviceFeeAmount,
+                    taxRate: TAX_RATE,
                     taxAmount,
                     total,
                     items: {

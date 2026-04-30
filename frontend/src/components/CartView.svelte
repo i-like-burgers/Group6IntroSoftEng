@@ -32,6 +32,8 @@
     <aside class="summary-panel">
         <p>Subtotal</p>
         <strong>{formatCurrency(cart.subtotal)}</strong>
+        <p>Service fee</p>
+        <strong>{formatCurrency(cart.serviceFee || 0)}</strong>
         <p>Estimated tax</p>
         <strong>{formatCurrency(cart.tax)}</strong>
         <p>Total</p>

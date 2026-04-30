@@ -2781,16 +2781,19 @@ function $o(e, t) {
 	var p = B(d, 4), m = z(p, !0);
 	k(p);
 	var h = B(p, 4), g = z(h, !0);
-	k(h), Le(2), k(u), k(a), V((e, t, n) => {
-		Q(f, e), Q(m, t), Q(g, n);
+	k(h);
+	var _ = B(h, 4), v = z(_, !0);
+	k(_), Le(2), k(u), k(a), V((e, t, n, r) => {
+		Q(f, e), Q(m, t), Q(g, n), Q(v, r);
 	}, [
 		() => (G(i()), G(n()), W(() => i()(n().subtotal))),
+		() => (G(i()), G(n()), W(() => i()(n().serviceFee || 0))),
 		() => (G(i()), G(n()), W(() => i()(n().tax))),
 		() => (G(i()), G(n()), W(() => i()(n().total)))
 	]), Z(e, a), $e();
 }
 var es, ts, ns, rs, is = e((() => {
-	to(), no(), Ja(), es = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty.</div>"), ts = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <button class=\"secondary\">Remove</button></div></article>"), ns = /* @__PURE__ */ X("<div class=\"list-grid\"></div>"), rs = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <a class=\"checkout-link\" href=\"/buyer/checkout\">Checkout</a></aside></div>");
+	to(), no(), Ja(), es = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty.</div>"), ts = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p> <button class=\"secondary\">Remove</button></div></article>"), ns = /* @__PURE__ */ X("<div class=\"list-grid\"></div>"), rs = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <a class=\"checkout-link\" href=\"/buyer/checkout\">Checkout</a></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/CheckoutView.svelte
@@ -2838,19 +2841,22 @@ function as(e, t) {
 	k(h);
 	var _ = B(h, 4), v = z(_, !0);
 	k(_);
-	var y = B(_, 4), b = z(y);
-	Le(2), k(y), k(f), k(s), V((e, t, r) => {
-		Q(m, e), Q(g, t), Q(v, r), b.disabled = (G(n()), W(() => n().items.length === 0));
+	var y = B(_, 4), b = z(y, !0);
+	k(y);
+	var x = B(y, 4), S = z(x);
+	Le(2), k(x), k(f), k(s), V((e, t, r, i) => {
+		Q(m, e), Q(g, t), Q(v, r), Q(b, i), S.disabled = (G(n()), W(() => n().items.length === 0));
 	}, [
 		() => (G(i()), G(n()), W(() => i()(n().subtotal))),
+		() => (G(i()), G(n()), W(() => i()(n().serviceFee || 0))),
 		() => (G(i()), G(n()), W(() => i()(n().tax))),
 		() => (G(i()), G(n()), W(() => i()(n().total)))
-	]), Y("click", b, function(...e) {
+	]), Y("click", S, function(...e) {
 		r()?.apply(this, e);
 	}), Z(e, s), $e();
 }
 var os, ss, cs, ls, us = e((() => {
-	to(), no(), Ja(), os = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty. Return to the storefront before checking out.</div>"), ss = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), cs = /* @__PURE__ */ X("<div class=\"checkout-stack\"><div class=\"shipping-panel\"><p class=\"section-kicker\">Shipping address</p> <div class=\"stack-form\"><label for=\"ship-name\">Full name</label> <input id=\"ship-name\" type=\"text\" required=\"\"/> <label for=\"ship-line1\">Address line 1</label> <input id=\"ship-line1\" type=\"text\" required=\"\"/> <label for=\"ship-line2\">Address line 2</label> <input id=\"ship-line2\" type=\"text\"/> <label for=\"ship-city\">City</label> <input id=\"ship-city\" type=\"text\" required=\"\"/> <label for=\"ship-state\">State / region</label> <input id=\"ship-state\" type=\"text\" required=\"\"/> <label for=\"ship-postal\">Postal code</label> <input id=\"ship-postal\" type=\"text\" required=\"\"/> <p class=\"field-hint\">Shipping currently supports United States addresses only.</p></div></div> <div class=\"list-grid\"></div></div>"), ls = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"payment-box\"><p class=\"payment-label\">Payment method</p> <div class=\"payment-choice selected\"><div><p class=\"payment-title\">Demo credit card ending in 4242</p></div></div> <div class=\"payment-choice payment-placeholder\" aria-disabled=\"true\"><span class=\"payment-plus\">+</span> <div><p class=\"payment-title\">Add another method</p> <p class=\"payment-copy\">Reserved for future cards and other payment options.</p></div></div></div> <div class=\"checkout-actions\"><button class=\"checkout-link place-order-button\">Place order</button> <a class=\"checkout-link secondary-link\" href=\"/buyer/cart\">Back to cart</a></div></aside></div>");
+	to(), no(), Ja(), os = /* @__PURE__ */ X("<div class=\"state-card\">Your cart is empty. Return to the storefront before checking out.</div>"), ss = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), cs = /* @__PURE__ */ X("<div class=\"checkout-stack\"><div class=\"shipping-panel\"><p class=\"section-kicker\">Shipping address</p> <div class=\"stack-form\"><label for=\"ship-name\">Full name</label> <input id=\"ship-name\" type=\"text\" required=\"\"/> <label for=\"ship-line1\">Address line 1</label> <input id=\"ship-line1\" type=\"text\" required=\"\"/> <label for=\"ship-line2\">Address line 2</label> <input id=\"ship-line2\" type=\"text\"/> <label for=\"ship-city\">City</label> <input id=\"ship-city\" type=\"text\" required=\"\"/> <label for=\"ship-state\">State / region</label> <input id=\"ship-state\" type=\"text\" required=\"\"/> <label for=\"ship-postal\">Postal code</label> <input id=\"ship-postal\" type=\"text\" required=\"\"/> <p class=\"field-hint\">Shipping currently supports United States addresses only.</p></div></div> <div class=\"list-grid\"></div></div>"), ls = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><!></div> <aside class=\"summary-panel\"><p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Estimated tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"payment-box\"><p class=\"payment-label\">Payment method</p> <div class=\"payment-choice selected\"><div><p class=\"payment-title\">Demo credit card ending in 4242</p></div></div> <div class=\"payment-choice payment-placeholder\" aria-disabled=\"true\"><span class=\"payment-plus\">+</span> <div><p class=\"payment-title\">Add another method</p> <p class=\"payment-copy\">Reserved for future cards and other payment options.</p></div></div></div> <div class=\"checkout-actions\"><button class=\"checkout-link place-order-button\">Place order</button> <a class=\"checkout-link secondary-link\" href=\"/buyer/cart\">Back to cart</a></div></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/CompareView.svelte
@@ -2931,18 +2937,21 @@ function gs(e, t) {
 	var re = B(T, 4), ie = z(re, !0);
 	k(re);
 	var D = B(re, 4), ae = z(D, !0);
-	k(D), Le(2), k(l), k(o), V((e, t, r, i, a) => {
-		Q(d, `#${(G(n()), W(() => n().id)) ?? ""}`), Q(p, (G(n()), W(() => n().status))), Q(h, e), Q(_, t), Q(y, (G(n()), W(() => n().shipToName))), Q(x, (G(n()), W(() => n().shipToLine1))), Q(te, `${(G(n()), W(() => n().shipToCity)) ?? ""}, ${(G(n()), W(() => n().shipToState)) ?? ""} ${(G(n()), W(() => n().shipToPostalCode)) ?? ""}`), Q(w, (G(n()), W(() => n().shipToCountry))), Q(E, r), Q(ie, i), Q(ae, a);
+	k(D);
+	var oe = B(D, 4), se = z(oe, !0);
+	k(oe), Le(2), k(l), k(o), V((e, t, r, i, a, o) => {
+		Q(d, `#${(G(n()), W(() => n().id)) ?? ""}`), Q(p, (G(n()), W(() => n().status))), Q(h, e), Q(_, t), Q(y, (G(n()), W(() => n().shipToName))), Q(x, (G(n()), W(() => n().shipToLine1))), Q(te, `${(G(n()), W(() => n().shipToCity)) ?? ""}, ${(G(n()), W(() => n().shipToState)) ?? ""} ${(G(n()), W(() => n().shipToPostalCode)) ?? ""}`), Q(w, (G(n()), W(() => n().shipToCountry))), Q(E, r), Q(ie, i), Q(ae, a), Q(se, o);
 	}, [
 		() => (G(a()), G(n()), W(() => a()(n().paymentMethod))),
 		() => (G(i()), G(n()), W(() => i()(n().createdAt))),
 		() => (G(r()), G(n()), W(() => r()(n().subtotal))),
+		() => (G(r()), G(n()), W(() => r()(n().serviceFeeAmount || 0))),
 		() => (G(r()), G(n()), W(() => r()(n().taxAmount))),
 		() => (G(r()), G(n()), W(() => r()(n().total)))
 	]), Z(e, o), $e();
 }
 var _s, vs, ys, bs = e((() => {
-	to(), no(), Ja(), _s = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), vs = /* @__PURE__ */ X("<strong> </strong>"), ys = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><div class=\"list-grid\"></div></div> <aside class=\"summary-panel\"><p>Order number</p> <strong> </strong> <p>Status</p> <strong> </strong> <p>Payment method</p> <strong> </strong> <p>Placed at</p> <strong> </strong> <p>Ship to</p> <strong> </strong> <strong> </strong> <!> <strong> </strong> <strong> </strong> <p>Subtotal</p> <strong> </strong> <p>Tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/buyer/home\">Continue shopping</a> <a class=\"checkout-link secondary-link\" href=\"/buyer/orders\">View order history</a></div></aside></div>");
+	to(), no(), Ja(), _s = /* @__PURE__ */ X("<article class=\"line-card\"><div><p class=\"seller\"> </p> <h3> </h3> <p class=\"description\"> </p></div> <div class=\"line-actions\"><p class=\"price\"> </p></div></article>"), vs = /* @__PURE__ */ X("<strong> </strong>"), ys = /* @__PURE__ */ X("<div class=\"cart-layout\"><div class=\"panel\"><div class=\"list-grid\"></div></div> <aside class=\"summary-panel\"><p>Order number</p> <strong> </strong> <p>Status</p> <strong> </strong> <p>Payment method</p> <strong> </strong> <p>Placed at</p> <strong> </strong> <p>Ship to</p> <strong> </strong> <strong> </strong> <!> <strong> </strong> <strong> </strong> <p>Subtotal</p> <strong> </strong> <p>Service fee</p> <strong> </strong> <p>Tax</p> <strong> </strong> <p>Total</p> <strong> </strong> <div class=\"checkout-actions\"><a class=\"checkout-link\" href=\"/buyer/home\">Continue shopping</a> <a class=\"checkout-link secondary-link\" href=\"/buyer/orders\">View order history</a></div></aside></div>");
 }));
 //#endregion
 //#region frontend/src/components/OrderHistoryView.svelte
@@ -3179,6 +3188,7 @@ function Ks(e, t) {
 	], i = new Set(r.map((e) => e.value)), a = /* @__PURE__ */ L("buyer"), o = /* @__PURE__ */ L("storefront"), s = /* @__PURE__ */ L([]), c = /* @__PURE__ */ L(""), l = /* @__PURE__ */ L(null), u = /* @__PURE__ */ L([]), d = /* @__PURE__ */ L({
 		items: [],
 		subtotal: 0,
+		serviceFee: 0,
 		tax: 0,
 		total: 0
 	}), f = /* @__PURE__ */ L(null), p = /* @__PURE__ */ L([]), m = /* @__PURE__ */ L({

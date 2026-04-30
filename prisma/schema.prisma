@@ -77,6 +77,8 @@ model Order {
   shipToPostalCode String
   shipToCountry String
   subtotal  Float
+  serviceFeeRate Float @default(0.05)
+  serviceFeeAmount Float @default(0)
   taxRate   Float
   taxAmount Float
   total     Float

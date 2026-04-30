@@ -264,8 +264,10 @@ describe('buyer api routes', () => {
         expect(response.status).toBe(200);
         expect(response.body.items).toHaveLength(2);
         expect(response.body.subtotal).toBe(369.97);
+        expect(response.body.serviceFeeRate).toBe(0.05);
+        expect(response.body.serviceFee).toBe(18.5);
         expect(response.body.tax).toBe(25.9);
-        expect(response.body.total).toBe(395.87);
+        expect(response.body.total).toBe(414.37);
     });
 
     test('GET /api/buyer/orders/:id returns an order for the current buyer', async () => {
@@ -549,6 +551,8 @@ describe('buyer api routes', () => {
                     shipToPostalCode: data.shipToPostalCode,
                     shipToCountry: data.shipToCountry,
                     subtotal: data.subtotal,
+                    serviceFeeRate: data.serviceFeeRate,
+                    serviceFeeAmount: data.serviceFeeAmount,
                     taxRate: data.taxRate,
                     taxAmount: data.taxAmount,
                     total: data.total,
@@ -603,7 +607,12 @@ describe('buyer api routes', () => {
                 shipToCity: 'Bismarck',
                 shipToState: 'ND',
                 shipToPostalCode: '58501',
-                shipToCountry: 'US'
+                shipToCountry: 'US',
+                serviceFeeRate: 0.05,
+                serviceFeeAmount: 9.95,
+                taxRate: 0.07,
+                taxAmount: 13.93,
+                total: 222.88
             })
         }));
         expect(webhookHandlers.deliverSellerOrderPlacedWebhooks).toHaveBeenCalledWith(

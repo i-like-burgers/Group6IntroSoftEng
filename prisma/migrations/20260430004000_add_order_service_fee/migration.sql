@@ -1,0 +1,3 @@
+ALTER TABLE `Order`
+    ADD COLUMN `serviceFeeRate` DOUBLE NOT NULL DEFAULT 0.05,
+    ADD COLUMN `serviceFeeAmount` DOUBLE NOT NULL DEFAULT 0;

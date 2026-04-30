@@ -44,6 +44,8 @@
         <strong>{order.shipToCountry}</strong>
         <p>Subtotal</p>
         <strong>{formatCurrency(order.subtotal)}</strong>
+        <p>Service fee</p>
+        <strong>{formatCurrency(order.serviceFeeAmount || 0)}</strong>
         <p>Tax</p>
         <strong>{formatCurrency(order.taxAmount)}</strong>
         <p>Total</p>
