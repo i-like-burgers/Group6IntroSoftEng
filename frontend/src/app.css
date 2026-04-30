@@ -1086,6 +1086,51 @@ textarea:focus-visible {
     color: var(--status-text);
 }
 
+.cart-toast-stack {
+    position: fixed;
+    top: 22px;
+    left: 50%;
+    z-index: 60;
+    transform: translateX(-50%);
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    width: min(380px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.cart-toast {
+    width: 100%;
+    min-width: min(340px, calc(100vw - 32px));
+    padding: 14px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--surface-strong);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    text-align: center;
+    font-weight: 700;
+    animation: toast-enter 0.18s ease-out;
+}
+
+.cart-toast.error {
+    border-color: var(--error-border);
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
+@keyframes toast-enter {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
 .state-card.error {
     color: var(--error-text);
     border-color: var(--error-border);

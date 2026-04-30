@@ -1,5 +1,5 @@
 <script>
-    import { onMount, tick } from 'svelte';
+    import { onDestroy, onMount, tick } from 'svelte';
     import AppHero from './components/AppHero.svelte';
     import CatalogHeader from './components/CatalogHeader.svelte';
     import AdminAuditView from './components/AdminAuditView.svelte';
@@ -88,6 +88,8 @@
     let loading = true;
     let errorMessage = '';
     let statusMessage = '';
+    let cartNotifications = [];
+    let cartNotificationTimers = new Map();
 
     $: pageContent = getPageContent(currentPage);
 
@@ -476,6 +478,28 @@
         await preserveScrollDuring(() => loadAdminModeration(nextPage, adminUsersPageInfo.search));
     }
 
+    function showCartNotification(message, type = 'success') {
+        const id = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random()}`;
+
+        cartNotifications = [
+            ...cartNotifications,
+            {
+                id,
+                message,
+                type
+            }
+        ];
+
+        const timer = setTimeout(() => {
+            cartNotifications = cartNotifications.filter((notification) => notification.id !== id);
+            cartNotificationTimers.delete(id);
+        }, 3200);
+
+        cartNotificationTimers.set(id, timer);
+    }
+
     async function addToCart(productId) {
         statusMessage = '';
 
@@ -492,8 +516,10 @@
             });
 
             statusMessage = 'Item added to cart.';
+            showCartNotification('Item added to cart.');
         } catch (error) {
             statusMessage = error.message || 'Could not add item to cart.';
+            showCartNotification(statusMessage, 'error');
         }
     }
 
@@ -601,6 +627,11 @@
         const storedTheme = typeof localStorage === 'undefined' ? null : localStorage.getItem('ram-theme');
         applyTheme(storedTheme || 'accessible');
         await loadCurrentPage();
+    });
+
+    onDestroy(() => {
+        cartNotificationTimers.forEach((timer) => clearTimeout(timer));
+        cartNotificationTimers.clear();
     });
 </script>
 
@@ -717,6 +748,16 @@
             <p class="status-banner">{statusMessage}</p>
         {/if}
     </section>
+
+    {#if cartNotifications.length > 0}
+        <div class="cart-toast-stack" aria-live="polite" aria-label="Cart notifications">
+            {#each cartNotifications as notification (notification.id)}
+                <div class="cart-toast" class:error={notification.type === 'error'} role="status">
+                    {notification.message}
+                </div>
+            {/each}
+        </div>
+    {/if}
 
     <div class="theme-dock">
         {#if themeMenuOpen}
