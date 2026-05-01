@@ -11,6 +11,11 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
             findMany: jest.fn(),
             create: jest.fn()
         },
+        orderItem: {
+            findMany: jest.fn(),
+            count: jest.fn(),
+            aggregate: jest.fn()
+        },
         authToken: {
             findUnique: jest.fn(),
             deleteMany: jest.fn()
@@ -109,6 +114,103 @@ describe('seller api routes', () => {
         const { app } = loadSellerApiApp({ role: 'buyer' });
 
         const response = await request(app).get('/api/seller/products');
+
+        expect(response.status).toBe(403);
+        expect(response.body).toEqual({ error: 'Access denied' });
+    });
+
+    test('GET /api/seller/sales returns sales and summary for authenticated sellers', async () => {
+        const sampleSales = [
+            {
+                id: 301,
+                productId: 201,
+                sellerId: 9,
+                productName: 'Samsung 990 Pro 2TB',
+                unitPrice: 179.99,
+                quantity: 2,
+                lineTotal: 359.98,
+                orderId: 88,
+                order: {
+                    id: 88,
+                    status: 'placed',
+                    paymentMethod: 'demo_card',
+                    createdAt: '2026-04-30T12:00:00.000Z'
+                }
+            }
+        ];
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.orderItem.findMany
+            .mockResolvedValueOnce(sampleSales)
+            .mockResolvedValueOnce([{ orderId: 88 }]);
+        prismaMock.orderItem.count.mockResolvedValue(1);
+        prismaMock.orderItem.aggregate.mockResolvedValue({
+            _sum: {
+                lineTotal: 359.98,
+                quantity: 2
+            },
+            _count: {
+                _all: 1
+            }
+        });
+
+        const response = await request(app).get('/api/seller/sales?page=1');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            sales: sampleSales,
+            summary: {
+                grossSales: 359.98,
+                unitsSold: 2,
+                orderItemCount: 1,
+                orderCount: 1
+            },
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            totalPages: 1,
+            hasPreviousPage: false,
+            hasNextPage: false
+        });
+        expect(prismaMock.orderItem.findMany).toHaveBeenNthCalledWith(1, {
+            where: {
+                sellerId: 9
+            },
+            include: {
+                order: {
+                    select: {
+                        id: true,
+                        status: true,
+                        paymentMethod: true,
+                        createdAt: true
+                    }
+                }
+            },
+            orderBy: {
+                order: {
+                    createdAt: 'desc'
+                }
+            },
+            skip: 0,
+            take: 10
+        });
+        expect(prismaMock.orderItem.aggregate).toHaveBeenCalledWith({
+            where: {
+                sellerId: 9
+            },
+            _sum: {
+                lineTotal: true,
+                quantity: true
+            },
+            _count: {
+                _all: true
+            }
+        });
+    });
+
+    test('GET /api/seller/sales rejects non-seller users', async () => {
+        const { app } = loadSellerApiApp({ role: 'buyer' });
+
+        const response = await request(app).get('/api/seller/sales');
 
         expect(response.status).toBe(403);
         expect(response.body).toEqual({ error: 'Access denied' });

@@ -13,6 +13,7 @@
         </p>
         <div class="checkout-actions">
             <a class="checkout-link" href="/seller/inventory">Open inventory</a>
+            <a class="checkout-link secondary-link" href="/seller/sales">View sales</a>
         </div>
     </article>
 

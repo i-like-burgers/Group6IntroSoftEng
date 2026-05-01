@@ -138,6 +138,76 @@ router.get('/products', async (req, res) => {
     }
 });
 
+router.get('/sales', async (req, res) => {
+    try {
+        const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+        const pageSize = 10;
+        const where = {
+            sellerId: req.user.id
+        };
+
+        const [sales, totalCount, totals, uniqueOrders] = await Promise.all([
+            prisma.orderItem.findMany({
+                where,
+                include: {
+                    order: {
+                        select: {
+                            id: true,
+                            status: true,
+                            paymentMethod: true,
+                            createdAt: true
+                        }
+                    }
+                },
+                orderBy: {
+                    order: {
+                        createdAt: 'desc'
+                    }
+                },
+                skip: (page - 1) * pageSize,
+                take: pageSize
+            }),
+            prisma.orderItem.count({ where }),
+            prisma.orderItem.aggregate({
+                where,
+                _sum: {
+                    lineTotal: true,
+                    quantity: true
+                },
+                _count: {
+                    _all: true
+                }
+            }),
+            prisma.orderItem.findMany({
+                where,
+                distinct: ['orderId'],
+                select: {
+                    orderId: true
+                }
+            })
+        ]);
+
+        res.json({
+            sales,
+            summary: {
+                grossSales: Number((totals._sum.lineTotal || 0).toFixed(2)),
+                unitsSold: totals._sum.quantity || 0,
+                orderItemCount: totals._count._all || 0,
+                orderCount: uniqueOrders.length
+            },
+            page,
+            pageSize,
+            totalCount,
+            totalPages: Math.max(Math.ceil(totalCount / pageSize), 1),
+            hasPreviousPage: page > 1,
+            hasNextPage: page * pageSize < totalCount
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load seller sales' });
+    }
+});
+
 router.post('/products', async (req, res) => {
     let imageUrl = DEFAULT_PRODUCT_IMAGE_URL;
 

@@ -21,6 +21,14 @@ router.get("/inventory",
     }
 );
 
+router.get("/sales",
+    auth.authenticateToken,
+    requireRole("seller"),
+    (req, res) => {
+        res.sendFile(path.join(__dirname, "../seller/sellerApp.html"));
+    }
+);
+
 router.get("/classic/home",
     auth.authenticateToken,
     requireRole("seller"),

@@ -24,6 +24,11 @@ export const PAGE_CONTENT = {
         kicker: 'Inventory management',
         heading: 'Your listings'
     },
+    'seller-sales': {
+        title: 'Seller Sales',
+        kicker: 'Sales records',
+        heading: 'Sales dashboard'
+    },
     cart: {
         title: 'Buyer Cart',
         kicker: 'Cart summary',
@@ -69,7 +74,8 @@ export const NAV_LINKS = {
     ],
     seller: [
         { href: '/seller/home', label: 'Seller Home' },
-        { href: '/seller/inventory', label: 'Inventory' }
+        { href: '/seller/inventory', label: 'Inventory' },
+        { href: '/seller/sales', label: 'Sales' }
     ],
     buyer: [
         { href: '/buyer/home', label: 'Storefront' },
@@ -120,6 +126,10 @@ export function detectPage(path = getPath()) {
 
     if (path === '/seller/inventory') {
         return 'seller-inventory';
+    }
+
+    if (path === '/seller/sales') {
+        return 'seller-sales';
     }
 
     if (path === '/buyer/cart') {

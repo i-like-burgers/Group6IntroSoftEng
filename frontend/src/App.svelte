@@ -13,6 +13,7 @@
     import ProductDetailView from './components/ProductDetailView.svelte';
     import SellerHomeView from './components/SellerHomeView.svelte';
     import SellerInventoryView from './components/SellerInventoryView.svelte';
+    import SellerSalesView from './components/SellerSalesView.svelte';
     import StorefrontView from './components/StorefrontView.svelte';
     import {
         capitalizeRole,
@@ -65,6 +66,18 @@
         hasNextPage: false
     };
     let sellerProducts = [];
+    let sellerSales = [];
+    let sellerSalesSummary = {
+        grossSales: 0,
+        unitsSold: 0,
+        orderCount: 0
+    };
+    let sellerSalesPageInfo = {
+        page: 1,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false
+    };
     let sellerWebhook = {
         endpointUrl: '',
         signingSecret: '',
@@ -254,6 +267,32 @@
         }
     }
 
+    async function loadSellerSales(page = 1) {
+        loading = true;
+        errorMessage = '';
+        statusMessage = '';
+
+        try {
+            const response = await fetchJson(`/api/seller/sales?page=${page}`);
+            sellerSales = response.sales || [];
+            sellerSalesSummary = response.summary || {
+                grossSales: 0,
+                unitsSold: 0,
+                orderCount: 0
+            };
+            sellerSalesPageInfo = {
+                page: response.page,
+                totalPages: response.totalPages,
+                hasPreviousPage: response.hasPreviousPage,
+                hasNextPage: response.hasNextPage
+            };
+        } catch (error) {
+            errorMessage = error.message || 'Could not load seller sales.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadAdminAuditLogs() {
         loading = true;
         errorMessage = '';
@@ -360,6 +399,11 @@
 
         if (currentPage === 'seller-inventory') {
             await loadSellerProducts();
+            return;
+        }
+
+        if (currentPage === 'seller-sales') {
+            await loadSellerSales();
             return;
         }
 
@@ -647,6 +691,14 @@
         await preserveScrollDuring(() => loadOrderHistory(nextPage));
     }
 
+    async function goToSellerSalesPage(nextPage) {
+        if (nextPage < 1 || nextPage > sellerSalesPageInfo.totalPages) {
+            return;
+        }
+
+        await preserveScrollDuring(() => loadSellerSales(nextPage));
+    }
+
     function showCartNotification(message, type = 'success') {
         const id = typeof crypto !== 'undefined' && crypto.randomUUID
             ? crypto.randomUUID()
@@ -871,6 +923,16 @@
                 onSellerFormInput={updateSellerForm}
                 onSellerImageInput={updateSellerImage}
                 {formatCurrency}
+            />
+        {:else if currentPage === 'seller-sales'}
+            <SellerSalesView
+                sales={sellerSales}
+                summary={sellerSalesSummary}
+                pageInfo={sellerSalesPageInfo}
+                {goToSellerSalesPage}
+                {formatCurrency}
+                {formatDate}
+                {formatPaymentMethod}
             />
         {:else if currentPage === 'product' && product}
             <ProductDetailView
