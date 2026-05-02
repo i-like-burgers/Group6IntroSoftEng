@@ -78,6 +78,22 @@
         hasPreviousPage: false,
         hasNextPage: false
     };
+    let sellerWallet = {
+        balance: 0,
+        totalEarned: 0
+    };
+    let sellerBankAccount = null;
+    let sellerPayouts = [];
+    let sellerBankForm = {
+        accountHolder: '',
+        bankName: '',
+        routingNumber: '',
+        accountNumber: ''
+    };
+    let sellerPayoutForm = {
+        amount: '',
+        note: ''
+    };
     let sellerWebhook = {
         endpointUrl: '',
         signingSecret: '',
@@ -267,6 +283,51 @@
         }
     }
 
+    function applySellerWalletResponse(response) {
+        sellerWallet = {
+            balance: response.wallet?.balance || 0,
+            totalEarned: response.wallet?.totalEarned || 0
+        };
+        sellerBankAccount = response.bankAccount || null;
+        sellerPayouts = response.payouts || [];
+    }
+
+    async function loadSellerWallet() {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            applySellerWalletResponse(await fetchJson('/api/seller/wallet'));
+        } catch (error) {
+            errorMessage = error.message || 'Could not load seller wallet.';
+        } finally {
+            loading = false;
+        }
+    }
+
+    async function loadSellerHome() {
+        loading = true;
+        errorMessage = '';
+
+        try {
+            const [webhookConfig, walletResponse] = await Promise.all([
+                fetchJson('/api/seller/webhook'),
+                fetchJson('/api/seller/wallet')
+            ]);
+
+            sellerWebhook = {
+                endpointUrl: webhookConfig.endpointUrl || '',
+                signingSecret: webhookConfig.signingSecret || '',
+                isActive: Boolean(webhookConfig.isActive)
+            };
+            applySellerWalletResponse(walletResponse);
+        } catch (error) {
+            errorMessage = error.message || 'Could not load seller dashboard.';
+        } finally {
+            loading = false;
+        }
+    }
+
     async function loadSellerSales(page = 1) {
         loading = true;
         errorMessage = '';
@@ -383,7 +444,7 @@
         }
 
         if (currentPage === 'seller-home') {
-            await loadSellerWebhook();
+            await loadSellerHome();
             return;
         }
 
@@ -456,6 +517,20 @@
         sellerWebhook = {
             ...sellerWebhook,
             [field]: field === 'isActive' ? event.currentTarget.checked : event.currentTarget.value
+        };
+    }
+
+    function updateSellerBankForm(field, event) {
+        sellerBankForm = {
+            ...sellerBankForm,
+            [field]: event.currentTarget.value
+        };
+    }
+
+    function updateSellerPayoutForm(field, event) {
+        sellerPayoutForm = {
+            ...sellerPayoutForm,
+            [field]: event.currentTarget.value
         };
     }
 
@@ -584,6 +659,56 @@
             statusMessage = 'Webhook setup saved.';
         } catch (error) {
             statusMessage = error.message || 'Could not save webhook setup.';
+        }
+    }
+
+    async function saveSellerBankAccount() {
+        statusMessage = '';
+
+        try {
+            sellerBankAccount = await fetchJson('/api/seller/wallet/bank-account', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sellerBankForm)
+            });
+            sellerBankForm = {
+                accountHolder: '',
+                bankName: '',
+                routingNumber: '',
+                accountNumber: ''
+            };
+            statusMessage = 'Mock bank details saved.';
+        } catch (error) {
+            statusMessage = error.message || 'Could not save mock bank details.';
+        }
+    }
+
+    async function createSellerPayout() {
+        statusMessage = '';
+
+        try {
+            const result = await fetchJson('/api/seller/wallet/payouts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sellerPayoutForm)
+            });
+
+            sellerWallet = {
+                balance: result.wallet?.balance || 0,
+                totalEarned: result.wallet?.totalEarned || sellerWallet.totalEarned
+            };
+            sellerPayoutForm = {
+                amount: '',
+                note: ''
+            };
+            statusMessage = 'Mock payout sent.';
+            await loadSellerWallet();
+        } catch (error) {
+            statusMessage = error.message || 'Could not send mock payout.';
         }
     }
 
@@ -910,9 +1035,20 @@
             />
         {:else if currentPage === 'seller-home'}
             <SellerHomeView
+                {sellerWallet}
+                {sellerBankAccount}
+                {sellerPayouts}
+                {sellerBankForm}
+                {sellerPayoutForm}
                 {sellerWebhook}
+                onSellerBankInput={updateSellerBankForm}
+                onSellerPayoutInput={updateSellerPayoutForm}
                 onSellerWebhookInput={updateSellerWebhook}
+                {saveSellerBankAccount}
+                {createSellerPayout}
                 {saveSellerWebhook}
+                {formatCurrency}
+                {formatDate}
             />
         {:else if currentPage === 'seller-inventory'}
             <SellerInventoryView

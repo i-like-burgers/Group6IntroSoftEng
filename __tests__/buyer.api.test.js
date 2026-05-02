@@ -561,13 +561,21 @@ describe('buyer api routes', () => {
                         {
                             sellerId: 9,
                             productName: 'Warehouse Keyboard',
-                            quantity: 2
+                            quantity: 2,
+                            lineTotal: 199
                         }
                     ]
                 }))
             },
             product: {
                 updateMany: jest.fn().mockResolvedValue({ count: 1 })
+            },
+            sellerWallet: {
+                upsert: jest.fn().mockResolvedValue({
+                    sellerId: 9,
+                    balance: 199,
+                    totalEarned: 199
+                })
             },
             cartItemDeleteMany: jest.fn(),
             auditLog: {
@@ -621,6 +629,24 @@ describe('buyer api routes', () => {
                 shipToName: 'Ada Lovelace'
             })
         );
+        expect(txMock.sellerWallet.upsert).toHaveBeenCalledWith({
+            where: {
+                sellerId: 9
+            },
+            create: {
+                sellerId: 9,
+                balance: 199,
+                totalEarned: 199
+            },
+            update: {
+                balance: {
+                    increment: 199
+                },
+                totalEarned: {
+                    increment: 199
+                }
+            }
+        });
         expect(prismaMock.$transaction).toHaveBeenCalled();
     });
 });

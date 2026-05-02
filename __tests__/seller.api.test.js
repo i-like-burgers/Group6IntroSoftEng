@@ -16,6 +16,19 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
             count: jest.fn(),
             aggregate: jest.fn()
         },
+        sellerWallet: {
+            upsert: jest.fn(),
+            update: jest.fn()
+        },
+        sellerBankAccount: {
+            findUnique: jest.fn(),
+            upsert: jest.fn()
+        },
+        sellerPayout: {
+            findMany: jest.fn(),
+            create: jest.fn(),
+            aggregate: jest.fn()
+        },
         authToken: {
             findUnique: jest.fn(),
             deleteMany: jest.fn()
@@ -30,6 +43,21 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
         },
         ...prismaOverrides
     };
+    prismaMock.$transaction = prismaMock.$transaction || jest.fn(async (handler) => handler(prismaMock));
+    prismaMock.orderItem.aggregate.mockResolvedValue({
+        _sum: {
+            lineTotal: null,
+            quantity: null
+        },
+        _count: {
+            _all: 0
+        }
+    });
+    prismaMock.sellerPayout.aggregate.mockResolvedValue({
+        _sum: {
+            amount: null
+        }
+    });
 
     jest.doMock('../lib/prisma', () => prismaMock);
     jest.doMock('../authenticate', () => ({
@@ -362,6 +390,183 @@ describe('seller api routes', () => {
             endpointUrl: 'https://warehouse.example.test/order-hook',
             isActive: true,
             regenerateSecret: true
+        });
+    });
+
+    test('GET /api/seller/wallet returns wallet, bank, and recent payouts', async () => {
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.orderItem.aggregate.mockResolvedValue({
+            _sum: {
+                lineTotal: 200
+            }
+        });
+        prismaMock.sellerPayout.aggregate.mockResolvedValue({
+            _sum: {
+                amount: 74.5
+            }
+        });
+        prismaMock.sellerWallet.upsert.mockResolvedValue({
+            sellerId: 9,
+            balance: 125.5,
+            totalEarned: 200
+        });
+        prismaMock.sellerBankAccount.findUnique.mockResolvedValue({
+            sellerId: 9,
+            accountHolder: 'Seller User',
+            bankName: 'Demo National Bank',
+            routingLast4: '1100',
+            accountLast4: '6789'
+        });
+        prismaMock.sellerPayout.findMany.mockResolvedValue([
+            {
+                id: 1,
+                sellerId: 9,
+                amount: 50,
+                status: 'paid'
+            }
+        ]);
+
+        const response = await request(app).get('/api/seller/wallet');
+
+        expect(response.status).toBe(200);
+        expect(response.body.wallet).toEqual({
+            sellerId: 9,
+            balance: 125.5,
+            totalEarned: 200
+        });
+        expect(response.body.bankAccount.accountLast4).toBe('6789');
+        expect(response.body.payouts).toHaveLength(1);
+        expect(prismaMock.sellerWallet.upsert).toHaveBeenCalledWith({
+            where: {
+                sellerId: 9
+            },
+            create: {
+                sellerId: 9,
+                balance: 125.5,
+                totalEarned: 200
+            },
+            update: {
+                balance: 125.5,
+                totalEarned: 200
+            }
+        });
+    });
+
+    test('PUT /api/seller/wallet/bank-account saves mock bank details as last-four values', async () => {
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.sellerBankAccount.upsert.mockResolvedValue({
+            sellerId: 9,
+            accountHolder: 'Seller User',
+            bankName: 'Demo National Bank',
+            routingLast4: '1100',
+            accountLast4: '6789'
+        });
+
+        const response = await request(app)
+            .put('/api/seller/wallet/bank-account')
+            .send({
+                accountHolder: 'Seller User',
+                bankName: 'Demo National Bank',
+                routingNumber: '021000021100',
+                accountNumber: '123456789'
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            sellerId: 9,
+            accountHolder: 'Seller User',
+            bankName: 'Demo National Bank',
+            routingLast4: '1100',
+            accountLast4: '6789'
+        });
+        expect(prismaMock.sellerBankAccount.upsert).toHaveBeenCalledWith({
+            where: {
+                sellerId: 9
+            },
+            create: {
+                sellerId: 9,
+                accountHolder: 'Seller User',
+                bankName: 'Demo National Bank',
+                routingLast4: '1100',
+                accountLast4: '6789'
+            },
+            update: {
+                accountHolder: 'Seller User',
+                bankName: 'Demo National Bank',
+                routingLast4: '1100',
+                accountLast4: '6789'
+            }
+        });
+    });
+
+    test('POST /api/seller/wallet/payouts requires saved mock bank details', async () => {
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.sellerBankAccount.findUnique.mockResolvedValue(null);
+
+        const response = await request(app)
+            .post('/api/seller/wallet/payouts')
+            .send({ amount: 25 });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'Save mock bank details before requesting a payout'
+        });
+    });
+
+    test('POST /api/seller/wallet/payouts withdraws from wallet balance', async () => {
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.sellerBankAccount.findUnique.mockResolvedValue({
+            sellerId: 9,
+            bankName: 'Demo National Bank',
+            accountLast4: '6789'
+        });
+        prismaMock.orderItem.aggregate.mockResolvedValue({
+            _sum: {
+                lineTotal: 200
+            }
+        });
+        prismaMock.sellerPayout.aggregate.mockResolvedValue({
+            _sum: {
+                amount: 74.5
+            }
+        });
+        prismaMock.sellerWallet.upsert.mockResolvedValue({
+            sellerId: 9,
+            balance: 125.5,
+            totalEarned: 200
+        });
+        prismaMock.sellerWallet.update.mockResolvedValue({
+            sellerId: 9,
+            balance: 75.5,
+            totalEarned: 200
+        });
+        prismaMock.sellerPayout.create.mockResolvedValue({
+            id: 5,
+            sellerId: 9,
+            amount: 50,
+            status: 'paid',
+            note: 'April withdrawal'
+        });
+
+        const response = await request(app)
+            .post('/api/seller/wallet/payouts')
+            .send({
+                amount: 50,
+                note: 'April withdrawal'
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body.wallet.balance).toBe(75.5);
+        expect(response.body.payout.amount).toBe(50);
+        expect(prismaMock.sellerWallet.update).toHaveBeenCalledWith({
+            where: {
+                sellerId: 9
+            },
+            data: {
+                balance: {
+                    decrement: 50
+                }
+            }
         });
     });
 });

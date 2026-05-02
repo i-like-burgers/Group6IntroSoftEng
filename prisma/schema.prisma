@@ -31,6 +31,9 @@ model User {
   comparison Compare[]
   authTokens AuthToken[]
   sellerWebhookSubscription SellerWebhookSubscription?
+  sellerWallet SellerWallet?
+  sellerBankAccount SellerBankAccount?
+  sellerPayouts SellerPayout[] @relation("SellerPayouts")
 }
 
 model Product {
@@ -100,6 +103,41 @@ model SellerWebhookSubscription {
 
   sellerId      Int      @unique
   seller        User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+}
+
+model SellerWallet {
+  id          Int      @id @default(autoincrement())
+  balance     Float    @default(0)
+  totalEarned Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sellerId    Int      @unique
+  seller      User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+}
+
+model SellerBankAccount {
+  id            Int      @id @default(autoincrement())
+  accountHolder String
+  bankName      String
+  routingLast4  String
+  accountLast4  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sellerId      Int      @unique
+  seller        User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+}
+
+model SellerPayout {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  status    String   @default("paid")
+  note      String?
+  createdAt DateTime @default(now())
+
+  sellerId  Int
+  seller    User     @relation("SellerPayouts", fields: [sellerId], references: [id], onDelete: Cascade)
 }
 
 model OrderItem {

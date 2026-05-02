@@ -21,6 +21,51 @@ const PRODUCT_IMAGE_MIME_EXTENSIONS = {
     'image/png': 'png'
 };
 
+function normalizeMoneyAmount(value) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount)) {
+        return null;
+    }
+
+    return Number(amount.toFixed(2));
+}
+
+function getLastFourDigits(value) {
+    const digits = String(value || '').replace(/\D/g, '');
+    return digits.length >= 4 ? digits.slice(-4) : null;
+}
+
+async function syncSellerWallet(client, sellerId) {
+    const [salesTotal, payoutTotal] = await Promise.all([
+        client.orderItem.aggregate({
+            where: { sellerId },
+            _sum: { lineTotal: true }
+        }),
+        client.sellerPayout.aggregate({
+            where: { sellerId },
+            _sum: { amount: true }
+        })
+    ]);
+
+    const totalEarned = Number((salesTotal._sum.lineTotal || 0).toFixed(2));
+    const totalPaidOut = Number((payoutTotal._sum.amount || 0).toFixed(2));
+    const balance = Math.max(Number((totalEarned - totalPaidOut).toFixed(2)), 0);
+
+    return client.sellerWallet.upsert({
+        where: { sellerId },
+        create: {
+            sellerId,
+            balance,
+            totalEarned
+        },
+        update: {
+            balance,
+            totalEarned
+        }
+    });
+}
+
 async function saveProductImage({ imageDataUrl, sellerId }) {
     if (!imageDataUrl) {
         return DEFAULT_PRODUCT_IMAGE_URL;
@@ -119,6 +164,145 @@ router.put('/webhook', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to save seller webhook configuration' });
+    }
+});
+
+router.get('/wallet', async (req, res) => {
+    try {
+        const [wallet, bankAccount, payouts] = await Promise.all([
+            syncSellerWallet(prisma, req.user.id),
+            prisma.sellerBankAccount.findUnique({
+                where: {
+                    sellerId: req.user.id
+                }
+            }),
+            prisma.sellerPayout.findMany({
+                where: {
+                    sellerId: req.user.id
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: 5
+            })
+        ]);
+
+        res.json({
+            wallet,
+            bankAccount,
+            payouts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load seller wallet' });
+    }
+});
+
+router.put('/wallet/bank-account', async (req, res) => {
+    try {
+        const accountHolder = String(req.body.accountHolder || '').trim();
+        const bankName = String(req.body.bankName || '').trim();
+        const routingLast4 = getLastFourDigits(req.body.routingNumber);
+        const accountLast4 = getLastFourDigits(req.body.accountNumber);
+
+        if (!accountHolder || !bankName || !routingLast4 || !accountLast4) {
+            return res.status(400).json({ error: 'Complete mock bank details are required' });
+        }
+
+        const bankAccount = await prisma.sellerBankAccount.upsert({
+            where: {
+                sellerId: req.user.id
+            },
+            create: {
+                sellerId: req.user.id,
+                accountHolder,
+                bankName,
+                routingLast4,
+                accountLast4
+            },
+            update: {
+                accountHolder,
+                bankName,
+                routingLast4,
+                accountLast4
+            }
+        });
+
+        res.json(bankAccount);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to save mock bank details' });
+    }
+});
+
+router.post('/wallet/payouts', async (req, res) => {
+    try {
+        const payoutAmount = normalizeMoneyAmount(req.body.amount);
+        const note = req.body.note == null ? null : String(req.body.note).trim();
+
+        if (payoutAmount == null || payoutAmount <= 0) {
+            return res.status(400).json({ error: 'A positive payout amount is required' });
+        }
+
+        if (note && note.length > 120) {
+            return res.status(400).json({ error: 'Payout note must be 120 characters or fewer' });
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
+            const bankAccount = await tx.sellerBankAccount.findUnique({
+                where: {
+                    sellerId: req.user.id
+                }
+            });
+
+            if (!bankAccount) {
+                const error = new Error('Save mock bank details before requesting a payout');
+                error.statusCode = 400;
+                throw error;
+            }
+
+            const wallet = await syncSellerWallet(tx, req.user.id);
+
+            if (wallet.balance < payoutAmount) {
+                const error = new Error('Payout amount exceeds wallet balance');
+                error.statusCode = 400;
+                throw error;
+            }
+
+            const updatedWallet = await tx.sellerWallet.update({
+                where: {
+                    sellerId: req.user.id
+                },
+                data: {
+                    balance: {
+                        decrement: payoutAmount
+                    }
+                }
+            });
+
+            const payout = await tx.sellerPayout.create({
+                data: {
+                    sellerId: req.user.id,
+                    amount: payoutAmount,
+                    status: 'paid',
+                    note: note || `Mock payout to ${bankAccount.bankName} account ending ${bankAccount.accountLast4}`
+                }
+            });
+
+            return {
+                wallet: updatedWallet,
+                payout
+            };
+        });
+
+        res.status(201).json(result);
+    } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
+
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create seller payout' });
     }
 });
 

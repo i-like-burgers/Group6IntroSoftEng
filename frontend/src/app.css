@@ -785,6 +785,58 @@ textarea:focus-visible {
     gap: 2px;
 }
 
+.seller-wallet-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.seller-wallet-metrics div,
+.seller-payout-row {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.seller-wallet-metrics p,
+.seller-wallet-metrics strong,
+.seller-payout-row p {
+    margin: 0;
+}
+
+.seller-wallet-metrics strong {
+    display: block;
+    margin-top: 4px;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    word-break: break-word;
+}
+
+.bank-form,
+.payout-form {
+    margin-top: 16px;
+}
+
+.seller-bank-summary {
+    margin: 12px 0 0;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.seller-payout-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.seller-payout-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .checkbox-row {
     display: flex;
     align-items: center;
@@ -1435,7 +1487,8 @@ textarea:focus-visible {
 
     .line-card,
     .detail-layout,
-    .detail-meta {
+    .detail-meta,
+    .seller-payout-row {
         flex-direction: column;
         align-items: flex-start;
     }

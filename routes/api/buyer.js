@@ -43,6 +43,20 @@ function isShippingAddressComplete(shippingAddress) {
         && shippingAddress.postalCode;
 }
 
+function buildSellerCredits(orderItems) {
+    const creditsBySeller = new Map();
+
+    orderItems.forEach((item) => {
+        const currentAmount = creditsBySeller.get(item.sellerId) || 0;
+        creditsBySeller.set(item.sellerId, Number((currentAmount + item.lineTotal).toFixed(2)));
+    });
+
+    return [...creditsBySeller.entries()].map(([sellerId, amount]) => ({
+        sellerId,
+        amount
+    }));
+}
+
 router.use(auth.authenticateToken, requireRole('buyer'));
 
 router.get('/products', async (req, res) => {
@@ -533,6 +547,28 @@ router.post('/checkout', async (req, res) => {
                     },
                     data: {
                         isListed: false
+                    }
+                });
+            }
+
+            const sellerCredits = buildSellerCredits(order.items);
+            for (const credit of sellerCredits) {
+                await tx.sellerWallet.upsert({
+                    where: {
+                        sellerId: credit.sellerId
+                    },
+                    create: {
+                        sellerId: credit.sellerId,
+                        balance: credit.amount,
+                        totalEarned: credit.amount
+                    },
+                    update: {
+                        balance: {
+                            increment: credit.amount
+                        },
+                        totalEarned: {
+                            increment: credit.amount
+                        }
                     }
                 });
             }
