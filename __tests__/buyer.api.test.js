@@ -277,6 +277,7 @@ describe('buyer api routes', () => {
             buyerId: 7,
             status: 'placed',
             paymentMethod: 'demo_card',
+            createdAt: '2026-04-30T12:00:00.000Z',
             items: [
                 {
                     id: 1,
@@ -289,19 +290,27 @@ describe('buyer api routes', () => {
         const response = await request(app).get('/api/buyer/orders/701');
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({
+        expect(response.body).toEqual(expect.objectContaining({
             id: 701,
             buyerId: 7,
             status: 'placed',
             paymentMethod: 'demo_card',
+            createdAt: '2026-04-30T12:00:00.000Z',
             items: [
                 {
                     id: 1,
                     productName: 'WD Black SN850X 2TB',
                     quantity: 1
                 }
-            ]
-        });
+            ],
+            tracking: expect.objectContaining({
+                trackingNumber: 'TRK-00000701',
+                shippingMethod: expect.any(String),
+                statusLabel: expect.any(String),
+                estimatedDeliveryAt: expect.any(String),
+                events: expect.any(Array)
+            })
+        }));
     });
 
     test('GET /api/buyer/orders returns paginated order history for the current buyer', async () => {
@@ -322,7 +331,16 @@ describe('buyer api routes', () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
-            orders,
+            orders: [
+                expect.objectContaining({
+                    id: 702,
+                    tracking: expect.objectContaining({
+                        trackingNumber: 'TRK-00000702',
+                        shippingMethod: expect.any(String),
+                        statusLabel: expect.any(String)
+                    })
+                })
+            ],
             page: 2,
             pageSize: 10,
             totalCount: 12,
@@ -607,6 +625,12 @@ describe('buyer api routes', () => {
 
         expect(response.status).toBe(201);
         expect(response.body.order.shipToName).toBe('Ada Lovelace');
+        expect(response.body.order.tracking).toEqual(expect.objectContaining({
+            trackingNumber: 'TRK-00000901',
+            shippingMethod: expect.any(String),
+            statusLabel: expect.any(String),
+            estimatedDeliveryAt: expect.any(String)
+        }));
         expect(txMock.order.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({
                 shipToName: 'Ada Lovelace',

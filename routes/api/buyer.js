@@ -20,6 +20,11 @@ const PAYMENT_METHODS = new Set([
 ]);
 const TAX_RATE = 0.07;
 const SERVICE_FEE_RATE = 0.05;
+const MOCK_SHIPPING_METHODS = [
+    'Ground',
+    'Priority',
+    'Freight'
+];
 
 function normalizeShippingAddress(input) {
     const shippingAddress = input && typeof input === 'object' ? input : {};
@@ -55,6 +60,119 @@ function buildSellerCredits(orderItems) {
         sellerId,
         amount
     }));
+}
+
+function addDays(date, days) {
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + days);
+    return nextDate;
+}
+
+function addSeconds(date, seconds) {
+    const nextDate = new Date(date);
+    nextDate.setSeconds(nextDate.getSeconds() + seconds);
+    return nextDate;
+}
+
+function getTrackingStage(createdAt, status) {
+    const normalizedStatus = String(status || '').toLowerCase();
+
+    if (normalizedStatus === 'cancelled' || normalizedStatus === 'canceled') {
+        return 'cancelled';
+    }
+
+    if (normalizedStatus === 'delivered' || normalizedStatus === 'completed') {
+        return 'delivered';
+    }
+
+    const placedAt = new Date(createdAt);
+    const ageSeconds = (Date.now() - placedAt.getTime()) / 1000;
+
+    if (ageSeconds >= 60) return 'delivered';
+    if (ageSeconds >= 30) return 'in_transit';
+    if (ageSeconds >= 10) return 'shipped';
+    return 'processing';
+}
+
+function getTrackingLabel(stage) {
+    const labels = {
+        processing: 'Processing',
+        shipped: 'Shipped',
+        in_transit: 'In transit',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled'
+    };
+
+    return labels[stage] || 'Processing';
+}
+
+function buildTrackingEvents(order, stage) {
+    const placedAt = new Date(order.createdAt);
+    const events = [
+        {
+            status: 'processing',
+            label: 'Order placed',
+            description: 'Order received and queued for fulfillment.',
+            occurredAt: placedAt.toISOString()
+        }
+    ];
+
+    if (['shipped', 'in_transit', 'delivered'].includes(stage)) {
+        events.push({
+            status: 'shipped',
+            label: 'Package shipped',
+            description: 'Package left the fulfillment facility.',
+            occurredAt: addSeconds(placedAt, 10).toISOString()
+        });
+    }
+
+    if (['in_transit', 'delivered'].includes(stage)) {
+        events.push({
+            status: 'in_transit',
+            label: 'In transit',
+            description: 'Package is moving through the carrier network.',
+            occurredAt: addSeconds(placedAt, 30).toISOString()
+        });
+    }
+
+    if (stage === 'delivered') {
+        events.push({
+            status: 'delivered',
+            label: 'Delivered',
+            description: 'Package marked delivered at the shipping destination.',
+            occurredAt: addSeconds(placedAt, 60).toISOString()
+        });
+    }
+
+    if (stage === 'cancelled') {
+        events.push({
+            status: 'cancelled',
+            label: 'Order cancelled',
+            description: 'Tracking stopped because the order was cancelled.',
+            occurredAt: placedAt.toISOString()
+        });
+    }
+
+    return events;
+}
+
+function withMockTracking(order) {
+    const stage = getTrackingStage(order.createdAt, order.status);
+    const placedAt = new Date(order.createdAt);
+    const events = buildTrackingEvents(order, stage);
+
+    return {
+        ...order,
+        tracking: {
+            trackingNumber: `TRK-${String(order.id).padStart(8, '0')}`,
+            shippingMethod: MOCK_SHIPPING_METHODS[order.id % MOCK_SHIPPING_METHODS.length],
+            status: stage,
+            statusLabel: getTrackingLabel(stage),
+            estimatedDeliveryAt: addSeconds(placedAt, 60).toISOString(),
+            latestUpdate: events[events.length - 1],
+            events
+        }
+    };
 }
 
 router.use(auth.authenticateToken, requireRole('buyer'));
@@ -223,7 +341,7 @@ router.get('/orders', async (req, res) => {
         ]);
 
         res.json({
-            orders,
+            orders: orders.map(withMockTracking),
             page,
             pageSize,
             totalCount,
@@ -259,7 +377,7 @@ router.get('/orders/:id', async (req, res) => {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        res.json(order);
+        res.json(withMockTracking(order));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to load order' });
@@ -596,7 +714,7 @@ router.post('/checkout', async (req, res) => {
         });
 
         res.status(201).json({
-            order
+            order: withMockTracking(order)
         });
     } catch (error) {
         console.error(error);

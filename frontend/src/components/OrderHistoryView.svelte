@@ -22,9 +22,14 @@
                     <p class="description">
                         Ship to {order.shipToCity}, {order.shipToState} {order.shipToPostalCode}
                     </p>
+                    {#if order.tracking}
+                        <p class="description">
+                            {order.tracking.shippingMethod} - ETA {formatDate(order.tracking.estimatedDeliveryAt)}
+                        </p>
+                    {/if}
                 </div>
                 <div class="line-actions">
-                    <p class="price">{order.status}</p>
+                    <p class="price">{order.tracking?.statusLabel || order.status}</p>
                     <a class="checkout-link secondary-link" href={`/buyer/orders/${order.id}/confirmation`}>View details</a>
                 </div>
             </article>

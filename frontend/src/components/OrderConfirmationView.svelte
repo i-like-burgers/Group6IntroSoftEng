@@ -8,6 +8,34 @@
 <div class="cart-layout">
     <div class="panel">
         <div class="list-grid">
+            {#if order.tracking}
+                <article class="tracking-card">
+                    <div class="tracking-header">
+                        <div>
+                            <p class="section-kicker">Mock tracking</p>
+                            <h3>{order.tracking.statusLabel}</h3>
+                            <p class="detail-description">
+                                {order.tracking.shippingMethod} - {order.tracking.trackingNumber}
+                            </p>
+                        </div>
+                        <div class="tracking-eta">
+                            <p>Estimated delivery</p>
+                            <strong>{formatDate(order.tracking.estimatedDeliveryAt)}</strong>
+                        </div>
+                    </div>
+
+                    <div class="tracking-timeline">
+                        {#each order.tracking.events as event}
+                            <article class="tracking-event" class:active={event.status === order.tracking.status}>
+                                <p class="seller">{formatDate(event.occurredAt)}</p>
+                                <h4>{event.label}</h4>
+                                <p>{event.description}</p>
+                            </article>
+                        {/each}
+                    </div>
+                </article>
+            {/if}
+
             {#each order.items as item}
                 <article class="line-card">
                     <div>
@@ -29,7 +57,13 @@
         <p>Order number</p>
         <strong>#{order.id}</strong>
         <p>Status</p>
-        <strong>{order.status}</strong>
+        <strong>{order.tracking?.statusLabel || order.status}</strong>
+        {#if order.tracking}
+            <p>Tracking number</p>
+            <strong>{order.tracking.trackingNumber}</strong>
+            <p>Shipping method</p>
+            <strong>{order.tracking.shippingMethod}</strong>
+        {/if}
         <p>Payment method</p>
         <strong>{formatPaymentMethod(order.paymentMethod)}</strong>
         <p>Placed at</p>

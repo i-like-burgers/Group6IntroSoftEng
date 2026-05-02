@@ -619,7 +619,8 @@ textarea:focus-visible {
 .detail-card,
 .summary-panel,
 .panel,
-.line-card {
+.line-card,
+.tracking-card {
     padding: 20px;
     border-radius: 22px;
     border: 1px solid var(--border);
@@ -669,7 +670,8 @@ textarea:focus-visible {
 .detail-card,
 .summary-panel,
 .panel,
-.line-card {
+.line-card,
+.tracking-card {
     box-shadow: inset 0 1px 0 var(--surface-highlight);
 }
 
@@ -835,6 +837,54 @@ textarea:focus-visible {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+}
+
+.tracking-card {
+    display: grid;
+    gap: 18px;
+}
+
+.tracking-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tracking-header h3,
+.tracking-eta p,
+.tracking-eta strong {
+    margin: 0;
+}
+
+.tracking-eta {
+    text-align: right;
+}
+
+.tracking-timeline {
+    display: grid;
+    gap: 10px;
+}
+
+.tracking-event {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.tracking-event.active {
+    border-color: var(--accent);
+    background: var(--status-bg);
+}
+
+.tracking-event h4,
+.tracking-event p {
+    margin: 0;
+}
+
+.tracking-event h4 {
+    margin: 4px 0;
 }
 
 .checkbox-row {
@@ -1488,9 +1538,14 @@ textarea:focus-visible {
     .line-card,
     .detail-layout,
     .detail-meta,
-    .seller-payout-row {
+    .seller-payout-row,
+    .tracking-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .tracking-eta {
+        text-align: left;
     }
 
     .seller-sales-actions {
