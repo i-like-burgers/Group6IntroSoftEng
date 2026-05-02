@@ -58,6 +58,7 @@
         total: 0
     };
     let order = null;
+    let returnForms = {};
     let orderHistory = [];
     let orderHistoryPageInfo = {
         page: 1,
@@ -78,6 +79,7 @@
         hasPreviousPage: false,
         hasNextPage: false
     };
+    let sellerReturnRequests = [];
     let sellerWallet = {
         balance: 0,
         totalEarned: 0
@@ -334,8 +336,12 @@
         statusMessage = '';
 
         try {
-            const response = await fetchJson(`/api/seller/sales?page=${page}`);
+            const [response, returnRequests] = await Promise.all([
+                fetchJson(`/api/seller/sales?page=${page}`),
+                fetchJson('/api/seller/returns')
+            ]);
             sellerSales = response.sales || [];
+            sellerReturnRequests = returnRequests || [];
             sellerSalesSummary = response.summary || {
                 grossSales: 0,
                 unitsSold: 0,
@@ -351,6 +357,24 @@
             errorMessage = error.message || 'Could not load seller sales.';
         } finally {
             loading = false;
+        }
+    }
+
+    async function updateSellerReturnStatus(id, status) {
+        statusMessage = '';
+
+        try {
+            await fetchJson(`/api/seller/returns/${id}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+            statusMessage = `Return request ${status}.`;
+            await loadSellerSales(sellerSalesPageInfo.page);
+        } catch (error) {
+            statusMessage = error.message || 'Could not update return request.';
         }
     }
 
@@ -577,6 +601,16 @@
         shippingAddress = {
             ...shippingAddress,
             [field]: event.currentTarget.value
+        };
+    }
+
+    function updateReturnForm(itemId, field, event) {
+        returnForms = {
+            ...returnForms,
+            [itemId]: {
+                ...(returnForms[itemId] || {}),
+                [field]: event.currentTarget.value
+            }
         };
     }
 
@@ -955,6 +989,36 @@
         }
     }
 
+    async function submitReturnRequest(itemId) {
+        statusMessage = '';
+        const form = returnForms[itemId] || {};
+
+        try {
+            await fetchJson(`/api/buyer/orders/${order.id}/items/${itemId}/returns`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reason: form.reason,
+                    details: form.details
+                })
+            });
+
+            returnForms = {
+                ...returnForms,
+                [itemId]: {
+                    reason: '',
+                    details: ''
+                }
+            };
+            statusMessage = 'Return request submitted.';
+            await loadOrderConfirmation();
+        } catch (error) {
+            statusMessage = error.message || 'Could not submit return request.';
+        }
+    }
+
     async function logout() {
         statusMessage = '';
 
@@ -1063,9 +1127,11 @@
         {:else if currentPage === 'seller-sales'}
             <SellerSalesView
                 sales={sellerSales}
+                returnRequests={sellerReturnRequests}
                 summary={sellerSalesSummary}
                 pageInfo={sellerSalesPageInfo}
                 {goToSellerSalesPage}
+                {updateSellerReturnStatus}
                 {formatCurrency}
                 {formatDate}
                 {formatPaymentMethod}
@@ -1094,6 +1160,9 @@
         {:else if currentPage === 'confirmation' && order}
             <OrderConfirmationView
                 {order}
+                {returnForms}
+                onReturnFormInput={updateReturnForm}
+                {submitReturnRequest}
                 {formatCurrency}
                 {formatDate}
                 {formatPaymentMethod}

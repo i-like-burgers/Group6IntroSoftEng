@@ -1,8 +1,19 @@
 <script>
     export let order;
+    export let returnForms = {};
+    export let onReturnFormInput;
+    export let submitReturnRequest;
     export let formatCurrency;
     export let formatDate;
     export let formatPaymentMethod;
+
+    const returnReasons = [
+        { value: 'wrong_item', label: 'Wrong item' },
+        { value: 'damaged', label: 'Damaged' },
+        { value: 'not_as_described', label: 'Not as described' },
+        { value: 'changed_mind', label: 'Changed mind' },
+        { value: 'other', label: 'Other' }
+    ];
 </script>
 
 <div class="cart-layout">
@@ -47,6 +58,39 @@
                     </div>
                     <div class="line-actions">
                         <p class="price">{formatCurrency(item.lineTotal)}</p>
+                    </div>
+                    <div class="return-panel">
+                        {#if item.returnRequests && item.returnRequests.length > 0}
+                            <p class="status-banner compact-status">
+                                Return request status: {item.returnRequests[0].status}
+                            </p>
+                        {:else}
+                            <form class="stack-form return-form" on:submit|preventDefault={() => submitReturnRequest(item.id)}>
+                                <label for={`return-reason-${item.id}`}>Return reason</label>
+                                <select
+                                    id={`return-reason-${item.id}`}
+                                    value={returnForms[item.id]?.reason || ''}
+                                    on:change={(event) => onReturnFormInput(item.id, 'reason', event)}
+                                    required
+                                >
+                                    <option value="">Select a reason</option>
+                                    {#each returnReasons as reason}
+                                        <option value={reason.value}>{reason.label}</option>
+                                    {/each}
+                                </select>
+
+                                <label for={`return-details-${item.id}`}>Details</label>
+                                <textarea
+                                    id={`return-details-${item.id}`}
+                                    rows="3"
+                                    maxlength="500"
+                                    value={returnForms[item.id]?.details || ''}
+                                    on:input={(event) => onReturnFormInput(item.id, 'details', event)}
+                                ></textarea>
+
+                                <button class="checkout-link place-order-button" type="submit">Submit return</button>
+                            </form>
+                        {/if}
                     </div>
                 </article>
             {/each}

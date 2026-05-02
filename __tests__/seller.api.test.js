@@ -29,6 +29,11 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
             create: jest.fn(),
             aggregate: jest.fn()
         },
+        returnRequest: {
+            findMany: jest.fn(),
+            findFirst: jest.fn(),
+            update: jest.fn()
+        },
         authToken: {
             findUnique: jest.fn(),
             deleteMany: jest.fn()
@@ -58,6 +63,7 @@ function loadSellerApiApp({ role = 'seller', prismaOverrides = {} } = {}) {
             amount: null
         }
     });
+    prismaMock.returnRequest.findMany.mockResolvedValue([]);
 
     jest.doMock('../lib/prisma', () => prismaMock);
     jest.doMock('../authenticate', () => ({
@@ -244,6 +250,81 @@ describe('seller api routes', () => {
         expect(response.body).toEqual({ error: 'Access denied' });
     });
 
+    test('GET /api/seller/returns returns return requests for seller order items', async () => {
+        const returnRequests = [
+            {
+                id: 44,
+                status: 'submitted',
+                reason: 'damaged',
+                orderItem: {
+                    productName: 'Samsung 990 Pro 2TB',
+                    sellerId: 9,
+                    order: {
+                        id: 88
+                    }
+                },
+                buyer: {
+                    username: 'buyer-user'
+                }
+            }
+        ];
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.returnRequest.findMany.mockResolvedValue(returnRequests);
+
+        const response = await request(app).get('/api/seller/returns');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(returnRequests);
+        expect(prismaMock.returnRequest.findMany).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                orderItem: {
+                    sellerId: 9
+                }
+            }
+        }));
+    });
+
+    test('POST /api/seller/returns/:id/status updates a seller return request', async () => {
+        const { app, prismaMock } = loadSellerApiApp();
+        prismaMock.returnRequest.findFirst.mockResolvedValue({
+            id: 44,
+            status: 'submitted',
+            orderItem: {
+                productName: 'Samsung 990 Pro 2TB',
+                sellerId: 9
+            }
+        });
+        prismaMock.returnRequest.update.mockResolvedValue({
+            id: 44,
+            status: 'approved',
+            orderItem: {
+                productName: 'Samsung 990 Pro 2TB',
+                sellerId: 9
+            }
+        });
+        prismaMock.sellerWallet.upsert.mockResolvedValue({
+            sellerId: 9,
+            balance: 0,
+            totalEarned: 0
+        });
+
+        const response = await request(app)
+            .post('/api/seller/returns/44/status')
+            .send({ status: 'approved' });
+
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe('approved');
+        expect(prismaMock.returnRequest.update).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                id: 44
+            },
+            data: {
+                status: 'approved'
+            }
+        }));
+        expect(prismaMock.sellerWallet.upsert).toHaveBeenCalled();
+    });
+
     test('POST /api/seller/products validates required fields', async () => {
         const { app } = loadSellerApiApp();
 
@@ -405,10 +486,17 @@ describe('seller api routes', () => {
                 amount: 74.5
             }
         });
+        prismaMock.returnRequest.findMany.mockResolvedValue([
+            {
+                orderItem: {
+                    lineTotal: 25
+                }
+            }
+        ]);
         prismaMock.sellerWallet.upsert.mockResolvedValue({
             sellerId: 9,
-            balance: 125.5,
-            totalEarned: 200
+            balance: 100.5,
+            totalEarned: 175
         });
         prismaMock.sellerBankAccount.findUnique.mockResolvedValue({
             sellerId: 9,
@@ -431,8 +519,8 @@ describe('seller api routes', () => {
         expect(response.status).toBe(200);
         expect(response.body.wallet).toEqual({
             sellerId: 9,
-            balance: 125.5,
-            totalEarned: 200
+            balance: 100.5,
+            totalEarned: 175
         });
         expect(response.body.bankAccount.accountLast4).toBe('6789');
         expect(response.body.payouts).toHaveLength(1);
@@ -442,12 +530,12 @@ describe('seller api routes', () => {
             },
             create: {
                 sellerId: 9,
-                balance: 125.5,
-                totalEarned: 200
+                balance: 100.5,
+                totalEarned: 175
             },
             update: {
-                balance: 125.5,
-                totalEarned: 200
+                balance: 100.5,
+                totalEarned: 175
             }
         });
     });

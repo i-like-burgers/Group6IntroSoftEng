@@ -37,7 +37,7 @@ function getLastFourDigits(value) {
 }
 
 async function syncSellerWallet(client, sellerId) {
-    const [salesTotal, payoutTotal] = await Promise.all([
+    const [salesTotal, payoutTotal, approvedReturns] = await Promise.all([
         client.orderItem.aggregate({
             where: { sellerId },
             _sum: { lineTotal: true }
@@ -45,10 +45,29 @@ async function syncSellerWallet(client, sellerId) {
         client.sellerPayout.aggregate({
             where: { sellerId },
             _sum: { amount: true }
+        }),
+        client.returnRequest.findMany({
+            where: {
+                status: 'approved',
+                orderItem: {
+                    sellerId
+                }
+            },
+            include: {
+                orderItem: {
+                    select: {
+                        lineTotal: true
+                    }
+                }
+            }
         })
     ]);
 
-    const totalEarned = Number((salesTotal._sum.lineTotal || 0).toFixed(2));
+    const grossSales = Number((salesTotal._sum.lineTotal || 0).toFixed(2));
+    const approvedReturnTotal = Number(approvedReturns.reduce((sum, request) => {
+        return sum + (request.orderItem?.lineTotal || 0);
+    }, 0).toFixed(2));
+    const totalEarned = Math.max(Number((grossSales - approvedReturnTotal).toFixed(2)), 0);
     const totalPaidOut = Number((payoutTotal._sum.amount || 0).toFixed(2));
     const balance = Math.max(Number((totalEarned - totalPaidOut).toFixed(2)), 0);
 
@@ -389,6 +408,107 @@ router.get('/sales', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to load seller sales' });
+    }
+});
+
+router.get('/returns', async (req, res) => {
+    try {
+        const returnRequests = await prisma.returnRequest.findMany({
+            where: {
+                orderItem: {
+                    sellerId: req.user.id
+                }
+            },
+            include: {
+                orderItem: {
+                    include: {
+                        order: {
+                            select: {
+                                id: true,
+                                createdAt: true,
+                                status: true
+                            }
+                        }
+                    }
+                },
+                buyer: {
+                    select: {
+                        username: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        res.json(returnRequests);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load seller return requests' });
+    }
+});
+
+router.post('/returns/:id/status', async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const status = String(req.body.status || '').trim();
+
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid return request' });
+        }
+
+        if (!['approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ error: 'A valid return status is required' });
+        }
+
+        const existingRequest = await prisma.returnRequest.findFirst({
+            where: {
+                id,
+                orderItem: {
+                    sellerId: req.user.id
+                }
+            },
+            include: {
+                orderItem: true
+            }
+        });
+
+        if (!existingRequest) {
+            return res.status(404).json({ error: 'Return request not found' });
+        }
+
+        const returnRequest = await prisma.$transaction(async (tx) => {
+            const updatedRequest = await tx.returnRequest.update({
+                where: {
+                    id
+                },
+                data: {
+                    status
+                },
+                include: {
+                    orderItem: true
+                }
+            });
+
+            if (status === 'approved') {
+                await syncSellerWallet(tx, req.user.id);
+            }
+
+            return updatedRequest;
+        });
+
+        await logAuditAction({
+            actorId: req.user.id,
+            username: req.user.username,
+            actionType: 'return_request_reviewed',
+            details: `Marked return request #${id} for "${existingRequest.orderItem.productName}" as ${status}`
+        });
+
+        res.json(returnRequest);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update return request' });
     }
 });
 

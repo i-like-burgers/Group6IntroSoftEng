@@ -30,6 +30,12 @@ function loadBuyerApiApp({ role = 'buyer', prismaOverrides = {} } = {}) {
             findFirst: jest.fn(),
             findMany: jest.fn()
         },
+        orderItem: {
+            findFirst: jest.fn()
+        },
+        returnRequest: {
+            create: jest.fn()
+        },
         compare: {
             findUnique: jest.fn()
         },
@@ -353,7 +359,15 @@ describe('buyer api routes', () => {
                 buyerId: 7
             },
             include: {
-                items: true
+                items: {
+                    include: {
+                        returnRequests: {
+                            where: {
+                                buyerId: 7
+                            }
+                        }
+                    }
+                }
             },
             orderBy: {
                 createdAt: 'desc'
@@ -382,6 +396,84 @@ describe('buyer api routes', () => {
                 buyerId: 7
             }
         }));
+    });
+
+    test('POST /api/buyer/orders/:orderId/items/:itemId/returns submits a return request', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.orderItem.findFirst.mockResolvedValue({
+            id: 1,
+            orderId: 701,
+            productName: 'WD Black SN850X 2TB',
+            returnRequests: []
+        });
+        prismaMock.returnRequest.create.mockResolvedValue({
+            id: 33,
+            buyerId: 7,
+            orderItemId: 1,
+            reason: 'damaged',
+            details: 'Box arrived crushed.',
+            status: 'submitted'
+        });
+
+        const response = await request(app)
+            .post('/api/buyer/orders/701/items/1/returns')
+            .send({
+                reason: 'damaged',
+                details: 'Box arrived crushed.'
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toEqual({
+            id: 33,
+            buyerId: 7,
+            orderItemId: 1,
+            reason: 'damaged',
+            details: 'Box arrived crushed.',
+            status: 'submitted'
+        });
+        expect(prismaMock.orderItem.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+            where: {
+                id: 1,
+                orderId: 701,
+                order: {
+                    buyerId: 7
+                }
+            }
+        }));
+        expect(prismaMock.returnRequest.create).toHaveBeenCalledWith({
+            data: {
+                buyerId: 7,
+                orderItemId: 1,
+                reason: 'damaged',
+                details: 'Box arrived crushed.'
+            }
+        });
+    });
+
+    test('POST /api/buyer/orders/:orderId/items/:itemId/returns rejects duplicate return requests', async () => {
+        const { app, prismaMock } = loadBuyerApiApp();
+        prismaMock.orderItem.findFirst.mockResolvedValue({
+            id: 1,
+            orderId: 701,
+            productName: 'WD Black SN850X 2TB',
+            returnRequests: [
+                {
+                    id: 33,
+                    status: 'submitted'
+                }
+            ]
+        });
+
+        const response = await request(app)
+            .post('/api/buyer/orders/701/items/1/returns')
+            .send({
+                reason: 'damaged'
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'A return request already exists for this item'
+        });
     });
 
     test('GET /api/buyer/compare returns the comparison list for the current buyer', async () => {

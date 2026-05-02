@@ -1,5 +1,6 @@
 <script>
     export let sales = [];
+    export let returnRequests = [];
     export let summary = {
         grossSales: 0,
         unitsSold: 0,
@@ -7,6 +8,7 @@
     };
     export let pageInfo;
     export let goToSellerSalesPage;
+    export let updateSellerReturnStatus;
     export let formatCurrency;
     export let formatDate;
     export let formatPaymentMethod;
@@ -26,6 +28,45 @@
         <strong>{formatCurrency(summary.grossSales)}</strong>
     </aside>
 </div>
+
+<section class="seller-returns-panel">
+    <div class="admin-panel-header">
+        <div>
+            <p class="section-kicker">Return requests</p>
+            <h3>Seller review queue</h3>
+        </div>
+        <p class="admin-count">{returnRequests.length} request{returnRequests.length === 1 ? '' : 's'}</p>
+    </div>
+
+    {#if returnRequests.length === 0}
+        <div class="state-card">No return requests for your sold items.</div>
+    {:else}
+        <div class="list-grid">
+            {#each returnRequests as request}
+                <article class="line-card return-review-card">
+                    <div>
+                        <p class="seller">Order #{request.orderItem.order.id} - {request.buyer.username}</p>
+                        <h3>{request.orderItem.productName}</h3>
+                        <p class="description">
+                            Reason: {request.reason.replaceAll('_', ' ')}
+                        </p>
+                        {#if request.details}
+                            <p class="description">{request.details}</p>
+                        {/if}
+                        <p class="seller">Submitted {formatDate(request.createdAt)}</p>
+                    </div>
+                    <div class="line-actions seller-sales-actions">
+                        <p class="price">{request.status}</p>
+                        {#if request.status === 'submitted'}
+                            <button type="button" class="secondary" on:click={() => updateSellerReturnStatus(request.id, 'approved')}>Approve</button>
+                            <button type="button" class="secondary" on:click={() => updateSellerReturnStatus(request.id, 'rejected')}>Reject</button>
+                        {/if}
+                    </div>
+                </article>
+            {/each}
+        </div>
+    {/if}
+</section>
 
 {#if sales.length === 0}
     <div class="state-card">No sales have been recorded yet.</div>

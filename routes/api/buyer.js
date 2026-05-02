@@ -25,6 +25,13 @@ const MOCK_SHIPPING_METHODS = [
     'Priority',
     'Freight'
 ];
+const RETURN_REASONS = new Set([
+    'wrong_item',
+    'damaged',
+    'not_as_described',
+    'changed_mind',
+    'other'
+]);
 
 function normalizeShippingAddress(input) {
     const shippingAddress = input && typeof input === 'object' ? input : {};
@@ -329,7 +336,15 @@ router.get('/orders', async (req, res) => {
             prisma.order.findMany({
                 where,
                 include: {
-                    items: true
+                    items: {
+                        include: {
+                            returnRequests: {
+                                where: {
+                                    buyerId: req.user.id
+                                }
+                            }
+                        }
+                    }
                 },
                 orderBy: {
                     createdAt: 'desc'
@@ -369,7 +384,15 @@ router.get('/orders/:id', async (req, res) => {
                 buyerId: req.user.id
             },
             include: {
-                items: true
+                items: {
+                    include: {
+                        returnRequests: {
+                            where: {
+                                buyerId: req.user.id
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -541,6 +564,73 @@ router.post('/cart/:id/remove', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to remove item from cart' });
+    }
+});
+
+router.post('/orders/:orderId/items/:itemId/returns', async (req, res) => {
+    try {
+        const orderId = Number(req.params.orderId);
+        const itemId = Number(req.params.itemId);
+        const reason = String(req.body.reason || '').trim();
+        const details = req.body.details == null ? null : String(req.body.details).trim();
+
+        if (Number.isNaN(orderId) || Number.isNaN(itemId)) {
+            return res.status(400).json({ error: 'Invalid order item' });
+        }
+
+        if (!RETURN_REASONS.has(reason)) {
+            return res.status(400).json({ error: 'A valid return reason is required' });
+        }
+
+        if (details && details.length > 500) {
+            return res.status(400).json({ error: 'Return details must be 500 characters or fewer' });
+        }
+
+        const orderItem = await prisma.orderItem.findFirst({
+            where: {
+                id: itemId,
+                orderId,
+                order: {
+                    buyerId: req.user.id
+                }
+            },
+            include: {
+                returnRequests: {
+                    where: {
+                        buyerId: req.user.id
+                    }
+                }
+            }
+        });
+
+        if (!orderItem) {
+            return res.status(404).json({ error: 'Order item not found' });
+        }
+
+        if (orderItem.returnRequests.length > 0) {
+            return res.status(400).json({ error: 'A return request already exists for this item' });
+        }
+
+        const returnRequest = await prisma.returnRequest.create({
+            data: {
+                buyerId: req.user.id,
+                orderItemId: itemId,
+                reason,
+                details: details || null
+            }
+        });
+
+        await logAuditAction({
+            actorId: req.user.id,
+            username: req.user.username,
+            actionType: 'return_request_submitted',
+            details: `Submitted return request #${returnRequest.id} for "${orderItem.productName}"`
+        });
+
+        res.status(201).json(returnRequest);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to submit return request' });
     }
 });
 

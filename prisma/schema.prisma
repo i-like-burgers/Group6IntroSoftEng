@@ -30,6 +30,7 @@ model User {
   orders     Order[]    @relation("BuyerOrders")
   comparison Compare[]
   authTokens AuthToken[]
+  returnRequests ReturnRequest[] @relation("BuyerReturnRequests")
   sellerWebhookSubscription SellerWebhookSubscription?
   sellerWallet SellerWallet?
   sellerBankAccount SellerBankAccount?
@@ -152,6 +153,23 @@ model OrderItem {
   orderId     Int
 
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  returnRequests ReturnRequest[]
+}
+
+model ReturnRequest {
+  id          Int      @id @default(autoincrement())
+  reason      String
+  details     String?  @db.Text
+  status      String   @default("submitted")
+  createdAt   DateTime @default(now())
+
+  buyerId     Int
+  orderItemId Int
+
+  buyer       User      @relation("BuyerReturnRequests", fields: [buyerId], references: [id], onDelete: Cascade)
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@unique([buyerId, orderItemId])
 }
 
 model AuditLog {

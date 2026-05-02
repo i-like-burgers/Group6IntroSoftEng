@@ -780,6 +780,17 @@ textarea:focus-visible {
     min-height: 0;
 }
 
+.seller-returns-panel {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.return-review-card .description {
+    min-height: 0;
+    text-transform: capitalize;
+}
+
 .seller-sales-actions {
     min-width: 140px;
     flex-direction: column;
@@ -1215,6 +1226,7 @@ textarea:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 16px;
 }
 
@@ -1374,6 +1386,7 @@ textarea:focus-visible {
 }
 
 .stack-form input,
+.stack-form select,
 .stack-form textarea {
     width: 100%;
     border: 1px solid var(--border);
@@ -1381,6 +1394,22 @@ textarea:focus-visible {
     background: var(--field-bg);
     color: var(--text);
     padding: 12px 14px;
+}
+
+.return-panel {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+.return-form {
+    margin-top: 4px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.compact-status {
+    display: inline-flex;
+    margin-top: 8px;
 }
 
 .status-banner {
